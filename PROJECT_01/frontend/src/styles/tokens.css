@@ -1,0 +1,83 @@
+/* Daybook design tokens: "morning edition" (light) and "night edition" (dark). */
+
+:root {
+  --paper: #f4efe4;
+  --paper-2: #ebe3d2;
+  --card: #fbf8f1;
+  --ink: #1c1a15;
+  --ink-2: #48443b;
+  --muted: #776f61;
+  --rule: #d6ccb8;
+  --rule-strong: #1c1a15;
+  --accent: #c2411a;
+  --accent-ink: #fff8f1;
+  --accent-soft: #f5dccd;
+  --ok: #2d6b59;
+  --ok-soft: #d6e7dc;
+  --warn: #9a610a;
+  --warn-soft: #f3e3bf;
+  --danger: #b42318;
+  --danger-soft: #f8d9d4;
+  --overlay: rgba(28, 26, 21, 0.38);
+  --grain-opacity: 0.07;
+
+  --serif: 'Fraunces Variable', 'Iowan Old Style', Georgia, serif;
+  --sans: 'Instrument Sans Variable', 'Segoe UI', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', monospace;
+
+  --radius: 3px;
+  --radius-lg: 6px;
+  --shadow: 0 1px 0 rgba(28, 26, 21, 0.05), 0 12px 32px -16px rgba(28, 26, 21, 0.28);
+  --ease: cubic-bezier(0.2, 0.7, 0.1, 1);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --paper: #12110e;
+    --paper-2: #1a1814;
+    --card: #1c1a16;
+    --ink: #ede6d6;
+    --ink-2: #c8c0ad;
+    --muted: #918876;
+    --rule: #36322b;
+    --rule-strong: #ede6d6;
+    --accent: #ff7a4d;
+    --accent-ink: #1d0e06;
+    --accent-soft: #3b2219;
+    --ok: #7cc4a8;
+    --ok-soft: #1c2f28;
+    --warn: #e5b65c;
+    --warn-soft: #362a12;
+    --danger: #ff8b7b;
+    --danger-soft: #3b1d19;
+    --overlay: rgba(0, 0, 0, 0.55);
+    --grain-opacity: 0.05;
+    --shadow: 0 1px 0 rgba(0, 0, 0, 0.4), 0 16px 40px -18px rgba(0, 0, 0, 0.8);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --paper: #12110e;
+  --paper-2: #1a1814;
+  --card: #1c1a16;
+  --ink: #ede6d6;
+  --ink-2: #c8c0ad;
+  --muted: #918876;
+  --rule: #36322b;
+  --rule-strong: #ede6d6;
+  --accent: #ff7a4d;
+  --accent-ink: #1d0e06;
+  --accent-soft: #3b2219;
+  --ok: #7cc4a8;
+  --ok-soft: #1c2f28;
+  --warn: #e5b65c;
+  --warn-soft: #362a12;
+  --danger: #ff8b7b;
+  --danger-soft: #3b1d19;
+  --overlay: rgba(0, 0, 0, 0.55);
+  --grain-opacity: 0.05;
+  --shadow: 0 1px 0 rgba(0, 0, 0, 0.4), 0 16px 40px -18px rgba(0, 0, 0, 0.8);
+  color-scheme: dark;
+}
