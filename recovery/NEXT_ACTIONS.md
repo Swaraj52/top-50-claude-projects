@@ -11,9 +11,6 @@ _Last updated: 2026-11-07_
    gh auth login
    gh auth status
    ```
-3. **Commit identity** (B-002). The account is confirmed as `Swaraj52`. Waiting for an OK to set
-   the repo-local identity `Swaraj52 <195276089+Swaraj52@users.noreply.github.com>` and
-   re-author the unpushed commits.
 
 ## Once GitHub access is verified
 

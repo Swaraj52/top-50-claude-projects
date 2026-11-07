@@ -13,20 +13,15 @@ _Last updated: 2026-11-07_
   sign-in). Credentials are never shared in chat.
 - **Workaround:** all work is committed locally. Pushing is a one-step catch-up once auth works.
 
-### B-002: commit identity for the public repo (account confirmed)
-
-- **Account: confirmed `Swaraj52`** by the owner on 2026-11-07. The repo will be
-  `Swaraj52/top-50-claude-projects`. It does not exist publicly. A private repo with that name
-  would also return 404, so `gh` must confirm after sign-in.
-- **Still open:** the global Git identity on this machine is `Swarajya1630`, with a personal
-  Gmail address. Commits made with it would show that email publicly and would not link to
-  `Swaraj52`.
-- **Proposed fix (awaiting the owner's OK):** a repo-local identity
-  `Swaraj52 <195276089+Swaraj52@users.noreply.github.com>` (GitHub's private noreply address
-  for that account). Then re-author the unpushed setup commits before the first push.
-- **Also check at push time:** Git Credential Manager may hold credentials for the other account.
-  Run `gh auth setup-git` after `gh auth login` so pushes go out as `Swaraj52`.
-
 ## Resolved
 
-_None yet._
+### B-002: GitHub account and commit identity (resolved 2026-11-07)
+
+- **Account:** the owner confirmed `Swaraj52`, so the repo is `Swaraj52/top-50-claude-projects`.
+  It does not exist publicly. A private repo with that name would also return 404, so `gh` must
+  confirm after sign-in.
+- **Commit identity:** the owner chose to **keep the machine's global Git identity**
+  (`Swarajya1630`). No repo-local identity is set and no commits are re-authored. Do not
+  propose this change again unless the owner asks.
+- **Still check at push time:** Git Credential Manager may hold credentials for a different
+  account. Run `gh auth setup-git` after `gh auth login` so pushes authenticate as `Swaraj52`.

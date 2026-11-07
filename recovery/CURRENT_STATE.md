@@ -19,7 +19,8 @@ allowed until then.
 | Git branch | `main` |
 | Latest verified commit | `cc83b6d` (setup). Later commits only touch recovery notes. Check `git log -1` |
 | GitHub target | `Swaraj52/top-50-claude-projects` (public). The owner confirmed the account on 2026-11-07 |
-| GitHub remote | Not configured yet. Blocked by B-001 (`gh` not installed or signed in) and B-002 (commit identity) |
+| GitHub remote | Not configured yet. Blocked only by B-001 (`gh` not installed or signed in) |
+| Commit identity | The machine's global Git identity, kept by the owner's choice (B-002 resolved) |
 
 ## Current project details
 
