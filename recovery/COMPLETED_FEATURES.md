@@ -12,6 +12,7 @@ Only items that were actually checked are listed here.
 | Root docs (README, handbook, index, tracker, architecture, contributing, log) | Written and generated. README project tables rendered from data |
 | Recovery system (`recovery/*.md`, `CLAUDE.md`) | Files present, and authorization recorded as NONE |
 | Git repository on `main` with the setup commit | `git log` (see `SESSION_HISTORY.md` for the hash) |
+| Public GitHub repo `Swaraj52/top-50-claude-projects` | `gh api`: visibility public, owner Swaraj52. Remote `main` = local `167b575`. 68/68 files and 50/50 project folders on GitHub. Repo page returns 200 |
 
 ## Projects
 

@@ -24,7 +24,8 @@ of each section.
 ### Environment verified
 
 - Python 3.13.7, Node.js 24.11.0, npm 11.6.1, Git 2.51.2 (Windows 11).
-- GitHub CLI (`gh`) is **not installed**. See `recovery/BLOCKERS.md`.
+- GitHub CLI 2.103.3 installed by the owner and signed in as Swaraj52. `gh auth setup-git`
+  configured. Public repo `Swaraj52/top-50-claude-projects` created and `main` pushed.
 
 ### Dependency changes
 

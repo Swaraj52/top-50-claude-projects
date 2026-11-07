@@ -11,16 +11,16 @@ allowed until then.
 
 | Item | Value |
 |---|---|
-| Phase | Setup complete. Awaiting first project command |
+| Phase | Setup complete and published. Awaiting first project command |
 | Current project | None |
 | Projects completed | 0 / 50 |
 | Projects published to GitHub | 0 / 50 |
 | Workspace | `C:\Users\Swayam Naik\TOP-50-CLAUDE-PROJECTS` |
-| Git branch | `main` |
-| Latest verified commit | `cc83b6d` (setup). Later commits only touch recovery notes. Check `git log -1` |
-| GitHub target | `Swaraj52/top-50-claude-projects` (public). The owner confirmed the account on 2026-11-07 |
-| GitHub remote | Not configured yet. Blocked only by B-001 (`gh` not installed or signed in) |
-| Commit identity | The machine's global Git identity, kept by the owner's choice (B-002 resolved) |
+| Git branch | `main`, tracking `origin/main` |
+| GitHub repo | https://github.com/Swaraj52/top-50-claude-projects (public, owner Swaraj52) |
+| GitHub auth | `gh` signed in as Swaraj52; git uses gh as its credential helper |
+| Commit identity | The machine's global Git identity, kept by the owner's choice (B-002) |
+| Latest verified commit | `167b575` pushed and confirmed on GitHub (68 files, 50 project folders). Later commits only touch recovery notes. Check `git log -1` |
 
 ## Current project details
 

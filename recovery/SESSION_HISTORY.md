@@ -8,6 +8,9 @@
   `CLAUDE.md`. Initialized Git on `main` and committed the setup. Checked the toolchain and
   GitHub (CLI missing).
 - **Setup commit:** `cc83b6d` chore(repo): set up Top 50 Claude Projects workspace.
-- **Remaining:** GitHub repo creation and push (blocked: B-001, B-002). Every project is pending.
+- **GitHub:** the owner confirmed account Swaraj52, kept the global Git identity, installed `gh`
+  and approved the device login. Created the public `Swaraj52/top-50-claude-projects`, pushed
+  `main` and checked that the remote matches local.
+- **Remaining:** every project is pending, waiting for `Start Project 1`.
 - **Recovery instructions:** read `CURRENT_STATE.md`. Authorized project is NONE, so wait for
   `Start Project N`.
