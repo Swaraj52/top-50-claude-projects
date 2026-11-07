@@ -22,7 +22,8 @@
 - **Verified:** 74 backend and 30 frontend tests; manual browser run of all core flows; a real
   public ICS feed. Four UI bugs were found in the browser run, fixed and covered by tests.
 - **Commits:** `76642d6` docs, `1c88e61` backend, `6dbb078` frontend, `8a2f79c` E2E fixes,
-  then the release commit + tag `project-01-v1.0`.
+  `2355900` release + tag `project-01-v1.0`. Pushed and verified on GitHub (remote = local,
+  tag present, 93/93 files).
 - **Not verified live:** the Claude briefing (no key) and IMAP (no mailbox credentials).
 - **Recovery instructions:** authorized project is NONE. Wait for `Start Project 2`.
 - **Recovery instructions:** read `CURRENT_STATE.md`. Authorized project is NONE, so wait for

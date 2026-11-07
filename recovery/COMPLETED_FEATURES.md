@@ -33,5 +33,6 @@ Only items that were actually checked are listed here.
 
 - **Tests:** backend 74 passed (`pytest`), frontend 30 passed (`npm test`), `tsc` clean, `vite build` OK.
 - **Docs:** README (15 sections), PRD, ARCHITECTURE, `.env.example`, 9 screenshots.
-- **Release:** commit `release(project-01): …`, tag `project-01-v1.0`.
-- **GitHub:** see the publication entry in `SESSION_HISTORY.md`.
+- **Release:** commit `2355900` `release(project-01): Personal Dashboard (Daybook) v1.0`, tag `project-01-v1.0`.
+- **GitHub:** pushed 2026-11-07. Verified with `gh api`: remote `main` = `2355900`, tag
+  `refs/tags/project-01-v1.0` present, 93/93 `PROJECT_01/` files on GitHub, and the project page returns 200.
