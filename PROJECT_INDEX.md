@@ -18,11 +18,12 @@ Generated from `projects.json`; descriptions and features come from the source P
 ### 01. Personal Dashboard
 
 - **Folder:** [`PROJECT_01/`](PROJECT_01/)
-- **Status:** In Development
+- **Status:** Completed
 - **What it does:** Brings calendar, tasks, reminders, emails and daily priorities together in one clean dashboard.
 - **Core features:** Daily briefing, Schedule view, Task tracker, Quick actions
 - **Tech stack:** FastAPI · SQLite · React + TypeScript · Claude API
 - **Reserved local ports:** backend `8001`, frontend `5101`
+- **Notes:** Daybook v1.0: 74 backend + 30 frontend tests; verified end-to-end in a browser incl. a real ICS feed. Claude briefing and IMAP not verified live (no key/credentials).
 
 > Original brief: Calendar, tasks, reminders, emails aur daily priorities ko ek clean dashboard mein laata hai.
 

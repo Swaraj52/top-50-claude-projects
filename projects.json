@@ -220,9 +220,9 @@
      "features": ["Team wiki", "Decision records", "Meeting summaries"]}
   ],
   "progress": {
-    "1": {"status": "In Development", "planning": "Done", "frontend": "", "backend": "In progress",
-          "database": "In progress", "testing": "", "docs": "", "github": "",
+    "1": {"status": "Completed", "planning": "Done", "frontend": "Done", "backend": "Done",
+          "database": "Done", "testing": "Done", "docs": "Done", "github": "In progress",
           "stack": "FastAPI · SQLite · React + TypeScript · Claude API",
-          "notes": ""}
+          "notes": "Daybook v1.0: 74 backend + 30 frontend tests; verified end-to-end in a browser incl. a real ICS feed. Claude briefing and IMAP not verified live (no key/credentials)."}
   }
 }

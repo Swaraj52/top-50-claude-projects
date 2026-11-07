@@ -3,6 +3,48 @@
 Architectural decisions, dependency changes, bugs and their fixes. Newest entries go at the top
 of each section.
 
+## 2026-11-07: Project 01, Personal Dashboard ("Daybook")
+
+### Decisions
+
+- **Integrations without OAuth:** calendars via ICS feeds/files and email via read-only IMAP.
+  These work with every provider and need no app registration. OAuth is listed as a future step.
+- **Cookie sessions + CSRF header** instead of JWTs in localStorage. Only the token's SHA-256 is stored.
+- **Briefing:** `claude-opus-5-5` (skill default) with structured JSON output, effort `low`,
+  server-side refusal fallback, and Pydantic validation. The labelled rule engine is used without
+  a key or on any failure. Tests use a fake client, so no credits are spent.
+- **Timezones:** UTC in the database; "today" is computed in the profile timezone on both server
+  and client (quick add parses dates in the profile zone, not the browser's).
+- **Fonts self-hosted** via @fontsource (no Google Fonts request at runtime).
+
+### Dependencies (PROJECT_01 only)
+
+- Backend: fastapi 0.162.2, uvicorn 0.54.0, SQLAlchemy 2.1.8, alembic 1.20.1, pydantic 2.14.3,
+  pydantic-settings 2.16.2, email-validator 2.3.0, python-multipart 0.0.33, httpx 0.28.1,
+  icalendar 7.3.0, recurring-ical-events 3.8.2, cryptography 50.0.2, anthropic 2.6.0, tzdata
+  2026.6; dev: pytest 9.2.0.
+- Frontend: react/react-dom 19.3, react-router-dom 7.18, @tanstack/react-query 5.107,
+  chrono-node 2.10, @fontsource fonts; dev: vite 8.3, @vitejs/plugin-react 6.2, typescript 7.0,
+  vitest 5.1, jsdom 29, @testing-library/*.
+
+### Bugs found and fixed
+
+- **AI answers missing fields were accepted** (the length-trimming step filled in defaults).
+  Required fields are now enforced before trimming (pytest).
+- **Sign-in/out did not switch views:** `queryClient.clear()` orphaned the App's `me` observer.
+  Now only non-session queries are removed. Regression tests were confirmed to fail on the old code.
+- **Reminder toasts persisted** after the reminder was handled elsewhere. The watcher now drops them (Vitest).
+- **Week view columns misaligned** because only the body scrolled. Header and body now share one
+  scroll container. Short events render compactly.
+- `daysBetween` used 1-based months as `Date.UTC` month indexes (wrong across month ends). Fixed
+  before release and covered by tests.
+
+### Tooling notes
+
+- The Playwright MCP server may only write under
+  `C:\Users\Swayam Naik\OneDrive\Documents\Sentivision` (its configured root). Screenshots are
+  saved to `.playwright-mcp/shots/` there, moved into the project, and that folder is then deleted.
+
 ## 2026-11-07: Programme setup
 
 ### Decisions

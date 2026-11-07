@@ -12,5 +12,18 @@
   and approved the device login. Created the public `Swaraj52/top-50-claude-projects`, pushed
   `main` and checked that the remote matches local.
 - **Remaining:** every project is pending, waiting for `Start Project 1`.
+
+## Session 1 (continued): 2026-11-07, Project 01
+
+- **Authorized by:** the owner's command `Start Project 1`.
+- **Built:** Daybook. FastAPI/SQLite backend (auth, tasks, reminders, events, ICS calendars,
+  IMAP email, priorities, dashboard, Claude/rule briefing) and a React frontend (Today, Tasks,
+  Calendar, Inbox, Settings, Ctrl+K quick add, reminder notifications, light/dark, mobile).
+- **Verified:** 74 backend and 30 frontend tests; manual browser run of all core flows; a real
+  public ICS feed. Four UI bugs were found in the browser run, fixed and covered by tests.
+- **Commits:** `76642d6` docs, `1c88e61` backend, `6dbb078` frontend, `8a2f79c` E2E fixes,
+  then the release commit + tag `project-01-v1.0`.
+- **Not verified live:** the Claude briefing (no key) and IMAP (no mailbox credentials).
+- **Recovery instructions:** authorized project is NONE. Wait for `Start Project 2`.
 - **Recovery instructions:** read `CURRENT_STATE.md`. Authorized project is NONE, so wait for
   `Start Project N`.
