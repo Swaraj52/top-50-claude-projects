@@ -17,7 +17,7 @@ allowed until then.
 | Projects published to GitHub | 0 / 50 |
 | Workspace | `C:\Users\Swayam Naik\TOP-50-CLAUDE-PROJECTS` |
 | Git branch | `main` |
-| Latest commit | See `git log -1`. The setup commit is recorded in `SESSION_HISTORY.md` |
+| Latest verified commit | `cc83b6d` (setup). Later commits only touch recovery notes. Check `git log -1` |
 | GitHub remote | Not configured yet. Blocked, see `BLOCKERS.md` (B-001, B-002) |
 
 ## Current project details
