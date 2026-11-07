@@ -1,0 +1,30 @@
+# Working rules for this repository
+
+## Execution control (highest priority)
+
+- **Never start a project without the owner's explicit command**, in the form `Start Project N`.
+- Build only the authorized project. Changes to an existing project need an explicit request that names it.
+- When the authorized project is complete, verified and published, **stop and report**. Do not start the next one.
+- Questions, discussion and progress updates are not authorization.
+- After a context reset or a new session, recover state (below), report it, and **wait**. Resume
+  the current project only when the owner says to continue.
+
+The current authorization lives in `recovery/CURRENT_STATE.md` → **Authorized project**.
+
+## On session start
+
+1. Read `recovery/CURRENT_STATE.md`, `recovery/NEXT_ACTIONS.md` and `recovery/BLOCKERS.md`.
+2. Run `git status` and `git log --oneline -10`, and inspect the current project's actual code.
+3. Do not trust earlier claims. Re-run tests before calling anything verified.
+
+## While working
+
+- Follow `MASTER_README.md` (lifecycle and definition of done) and `ARCHITECTURE_OVERVIEW.md`
+  (layout, ports, environments, AI and security policy).
+- Keep changes inside `PROJECT_NN/`, except for tracker and recovery updates.
+- Progress goes in `projects.json` → `progress`. Then run
+  `python shared-resources/scripts/render_docs.py`, and never hand-edit generated files.
+- Commit at milestones with Conventional Commits scoped `project-NN`. Never commit secrets or
+  databases, and never force-push.
+- Never spend API credits or deploy publicly without the owner's explicit permission.
+- Update the `recovery/` files before ending a session or finishing a project.
