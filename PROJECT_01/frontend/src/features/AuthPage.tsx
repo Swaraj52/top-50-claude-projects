@@ -41,13 +41,18 @@ export function AuthPage() {
         </h1>
         <ul className="auth-points">
           <li>
-            <b>i.</b> A morning briefing of meetings, deadlines and mail, written by Claude or by rules if you'd rather not use AI.
+            <b>i.</b>
+            <span>A morning briefing of meetings, deadlines and mail, written by Claude or by rules if you'd rather not use AI.</span>
           </li>
           <li>
-            <b>ii.</b> Three priorities a day. Quick add anything with <span className="kbd">Ctrl K</span>.
+            <b>ii.</b>
+            <span>
+              Three priorities a day. Quick add anything with <span className="kbd">Ctrl K</span>.
+            </span>
           </li>
           <li>
-            <b>iii.</b> Your Google, Outlook or Apple calendar via ICS, and any IMAP inbox, read-only.
+            <b>iii.</b>
+            <span>Your Google, Outlook or Apple calendar via ICS, and any IMAP inbox, read-only.</span>
           </li>
         </ul>
       </div>

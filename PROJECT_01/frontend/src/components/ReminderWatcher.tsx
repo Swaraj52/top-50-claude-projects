@@ -6,11 +6,20 @@ import { useFeedback } from './feedback';
 export function ReminderWatcher() {
   const { data } = useDueReminders(true);
   const { snooze, dismiss } = useReminderMutations();
-  const { toast } = useFeedback();
+  const { toast, dismissToast } = useFeedback();
   const alerted = useRef(new Set<string>());
 
   useEffect(() => {
-    for (const r of data ?? []) {
+    if (!data) return;
+    // A reminder handled elsewhere (dashboard, snoozed in another tab) loses its toast.
+    const dueKeys = new Set(data.map((r) => `${r.id}@${r.remind_at}`));
+    for (const key of alerted.current) {
+      if (!dueKeys.has(key)) {
+        alerted.current.delete(key);
+        dismissToast(`reminder-${key.split('@')[0]}`);
+      }
+    }
+    for (const r of data) {
       const key = `${r.id}@${r.remind_at}`;
       if (alerted.current.has(key)) continue;
       alerted.current.add(key);
@@ -34,7 +43,7 @@ export function ReminderWatcher() {
         }
       }
     }
-  }, [data, toast, snooze, dismiss]);
+  }, [data, toast, dismissToast, snooze, dismiss]);
 
   return null;
 }

@@ -85,7 +85,7 @@ def sync(
     except (imap.ImapError, ValueError) as exc:
         account.last_error = str(exc)[:500]
         db.commit()
-        raise HTTPException(status.HTTP_502_BAD_GATEWAY, f"Email sync failed: {exc}") from exc
+        raise HTTPException(status.HTTP_502_BAD_GATEWAY, str(exc)) from exc
 
     existing = {e.uid: e for e in db.scalars(select(Email).where(Email.account_id == account.id))}
     seen = set()

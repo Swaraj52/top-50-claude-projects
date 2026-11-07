@@ -105,7 +105,7 @@ def sync(
     except (ics.IcsError, ValueError) as exc:
         source.last_error = str(exc)[:500]
         db.commit()
-        raise HTTPException(status.HTTP_502_BAD_GATEWAY, f"Sync failed: {exc}") from exc
+        raise HTTPException(status.HTTP_502_BAD_GATEWAY, str(exc)) from exc
     ics.replace_source_events(db, source, parsed)
     db.commit()
     return source

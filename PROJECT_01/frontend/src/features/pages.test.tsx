@@ -50,6 +50,9 @@ describe('signed-out app', () => {
     const calls = mockApi({
       'GET /auth/me': () => new Response(JSON.stringify({ detail: 'Not signed in' }), { status: 401 }),
       'POST /auth/register': (c) => ({ ...ME, name: (c.body as { name: string }).name }),
+      'GET /dashboard/today': () => dashboard(),
+      'GET /meta': () => ({ version: '1.0.0', ai_enabled: false, ai_model: null }),
+      'GET /reminders/due': () => [],
     });
     renderApp(<App />);
     const user = userEvent.setup();
@@ -64,6 +67,35 @@ describe('signed-out app', () => {
     await user.type(screen.getByLabelText('Password'), '-but-longer');
     await user.click(screen.getByRole('button', { name: 'Create account' }));
     await waitFor(() => expect(calls.find((c) => c.path === '/auth/register')?.body).toMatchObject({ email: 'ana@example.com', name: 'Ana' }));
+    // The app must actually switch to the signed-in view.
+    expect(await screen.findByText('No briefing yet today')).toBeInTheDocument();
+  });
+
+  it('signs in, then signs out back to the login form', async () => {
+    let signedIn = false;
+    mockApi({
+      'GET /auth/me': () => (signedIn ? ME : new Response(JSON.stringify({ detail: 'Not signed in' }), { status: 401 })),
+      'POST /auth/login': () => {
+        signedIn = true;
+        return ME;
+      },
+      'POST /auth/logout': () => {
+        signedIn = false;
+        return undefined;
+      },
+      'GET /dashboard/today': () => dashboard(),
+      'GET /meta': () => ({ version: '1.0.0', ai_enabled: false, ai_model: null }),
+      'GET /reminders/due': () => [],
+    });
+    renderApp(<App />);
+    const user = userEvent.setup();
+    await user.type(await screen.findByLabelText('Email'), 'ana@example.com');
+    await user.type(screen.getByLabelText('Password'), 'correct horse 1');
+    await user.click(screen.getByRole('button', { name: 'Sign in' }));
+    expect(await screen.findByText('Send proposal')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Sign out' }));
+    expect(await screen.findByRole('heading', { name: 'Sign in' })).toBeInTheDocument();
   });
 });
 

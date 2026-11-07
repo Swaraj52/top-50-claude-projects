@@ -260,6 +260,7 @@ textarea {
   border-radius: 3px;
   padding: 0 4px;
   opacity: 0.75;
+  white-space: nowrap;
 }
 
 .field {
@@ -1065,6 +1066,20 @@ textarea {
 
 .week-event.allday {
   position: static;
+}
+
+.week-event.compact {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.week-event.compact .t {
+  display: inline;
 }
 
 .week-event .t {

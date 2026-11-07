@@ -65,10 +65,13 @@ export function useMeta() {
 
 export function useAuth() {
   const qc = useQueryClient();
-  const onSignedIn = (user: User) => {
-    qc.clear();
+  // Keep the "me" query (the App is subscribed to it) and drop everything that belonged
+  // to the previous session. clear() would orphan the App's observer.
+  const switchUser = (user: User | null) => {
     qc.setQueryData(keys.me, user);
+    qc.removeQueries({ predicate: (q) => q.queryKey[0] !== 'me' });
   };
+  const onSignedIn = (user: User) => switchUser(user);
   return {
     login: useMutation({
       mutationFn: (body: { email: string; password: string }) =>
@@ -82,10 +85,7 @@ export function useAuth() {
     }),
     logout: useMutation({
       mutationFn: () => api<void>('/auth/logout', { method: 'POST' }),
-      onSuccess: () => {
-        qc.clear();
-        qc.setQueryData(keys.me, null);
-      },
+      onSuccess: () => switchUser(null),
     }),
   };
 }
@@ -152,6 +152,7 @@ export function useDueReminders(enabled: boolean) {
 
 export function useReminderMutations() {
   const invalidate = useInvalidate();
+  // 'reminders' also covers the ['reminders', 'due'] poll, so toasts update at once.
   const done = () => invalidate('reminders');
   return {
     create: useMutation({

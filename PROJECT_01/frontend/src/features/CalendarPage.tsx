@@ -44,7 +44,7 @@ export function CalendarPage() {
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
-    if (scroller.current) scroller.current.scrollTop = 7 * HOUR_PX;
+    if (scroller.current) scroller.current.scrollTop = 7 * HOUR_PX - 16;
   }, []);
   useEffect(() => {
     const t = window.setInterval(() => setNow(Date.now()), 60_000);
@@ -104,7 +104,7 @@ export function CalendarPage() {
       </p>
       {error && <ErrorNotice error={error} retry={() => refetch()} />}
 
-      <div className="week" aria-label={`Week ${label}`}>
+      <div className="week" aria-label={`Week ${label}`} ref={scroller} style={{ maxHeight: '70vh', overflow: 'auto' }}>
         <div className="week-grid" style={{ position: 'sticky', top: 0, zIndex: 3, background: 'var(--card)' }}>
           <div className="week-dayhead" style={{ borderLeft: 0 }} />
           {days.map((day) => (
@@ -126,7 +126,7 @@ export function CalendarPage() {
             </div>
           ))}
         </div>
-        <div ref={scroller} style={{ maxHeight: '64vh', overflowY: 'auto' }}>
+        <div>
           <div className="week-grid" style={{ height: 24 * HOUR_PX }}>
             <div className="week-hours">
               {Array.from({ length: 23 }, (_, i) => (
@@ -146,7 +146,7 @@ export function CalendarPage() {
                 {byDay.get(day)!.timed.map(({ event: e, top, height, lane, lanes }) => (
                   <button
                     key={e.id}
-                    className="week-event"
+                    className={`week-event ${height < 38 ? 'compact' : ''}`}
                     style={{
                       top,
                       height,
