@@ -9,8 +9,8 @@ of each section.
 
 - **Workspace location:** `C:\Users\Swayam Naik\TOP-50-CLAUDE-PROJECTS`, outside OneDrive so
   that `node_modules/` and virtualenvs are not synced, and outside any other Git repository.
-- **Single repository:** all 50 projects in one repo, `top-50-claude-projects`, to be public,
-  with each project isolated in `PROJECT_NN/`.
+- **Single repository:** all 50 projects in one repo, `Swaraj52/top-50-claude-projects`
+  (account confirmed by the owner), to be public, with each project isolated in `PROJECT_NN/`.
 - **User-controlled execution:** no project starts without the explicit command
   `Start Project N`. Work stops after each project. Recorded in `MASTER_README.md`,
   `CLAUDE.md` and `recovery/CURRENT_STATE.md`.

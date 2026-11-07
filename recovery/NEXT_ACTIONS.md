@@ -11,14 +11,15 @@ _Last updated: 2026-11-07_
    gh auth login
    gh auth status
    ```
-3. **Account and commit email** (B-002). Confirm which account owns the repo (`Swaraj52`
-   expected) and which email public commits should use.
+3. **Commit identity** (B-002). The account is confirmed as `Swaraj52`. Waiting for an OK to set
+   the repo-local identity `Swaraj52 <195276089+Swaraj52@users.noreply.github.com>` and
+   re-author the unpushed commits.
 
 ## Once GitHub access is verified
 
-1. `gh auth status`: confirm the signed-in login matches the confirmed account.
-2. Check that `<account>/top-50-claude-projects` does not already exist (never overwrite it).
-3. `gh repo create <account>/top-50-claude-projects --public --source . --remote origin --description "50 independently runnable applications built from the Top 50 Claude Project Ideas list"`
+1. `gh auth status`: the signed-in login must be `Swaraj52`. Then run `gh auth setup-git`.
+2. `gh repo view Swaraj52/top-50-claude-projects` must fail with "not found". Never overwrite an existing repo.
+3. `gh repo create Swaraj52/top-50-claude-projects --public --source . --remote origin --description "50 independently runnable applications built from the Top 50 Claude Project Ideas list"`
 4. Scan for secrets, then `git push -u origin main`.
 5. Check the files on GitHub, then update `COMPLETED_FEATURES.md`, `BLOCKERS.md` and `CURRENT_STATE.md`.
 
