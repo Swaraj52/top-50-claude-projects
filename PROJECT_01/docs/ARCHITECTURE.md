@@ -39,7 +39,7 @@ also serves the built SPA from `frontend/dist`, so the whole app is one process 
 users(id, email UNIQUE, name, password_hash, timezone, created_at)
 sessions(id, user_id→users, token_hash UNIQUE, created_at, expires_at)
 tasks(id, user_id, title, notes, priority[low|medium|high], status[todo|done],
-      due_date DATE?, completed_at?, source_email_id?, created_at, updated_at)
+      due_date DATE?, completed_at?, created_at, updated_at)
 reminders(id, user_id, text, remind_at UTC, status[pending|dismissed], task_id?, created_at)
 calendar_sources(id, user_id, name, kind[url|file], url_encrypted?, color,
                  last_synced_at?, last_error?, event_count, created_at)
@@ -48,10 +48,11 @@ events(id, user_id, source_id?→calendar_sources (NULL = local event), uid, tit
 email_accounts(id, user_id UNIQUE, host, port, username, password_encrypted, mailbox,
                last_synced_at?, last_error?, created_at)
 emails(id, user_id, account_id→email_accounts, uid, message_id, from_name, from_addr,
-       subject, received_at UTC, is_unread, is_flagged, UNIQUE(account_id, uid))
+       subject, received_at UTC, is_unread, is_flagged, task_id?→tasks,
+       UNIQUE(account_id, uid))
 daily_priorities(id, user_id, day DATE, position 1..3, text, task_id?, done,
                  UNIQUE(user_id, day, position))
-briefings(id, user_id, day DATE, source[ai|rule], model?, content JSON, created_at)
+briefings(id, user_id, day DATE, source[ai|rule], model?, note?, content JSON, created_at)
 ```
 
 All timestamps are stored in UTC. "Today", "overdue" and the agenda are computed in the user's
