@@ -48,7 +48,7 @@ top-50-claude-projects/
 
 | # | Project | What it does | Stack | Status |
 |---|---|---|---|---|
-| 01 | [Personal Dashboard](PROJECT_01/) | Brings calendar, tasks, reminders, emails and daily priorities together in one clean dashboard. | — | Pending |
+| 01 | [Personal Dashboard](PROJECT_01/) | Brings calendar, tasks, reminders, emails and daily priorities together in one clean dashboard. | FastAPI · SQLite · React + TypeScript · Claude API | In Development |
 | 02 | [Second Brain / Life Library](PROJECT_02/) | Saves articles, newsletters, YouTube videos and web pages so you can ask questions about them later. | — | Pending |
 | 03 | [Daily Review Agent](PROJECT_03/) | At the end of the day, builds a review of completed work, pending tasks and tomorrow's priorities. | — | Pending |
 | 04 | [Personal Goal Tracker](PROJECT_04/) | Breaks long-term goals down into milestones and weekly actions. | — | Pending |

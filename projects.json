@@ -219,5 +219,10 @@
      "what_original": "Team documents, decisions aur recurring updates ko central searchable space mein rakhta hai.",
      "features": ["Team wiki", "Decision records", "Meeting summaries"]}
   ],
-  "progress": {}
+  "progress": {
+    "1": {"status": "In Development", "planning": "Done", "frontend": "", "backend": "In progress",
+          "database": "In progress", "testing": "", "docs": "", "github": "",
+          "stack": "FastAPI · SQLite · React + TypeScript · Claude API",
+          "notes": ""}
+  }
 }

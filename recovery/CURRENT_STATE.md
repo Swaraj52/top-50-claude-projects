@@ -1,32 +1,33 @@
 # Current State
 
-_Last updated: 2026-11-07 (setup session)_
+_Last updated: 2026-11-07_
 
 ## Authorized project
 
-**NONE.** Waiting for the owner's explicit command (`Start Project 1`). No project work is
-allowed until then.
+**Project 01 — Personal Dashboard.** Authorized by the owner's command `Start Project 1`
+(2026-11-07). Work only on `PROJECT_01/`. When it is complete, verified and published: stop
+and wait for the next command.
 
 ## Programme status
 
 | Item | Value |
 |---|---|
-| Phase | Setup complete and published. Awaiting first project command |
-| Current project | None |
+| Phase | Project 01 in development |
+| Current project | 01 — Personal Dashboard (`PROJECT_01/`) |
 | Projects completed | 0 / 50 |
-| Projects published to GitHub | 0 / 50 |
+| Projects published to GitHub | 0 / 50 (setup only) |
 | Workspace | `C:\Users\Swayam Naik\TOP-50-CLAUDE-PROJECTS` |
 | Git branch | `main`, tracking `origin/main` |
 | GitHub repo | https://github.com/Swaraj52/top-50-claude-projects (public, owner Swaraj52) |
 | GitHub auth | `gh` signed in as Swaraj52; git uses gh as its credential helper |
 | Commit identity | The machine's global Git identity, kept by the owner's choice (B-002) |
-| Latest verified commit | `167b575` pushed and confirmed on GitHub (68 files, 50 project folders). Later commits only touch recovery notes. Check `git log -1` |
+| Latest verified commit | `2bd256c` (setup, pushed) |
 
 ## Current project details
 
-_None in progress._ When a project starts, record its number, name, phase, completed
-features, in-progress features, remaining tasks, known errors and latest good commit here.
-
-## Known errors
-
-None.
+- **Phase:** A. Planning (PRD + architecture)
+- **Completed features:** none yet
+- **In progress:** PRD and architecture docs
+- **Remaining:** backend, integrations, tests, frontend, end-to-end verification, screenshots,
+  README, release + push
+- **Known errors:** none
