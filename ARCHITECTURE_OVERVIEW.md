@@ -66,6 +66,17 @@ Ports can be overridden through the project's `.env`.
 
 Projects state their own minimum versions, usually Python 3.11+ and Node 20+.
 
+## Live previews
+
+Every project can be previewed with one command that starts it with clearly labelled demo data,
+without touching the user's real data (a separate demo database or folder). The command is
+documented in the project README, and the workspace's [`.claude/launch.json`](.claude/launch.json)
+has a matching `project-NN-<slug>` entry so it can be opened in the Claude desktop Browser pane.
+
+| Project | Preview command | URL |
+|---|---|---|
+| 01 Personal Dashboard | `python PROJECT_01/backend/scripts/preview.py` (after `npm run build` in `frontend/`) | http://127.0.0.1:8001 |
+
 ## AI integration policy
 
 - Use AI only where it beats ordinary code. Summaries, drafting, extraction and semantic search

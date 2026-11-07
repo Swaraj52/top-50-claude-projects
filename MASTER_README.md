@@ -42,9 +42,11 @@ A project is marked **Completed** only when all of these are true:
 3. Nothing is presented as working when it is not. Unverified integrations (for example, ones that
    need credentials that were never supplied) are listed under *Known limitations*.
 4. The README, architecture doc, `.env.example` and screenshots are present.
-5. A secrets scan is clean and work is committed with a `release(project-NN)` commit and a
+5. The project has a **one-command live preview** with clearly labelled demo data, an entry in
+   `.claude/launch.json`, and the owner has been shown it running in the Browser pane.
+6. A secrets scan is clean and work is committed with a `release(project-NN)` commit and a
    `project-NN-v1.0` tag.
-6. `projects.json` is updated and the docs are regenerated.
+7. `projects.json` is updated and the docs are regenerated.
 
 GitHub publication is tracked separately. A project can be complete locally while its push is blocked.
 
@@ -59,7 +61,9 @@ GitHub publication is tracked separately. A project can be complete locally whil
    `python shared-resources/scripts/render_docs.py`.
 7. Scan for secrets, commit `release(project-NN): ...`, and tag `project-NN-v1.0`.
 8. Push to GitHub and check the files appear there.
-9. Update every file in `recovery/` with the final state. **Stop and report.**
+9. Open the live preview for the owner in the Browser pane (`preview_start` with the project's
+   `.claude/launch.json` entry), signed in to the demo account where the app needs one.
+10. Update every file in `recovery/` with the final state. **Stop and report.**
 
 ## 4. Quality bar
 

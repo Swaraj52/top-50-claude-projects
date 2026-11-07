@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "project-01-daybook",
+      "runtimeExecutable": "PROJECT_01/backend/.venv/Scripts/python.exe",
+      "runtimeArgs": ["PROJECT_01/backend/scripts/preview.py"],
+      "port": 8001
+    }
+  ]
+}

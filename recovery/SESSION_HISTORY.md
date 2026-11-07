@@ -26,5 +26,10 @@
   tag present, 93/93 files).
 - **Not verified live:** the Claude briefing (no key) and IMAP (no mailbox credentials).
 - **Recovery instructions:** authorized project is NONE. Wait for `Start Project 2`.
+- **Follow-up (owner request "provide preview of each project"):** added
+  `PROJECT_01/backend/scripts/preview.py` (fresh demo data + built UI on :8001), a
+  `.claude/launch.json` entry `project-01-daybook`, and a live-preview step in the definition of
+  done (`MASTER_README.md`, `CLAUDE.md`, `ARCHITECTURE_OVERVIEW.md`). Opened the preview for the
+  owner in the Browser pane. Released as tag `project-01-v1.1`.
 - **Recovery instructions:** read `CURRENT_STATE.md`. Authorized project is NONE, so wait for
   `Start Project N`.

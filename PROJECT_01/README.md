@@ -208,6 +208,17 @@ uvicorn app.main:create_app --factory --host 127.0.0.1 --port 8001   # http://lo
 
 Then open the app, create an account, and connect a calendar and mailbox under **Settings**.
 
+**Live preview with demo data** (one command, separate `data/demo.db`, your real data untouched):
+
+```bash
+python PROJECT_01/backend/scripts/preview.py        # http://127.0.0.1:8001
+```
+
+It recreates a labelled demo account each time, so "today" always has meetings, tasks,
+reminders and mail. The sign-in details are at the top of `backend/scripts/seed_demo.py`. Use
+the backend's virtualenv Python and build the frontend once first (`npm run build`). In the
+Claude desktop app, the same preview is the `project-01-daybook` entry in `.claude/launch.json`.
+
 ## 12. Testing
 
 ```bash

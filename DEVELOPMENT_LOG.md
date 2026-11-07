@@ -41,6 +41,10 @@ of each section.
 
 ### Tooling notes
 
+- **Live previews (owner request):** each project gets a one-command preview with demo data and a
+  `.claude/launch.json` entry. The Browser pane's `preview_start` reads `launch.json` from the
+  folder the Claude session started in. If that isn't this workspace, start the preview in a
+  terminal tab and open the URL with `preview_start` `url` instead.
 - The Playwright MCP server may only write under
   `C:\Users\Swayam Naik\OneDrive\Documents\Sentivision` (its configured root). Screenshots are
   saved to `.playwright-mcp/shots/` there, moved into the project, and that folder is then deleted.

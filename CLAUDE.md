@@ -28,3 +28,7 @@ The current authorization lives in `recovery/CURRENT_STATE.md` → **Authorized 
   databases, and never force-push.
 - Never spend API credits or deploy publicly without the owner's explicit permission.
 - Update the `recovery/` files before ending a session or finishing a project.
+- **Every project gets a live preview** (owner's standing request): a one-command preview with demo
+  data, a `project-NN-<slug>` entry in `.claude/launch.json`, and the running app opened in the
+  Browser pane for the owner when the project is finished. If the owner asks to see a finished
+  project again, start its preview. That is not a request to change the project.

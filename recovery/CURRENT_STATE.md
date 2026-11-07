@@ -20,7 +20,7 @@ _Last updated: 2026-11-07_
 | GitHub repo | https://github.com/Swaraj52/top-50-claude-projects (public, owner Swaraj52) |
 | GitHub auth | `gh` signed in as Swaraj52; git uses gh as its credential helper |
 | Commit identity | The machine's global Git identity, kept by the owner's choice (B-002) |
-| Latest verified release | `project-01-v1.0` at `2355900`, pushed and verified on GitHub (later commits only touch recovery notes) |
+| Latest verified release | `project-01-v1.1` (adds the live preview script; v1.0 was `2355900`), pushed and verified on GitHub |
 
 ## Project 01: final state
 

@@ -30,6 +30,7 @@ Only items that were actually checked are listed here.
 | Responsive light/dark UI | Browser screenshots at 1440 px (light, dark) and 390 px (mobile) |
 | Migrations | pytest: migrated schema matches the models; `alembic upgrade head` run by hand |
 | Production serving (SPA fallback, traversal-safe) | pytest; curl against the running server |
+| Live preview (v1.1): `scripts/preview.py` | Started from the repo root; it seeded the demo, served on :8001, and the demo account signed in from the Browser pane |
 
 - **Tests:** backend 74 passed (`pytest`), frontend 30 passed (`npm test`), `tsc` clean, `vite build` OK.
 - **Docs:** README (15 sections), PRD, ARCHITECTURE, `.env.example`, 9 screenshots.
