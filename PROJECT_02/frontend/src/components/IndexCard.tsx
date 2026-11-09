@@ -15,7 +15,7 @@ interface Props {
 export function IndexCard({ item, mode, onTag }: Props) {
   const { update, remove } = useItemMutations();
   const { toast, confirm } = useFeedback();
-  const source = item.source_name || hostOf(item.url) || KIND_LABEL[item.kind];
+  const source = item.source_name || hostOf(item.url);
 
   const move = (status: 'library' | 'archived', label: string) =>
     update.mutate(
@@ -55,7 +55,8 @@ export function IndexCard({ item, mode, onTag }: Props) {
         {item.title}
       </Link>
       <div className="icard-meta">
-        {KIND_LABEL[item.kind]} · {source}
+        {KIND_LABEL[item.kind]}
+        {source && ` · ${source}`}
         {item.reading_minutes > 0 && ` · ${item.reading_minutes} min ${item.kind === 'video' ? 'transcript' : 'read'}`}
         {item.kind === 'video' && !item.has_transcript && ' · no transcript'}
       </div>

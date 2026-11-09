@@ -67,3 +67,6 @@ desktop.ini
 .claude/settings.local.json
 .claude-flow/
 .swarm/
+
+# --- Browser automation logs (local only) ---
+.playwright-mcp/

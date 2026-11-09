@@ -107,7 +107,17 @@ def normalize_tag(name: str) -> str:
 
 def keywords(text: str, k: int = 5) -> list[str]:
     counts = Counter(w for w in words(text) if len(w) > 3 and w not in STOPWORDS and not w.isdigit())
-    return [w for w, _ in counts.most_common(k)]
+    picked: list[str] = []
+    roots: set[str] = set()
+    for w, _ in counts.most_common():
+        root = w[:-1] if w.endswith("s") and not w.endswith("ss") else w  # "neurons" ~ "neuron"
+        if root in roots:
+            continue
+        roots.add(root)
+        picked.append(w)
+        if len(picked) == k:
+            break
+    return picked
 
 
 def extractive_summary(text: str, n_points: int = 4) -> tuple[str, list[str]]:

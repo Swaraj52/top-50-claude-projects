@@ -4,8 +4,18 @@
     {
       "name": "project-01-daybook",
       "runtimeExecutable": "PROJECT_01/backend/.venv/Scripts/python.exe",
-      "runtimeArgs": ["PROJECT_01/backend/scripts/preview.py"],
+      "runtimeArgs": [
+        "PROJECT_01/backend/scripts/preview.py"
+      ],
       "port": 8001
+    },
+    {
+      "name": "project-02-stacks",
+      "runtimeExecutable": "PROJECT_02/backend/.venv/Scripts/python.exe",
+      "runtimeArgs": [
+        "PROJECT_02/backend/scripts/preview.py"
+      ],
+      "port": 8002
     }
   ]
 }

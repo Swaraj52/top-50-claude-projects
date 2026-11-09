@@ -13,7 +13,9 @@ from urllib.parse import urljoin, urlsplit
 
 import httpx
 
-USER_AGENT = "Mozilla/5.0 (compatible; LifeLibrary/1.0; +personal read-later app)"
+# An honest, contactable identity: sites such as Wikipedia reject clients without one
+# (https://meta.wikimedia.org/wiki/User-Agent_policy). We never pose as a browser.
+USER_AGENT = "LifeLibrary/1.0 (+https://github.com/Swaraj52/top-50-claude-projects; personal read-later app)"
 ALLOWED_TYPES = ("text/html", "application/xhtml+xml", "text/plain", "text/markdown", "application/pdf")
 MAX_REDIRECTS = 5
 

@@ -29,6 +29,13 @@ def test_fts_query_is_safe():
     assert text.fts_query("the and of") is None
 
 
+def test_keywords_skip_plural_duplicates():
+    body = "Neurons fire. A neuron connects to neurons. Layers of neurons form a network. Network layers learn."
+    kws = text.keywords(body, k=3)
+    assert kws[0] == "neurons" and "neuron" not in kws
+    assert len(kws) == 3 and len({k.rstrip("s") for k in kws}) == 3
+
+
 def test_normalize_tag():
     assert text.normalize_tag("  Machine Learning ") == "machine-learning"
     assert text.normalize_tag("#AI/ML!") == "aiml"

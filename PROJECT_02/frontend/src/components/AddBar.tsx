@@ -27,6 +27,7 @@ export function AddBar({ initialUrl = '' }: { initialUrl?: string }) {
 
   function saved(r: SaveResult) {
     setError(null);
+    setTags(''); // tags apply to one save; carrying them over silently mis-tags the next item
     const dup = r.warnings.includes('You already saved this link.');
     toast({
       title: dup ? 'Already in your library' : 'Saved to inbox',

@@ -58,6 +58,8 @@ describe('Inbox', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }));
     await waitFor(() => expect(calls.find((c) => c.path === '/items/url')?.body).toEqual({ url: 'https://habits.example/tiny', tags: ['habits', 'focus'] }));
     expect(await screen.findByText('Saved to inbox')).toBeInTheDocument();
+    // Tags belong to that save only; they must not carry over to the next link.
+    expect(screen.getByLabelText('Tags')).toHaveValue('');
   });
 
   it('prefills the link from the bookmarklet parameter', async () => {
