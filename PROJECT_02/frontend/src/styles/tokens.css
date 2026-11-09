@@ -1,0 +1,84 @@
+/* "Stacks": a reading room with a card catalogue. Light = daylight, dark = after hours. */
+
+:root {
+  --paper: #e9ece2;
+  --paper-2: #dfe3d6;
+  --card: #fbfaf4;
+  --ink: #15231c;
+  --ink-2: #3a4a41;
+  --muted: #69766e;
+  --rule: #c9d0c2;
+  --green: #1d4a37;
+  --green-2: #2c6a50;
+  --on-green: #f2f0e4;
+  --brass: #a8741f;
+  --brass-soft: #f1e2c3;
+  --red-line: #c0473d;
+  --blue-line: rgba(80, 120, 170, 0.16);
+  --danger: #a3302a;
+  --danger-soft: #f6dcd8;
+  --ok: #2c6a50;
+  --ok-soft: #d5e7dc;
+  --mark: #f5d77a;
+  --overlay: rgba(21, 35, 28, 0.42);
+  --shadow: 0 1px 0 rgba(21, 35, 28, 0.06), 0 10px 26px -14px rgba(21, 35, 28, 0.35);
+
+  --serif: 'Literata Variable', 'Iowan Old Style', Georgia, serif;
+  --sans: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif;
+  --mono: 'Courier Prime', 'Courier New', ui-monospace, monospace;
+  --radius: 4px;
+  --ease: cubic-bezier(0.22, 0.8, 0.2, 1);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --paper: #0e1512;
+    --paper-2: #15201b;
+    --card: #18241e;
+    --ink: #e7eadf;
+    --ink-2: #c3cabd;
+    --muted: #8d998f;
+    --rule: #2b3a32;
+    --green: #78c49d;
+    --green-2: #9bd8b6;
+    --on-green: #0e1512;
+    --brass: #e0b25a;
+    --brass-soft: #3a2f17;
+    --red-line: #e0766b;
+    --blue-line: rgba(140, 170, 210, 0.08);
+    --danger: #f08f84;
+    --danger-soft: #3c1f1c;
+    --ok: #78c49d;
+    --ok-soft: #1c3229;
+    --mark: #6b5718;
+    --overlay: rgba(0, 0, 0, 0.6);
+    --shadow: 0 1px 0 rgba(0, 0, 0, 0.4), 0 14px 34px -16px rgba(0, 0, 0, 0.8);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --paper: #0e1512;
+  --paper-2: #15201b;
+  --card: #18241e;
+  --ink: #e7eadf;
+  --ink-2: #c3cabd;
+  --muted: #8d998f;
+  --rule: #2b3a32;
+  --green: #78c49d;
+  --green-2: #9bd8b6;
+  --on-green: #0e1512;
+  --brass: #e0b25a;
+  --brass-soft: #3a2f17;
+  --red-line: #e0766b;
+  --blue-line: rgba(140, 170, 210, 0.08);
+  --danger: #f08f84;
+  --danger-soft: #3c1f1c;
+  --ok: #78c49d;
+  --ok-soft: #1c3229;
+  --mark: #6b5718;
+  --overlay: rgba(0, 0, 0, 0.6);
+  --shadow: 0 1px 0 rgba(0, 0, 0, 0.4), 0 14px 34px -16px rgba(0, 0, 0, 0.8);
+  color-scheme: dark;
+}
