@@ -31,7 +31,8 @@ Only items that were actually checked are listed here.
 
 - **Tests:** backend 33 passed.
 - **Docs:** README (15 sections), PRD, ARCHITECTURE, YOUR_DATA, `.env.example`, 9 screenshots.
-- **Release / GitHub:** see `SESSION_HISTORY.md`.
+- **Release:** commit `2bac5a1`, tag `project-03-v1.0`. **GitHub:** pushed 2026-11-09; remote `main` =
+  `2bac5a1`, tag present, 69/69 `PROJECT_03/` files.
 
 ## Project 02: Second Brain / Life Library ("Stacks"), v1.0
 

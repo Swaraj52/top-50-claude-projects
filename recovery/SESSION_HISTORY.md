@@ -65,8 +65,9 @@
   database checked afterwards; trends, history, settings, both themes and mobile. Five issues found
   in that run were fixed (in-progress order, weekend streak, "0 day(s)" wording, mobile nav, "later"
   without JavaScript).
-- **Commits:** `8cb8fd7` docs, `460bbab` app, then the preview/seed/import commit and the release
-  commit tagged `project-03-v1.0` (hashes recorded in the publication commit).
+- **Commits:** `8cb8fd7` docs, `460bbab` app, `0a3c2e8` seed, preview and import, `2bac5a1` release +
+  tag `project-03-v1.0`. Pushed and verified on GitHub (remote `main` = local, tag present, 69/69
+  `PROJECT_03/` files).
 - **Not verified live:** the Claude-written review (no API key).
 - **Recovery instructions:** authorized project is NONE. Wait for `Start Project N`. The Project 01/02
   follow-ups in `NEXT_ACTIONS.md` need the owner's go-ahead.

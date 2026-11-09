@@ -714,7 +714,7 @@
       "database": "Done",
       "testing": "Done",
       "docs": "Done",
-      "github": "In progress",
+      "github": "Done",
       "stack": "FastAPI · Jinja2 + HTMX · SQLite · Claude API",
       "notes": "Shutdown v1.0: 33 backend tests; triage, review and commit verified end-to-end in a browser with the database checked afterwards. Claude review not verified live (no key)."
     }
