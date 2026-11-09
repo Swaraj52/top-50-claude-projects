@@ -225,7 +225,7 @@
           "stack": "FastAPI · SQLite · React + TypeScript · Claude API",
           "notes": "Daybook v1.0: 74 backend + 30 frontend tests; verified end-to-end in a browser incl. a real ICS feed. Claude briefing and IMAP not verified live (no key/credentials)."},
     "2": {"status": "Completed", "planning": "Done", "frontend": "Done", "backend": "Done",
-          "database": "Done", "testing": "Done", "docs": "Done", "github": "In progress",
+          "database": "Done", "testing": "Done", "docs": "Done", "github": "Done",
           "stack": "FastAPI · SQLite FTS5 · React + TypeScript · Claude API",
           "notes": "Stacks v1.0: 60 backend + 12 frontend tests; live capture of a real Wikipedia article and a real YouTube transcript verified in a browser. Claude summaries/answers not verified live (no key)."}
   }

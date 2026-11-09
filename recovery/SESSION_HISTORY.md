@@ -33,3 +33,19 @@
   owner in the Browser pane. Released as tag `project-01-v1.1`.
 - **Recovery instructions:** read `CURRENT_STATE.md`. Authorized project is NONE, so wait for
   `Start Project N`.
+
+## Sessions 2–3: 2026-11-08 to 2026-11-09, Project 02
+
+- **Authorized by:** the owner's command `Start Project 2`. The owner paused ("stop this for now") and
+  resumed ("continue"). The work resumed from the uncommitted backend after re-checking the code.
+- **Built:** Stacks. FastAPI + SQLite FTS5 backend (SSRF-safe capture of articles, YouTube,
+  newsletters, PDFs; inbox/library/tags; BM25 search; summaries; Ask Your Library with cited
+  answers) and a React card-catalogue frontend.
+- **Verified:** 60 backend + 12 frontend tests; live browser run capturing a real Wikipedia article
+  and a real YouTube transcript; search and Ask over real content; light, dark and mobile. Three issues
+  were found in that run and fixed (User-Agent policy, carried-over tags, duplicate label).
+- **Commits:** `ac36f49` docs, `132a929` backend, `cc8dd4e` frontend, `f44155d` fixes, seed, preview and
+  screenshots, `f9e3c67` release + tag `project-02-v1.0`. Pushed and verified on GitHub (remote =
+  local, tag present, 86/86 files).
+- **Not verified live:** Claude summaries and answers (no API key).
+- **Recovery instructions:** authorized project is NONE. Wait for `Start Project 3`.
