@@ -42,10 +42,10 @@ Generated from `projects.json`; descriptions and features come from the source P
 ### 03. Daily Review Agent
 
 - **Folder:** [`PROJECT_03/`](PROJECT_03/)
-- **Status:** Pending
+- **Status:** In Development
 - **What it does:** At the end of the day, builds a review of completed work, pending tasks and tomorrow's priorities.
 - **Core features:** Daily recap, Blockers, Tomorrow plan, Weekly trends
-- **Tech stack:** Chosen when the project starts
+- **Tech stack:** FastAPI · Jinja2 + HTMX · SQLite · Claude API
 - **Reserved local ports:** backend `8003`, frontend `5103`
 
 > Original brief: Din ke end par completed work, pending tasks aur kal ki priorities ka review banata hai.
