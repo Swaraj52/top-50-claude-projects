@@ -220,6 +220,20 @@ def test_trend_maths_in_local_days(app, browser):
     assert dict(t.area_minutes)["code"] > 0
 
 
+def test_rest_days_do_not_break_the_streak(app, browser):
+    with app.state.sessionmaker() as db:
+        user = db.scalar(select(User))
+        empty = {"headline": "", "recap": "", "wins": [], "blockers": [], "tomorrow_focus": [], "reflection_question": "?"}
+        for back in (1, 4, 5):  # reviews on these days; days 2-3 are a quiet weekend
+            db.add(Review(user_id=user.id, day=TODAY - timedelta(days=back), source="rule", content=empty, plan={}, committed=True))
+        db.commit()
+        assert trends.review_streak(db, user, IST, TODAY) == 3
+        # Activity on day 2 without a review breaks it.
+        db.add(Checkin(user_id=user.id, day=TODAY - timedelta(days=2), energy=3, mood=3, focus_hours=1))
+        db.commit()
+        assert trends.review_streak(db, user, IST, TODAY) == 1
+
+
 def test_trends_history_and_settings_pages(app, browser):
     seed_week(app)
     page = browser.get("/trends").text

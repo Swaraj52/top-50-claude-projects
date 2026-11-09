@@ -16,6 +16,14 @@
         "PROJECT_02/backend/scripts/preview.py"
       ],
       "port": 8002
+    },
+    {
+      "name": "project-03-shutdown",
+      "runtimeExecutable": "PROJECT_03/backend/.venv/Scripts/python.exe",
+      "runtimeArgs": [
+        "PROJECT_03/backend/scripts/preview.py"
+      ],
+      "port": 8003
     }
   ]
 }

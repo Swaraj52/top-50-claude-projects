@@ -10,7 +10,7 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import select
 from sqlalchemy.orm import Session as DbSession
 
-from ..models import Blocker, Checkin, Review, Task, User
+from ..models import Blocker, Checkin, LogEntry, Review, Task, User
 from ..timeutil import day_bounds_utc
 
 
@@ -59,6 +59,27 @@ class Trends:
         return self.labels[i]
 
 
+def review_streak(db: DbSession, user: User, tz: ZoneInfo, today: date, horizon: int = 90) -> int:
+    """Consecutive days ending yesterday (or today, once committed) with a committed review.
+
+    Rest days, with no tasks finished, nothing logged and no check-in, don't break the streak.
+    """
+    since = today - timedelta(days=horizon)
+    start, _ = day_bounds_utc(since, tz)
+    committed = {r.day for r in db.scalars(select(Review).where(Review.user_id == user.id, Review.committed, Review.day >= since))}
+    active = {t.completed_at.astimezone(tz).date() for t in db.scalars(select(Task).where(Task.user_id == user.id, Task.completed_at >= start))}
+    active |= set(db.scalars(select(LogEntry.day).where(LogEntry.user_id == user.id, LogEntry.day >= since)))
+    active |= set(db.scalars(select(Checkin.day).where(Checkin.user_id == user.id, Checkin.day >= since)))
+    streak, d = 0, today if today in committed else today - timedelta(days=1)
+    while d >= since:
+        if d in committed:
+            streak += 1
+        elif d in active:
+            break
+        d -= timedelta(days=1)
+    return streak
+
+
 def compute(db: DbSession, user: User, tz: ZoneInfo, today: date, span: int = 7) -> Trends:
     days = [today - timedelta(days=span - 1 - i) for i in range(span)]
     first_start, _ = day_bounds_utc(days[0], tz)
@@ -78,11 +99,7 @@ def compute(db: DbSession, user: User, tz: ZoneInfo, today: date, span: int = 7)
     checkins = {c.day: c for c in db.scalars(select(Checkin).where(Checkin.user_id == user.id, Checkin.day >= days[0], Checkin.day <= today))}
     blockers = list(db.scalars(select(Blocker).where(Blocker.user_id == user.id)))
 
-    streak, d = 0, today if (today in reviews and reviews[today].committed) else today - timedelta(days=1)
-    committed_days = {r.day for r in db.scalars(select(Review).where(Review.user_id == user.id, Review.committed))}
-    while d in committed_days:
-        streak += 1
-        d -= timedelta(days=1)
+    streak = review_streak(db, user, tz, today)
 
     return Trends(
         days=days,

@@ -88,7 +88,11 @@ def rule_review(snap: DaySnapshot, plan: list[PlanItem], recurring: list[str], c
     if carried:
         recap += f" {_plural(carried, 'task')} will carry over to tomorrow."
 
-    blockers = [f"“{b.text}” open for {(snap.day - b.opened_on).days} day(s): name one person or action that unblocks it." for b in snap.blockers_open[:3]]
+    def age(b) -> str:
+        days = (snap.day - b.opened_on).days
+        return "opened today" if days == 0 else f"open for {_plural(days, 'day')}"
+
+    blockers = [f"“{b.text}” ({age(b)}): name one person or action that unblocks it." for b in snap.blockers_open[:3]]
     blockers += recurring[:2]
 
     headline_bits = [f"{len(done)} done"]

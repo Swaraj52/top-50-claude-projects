@@ -44,7 +44,7 @@ def snapshot(db: DbSession, user: User, day: date, tz: ZoneInfo) -> DaySnapshot:
     return DaySnapshot(
         day=day,
         done=list(db.scalars(mine.where(Task.status == "done", Task.completed_at >= start, Task.completed_at < end).order_by(Task.completed_at))),
-        open_today=list(db.scalars(mine.where(Task.status.in_(OPEN), Task.planned_for <= day).order_by(Task.status.desc(), *order))),
+        open_today=list(db.scalars(mine.where(Task.status.in_(OPEN), Task.planned_for <= day).order_by((Task.status == "doing").desc(), *order))),
         backlog=list(db.scalars(mine.where(Task.status.in_(OPEN), Task.planned_for.is_(None)).order_by(*order))),
         upcoming=list(
             db.scalars(
