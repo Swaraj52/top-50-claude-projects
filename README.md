@@ -8,16 +8,17 @@ Each project lives in its own folder with its own dependencies, database, tests 
 Projects are built in the original order, and a project only counts as complete after its core
 features have been run and tested.
 
-> **Current status:** 1 of 50 complete. See
+> **Current status:** 2 of 50 complete. See
 > [MASTER_PROJECT_TRACKER.md](MASTER_PROJECT_TRACKER.md) for live progress.
 
-## Latest: Project 01, Personal Dashboard ("Daybook")
+## Completed so far
 
-Calendar (ICS), tasks, reminders, IMAP email and three daily priorities on one newspaper-style
-page, with a daily briefing written by Claude (or a labelled rule engine when no API key is set).
-FastAPI + SQLite + React, 104 automated tests. [Read more →](PROJECT_01/)
+| | |
+|---|---|
+| [![Daybook](PROJECT_01/docs/screenshots/02-today.png)](PROJECT_01/) | [![Stacks](PROJECT_02/docs/screenshots/03-library.png)](PROJECT_02/) |
+| **[01 Personal Dashboard: "Daybook"](PROJECT_01/)**<br>Calendar (ICS), tasks, reminders, IMAP email and three daily priorities on one newspaper-style page, with a daily briefing by Claude (or a labelled rule engine). FastAPI · SQLite · React, 104 tests. | **[02 Second Brain / Life Library: "Stacks"](PROJECT_02/)**<br>Save articles, YouTube videos (with transcripts), newsletters and PDFs; full-text search; summaries; and "Ask your library" answers with citations. FastAPI · SQLite FTS5 · React, 72 tests. |
 
-![Daybook, the Project 01 dashboard](PROJECT_01/docs/screenshots/02-today.png)
+Each project can be previewed locally with one command and demo data (see the project README).
 
 ## How this repository is organized
 
@@ -57,7 +58,7 @@ top-50-claude-projects/
 | # | Project | What it does | Stack | Status |
 |---|---|---|---|---|
 | 01 | [Personal Dashboard](PROJECT_01/) | Brings calendar, tasks, reminders, emails and daily priorities together in one clean dashboard. | FastAPI · SQLite · React + TypeScript · Claude API | Completed |
-| 02 | [Second Brain / Life Library](PROJECT_02/) | Saves articles, newsletters, YouTube videos and web pages so you can ask questions about them later. | FastAPI · SQLite FTS5 · React + TypeScript · Claude API | In Development |
+| 02 | [Second Brain / Life Library](PROJECT_02/) | Saves articles, newsletters, YouTube videos and web pages so you can ask questions about them later. | FastAPI · SQLite FTS5 · React + TypeScript · Claude API | Completed |
 | 03 | [Daily Review Agent](PROJECT_03/) | At the end of the day, builds a review of completed work, pending tasks and tomorrow's priorities. | — | Pending |
 | 04 | [Personal Goal Tracker](PROJECT_04/) | Breaks long-term goals down into milestones and weekly actions. | — | Pending |
 | 05 | [Habit & Routine Coach](PROJECT_05/) | Tracks the user's routines and gives realistic habit suggestions. | — | Pending |

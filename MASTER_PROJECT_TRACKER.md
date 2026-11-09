@@ -3,7 +3,7 @@
 Generated from `projects.json` by `shared-resources/scripts/render_docs.py`.
 Edit `projects.json`, then re-run the script. Do not edit this table by hand.
 
-**Summary:** Pending: 48 · Planning: 0 · In Development: 1 · Testing: 0 · Blocked: 0 · Completed: 1 · Published to GitHub: 1/50
+**Summary:** Pending: 48 · Planning: 0 · In Development: 0 · Testing: 0 · Blocked: 0 · Completed: 2 · Published to GitHub: 1/50
 
 Phase values: `—` not started · `In progress` · `Done` · `N/A` (not needed) · `Blocked`.
 GitHub publication is tracked separately from local completion.
@@ -13,7 +13,7 @@ GitHub publication is tracked separately from local completion.
 | Project | Name | Planning | Frontend | Backend | Database | Testing | Docs | GitHub | Status |
 |---|---|---|---|---|---|---|---|---|---|
 | [Project 01](PROJECT_01/) | Personal Dashboard | Done | Done | Done | Done | Done | Done | Done | **Completed** |
-| [Project 02](PROJECT_02/) | Second Brain / Life Library | Done | — | In progress | In progress | — | — | — | **In Development** |
+| [Project 02](PROJECT_02/) | Second Brain / Life Library | Done | Done | Done | Done | Done | Done | In progress | **Completed** |
 | [Project 03](PROJECT_03/) | Daily Review Agent | — | — | — | — | — | — | — | **Pending** |
 | [Project 04](PROJECT_04/) | Personal Goal Tracker | — | — | — | — | — | — | — | **Pending** |
 | [Project 05](PROJECT_05/) | Habit & Routine Coach | — | — | — | — | — | — | — | **Pending** |

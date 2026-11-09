@@ -3,6 +3,37 @@
 Architectural decisions, dependency changes, bugs and their fixes. Newest entries go at the top
 of each section.
 
+## 2026-11-08 to 11-09: Project 02, Second Brain / Life Library ("Stacks")
+
+### Decisions
+
+- **Search and retrieval on SQLite FTS5** (Porter stemmer, BM25) instead of embeddings. That means
+  no extra API key or model download, and it's fast. Ask Your Library = BM25 passages, then a Claude
+  answer grounded in them, with validated citations. Embeddings are listed as a future improvement.
+- **FTS tables via raw SQL in Alembic**, excluded from autogenerate (`include_object`), and kept
+  in sync by a service-layer indexer.
+- **SSRF-safe fetching:** manual redirects with a public-IP check per hop. Content is stored and
+  rendered as text only.
+- **Honest User-Agent** with a contact URL (Wikimedia policy). Never pose as a browser.
+- **Different visual identity** from Project 01 (card catalogue: Literata, Atkinson
+  Hyperlegible, Courier Prime; sage and library green).
+
+### Dependencies (PROJECT_02 only)
+
+- Backend: same core as Project 01 (FastAPI 0.162.2, SQLAlchemy 2.1.8, Alembic 1.20.1, Pydantic
+  2.14.3, anthropic 2.6.0…) plus trafilatura 2.3.1 (lxml 6.1.3), youtube-transcript-api 1.2.5 and
+  pypdf 7.0.0. There's no cryptography dependency (no stored third-party secrets).
+- Frontend: React 19.3, React Router 7, TanStack Query 5, Vite 8, TypeScript 7, Vitest 5;
+  @fontsource Literata, Atkinson Hyperlegible and Courier Prime.
+
+### Bugs found and fixed
+
+- **Wikipedia 403** for the original User-Agent. It now uses a policy-compliant identity. Found in the live browser run.
+- **Tags carried over** from one save to the next (the YouTube video was mis-tagged). They now clear
+  after saving, with a Vitest assertion.
+- **API tag order** differed between save and fetch. Tags are now always sorted.
+- **Duplicate type label** on cards without a source. Plural duplicates removed from keyword tag suggestions.
+
 ## 2026-11-07: Project 01, Personal Dashboard ("Daybook")
 
 ### Decisions

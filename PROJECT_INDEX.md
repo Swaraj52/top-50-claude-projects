@@ -30,11 +30,12 @@ Generated from `projects.json`; descriptions and features come from the source P
 ### 02. Second Brain / Life Library
 
 - **Folder:** [`PROJECT_02/`](PROJECT_02/)
-- **Status:** In Development
+- **Status:** Completed
 - **What it does:** Saves articles, newsletters, YouTube videos and web pages so you can ask questions about them later.
 - **Core features:** Content inbox, Tags, Search, Summaries, Ask Your Library
 - **Tech stack:** FastAPI · SQLite FTS5 · React + TypeScript · Claude API
 - **Reserved local ports:** backend `8002`, frontend `5102`
+- **Notes:** Stacks v1.0: 60 backend + 12 frontend tests; live capture of a real Wikipedia article and a real YouTube transcript verified in a browser. Claude summaries/answers not verified live (no key).
 
 > Original brief: Articles, newsletters, YouTube videos aur web pages save karke un par baad mein questions poochne deta hai.
 

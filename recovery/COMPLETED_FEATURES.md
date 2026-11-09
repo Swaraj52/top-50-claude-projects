@@ -12,6 +12,28 @@ Only items that were actually checked are listed here.
 | Root docs and recovery system | Written and generated; `CLAUDE.md` enforces the start-command rule |
 | Public GitHub repo `Swaraj52/top-50-claude-projects` | `gh api`: public, owner Swaraj52; remote `main` matched local after each push |
 
+## Project 02: Second Brain / Life Library ("Stacks"), v1.0
+
+| Feature | Verification |
+|---|---|
+| Accounts, CSRF, rate limits, per-user isolation | pytest (auth, isolation on items, tags, search, ask, summarize); Vitest sign-in/out |
+| Capture: article URL | pytest with a fake web server; **browser: live Wikipedia article (3,200 words, 21 passages)** |
+| Capture: YouTube (oEmbed + transcript) | pytest with faked services; **browser: live 3Blue1Brown video with its real transcript** |
+| Capture: pasted text, `.eml`, `.pdf`, `.md` | pytest fixtures (multipart email, generated PDF) |
+| SSRF guard (private hosts, redirect hops, size and type) | pytest |
+| Inbox triage, library filters, favourites, sorting, stats | pytest; Vitest; browser |
+| Tags: add/remove, rename/merge, delete, orphan cleanup, suggestions | pytest; browser (re-tagged the live video) |
+| Full-text search (BM25, stemming, prefixes, snippets, any-word fallback) | pytest; Vitest (safe highlight rendering); browser |
+| Summaries: extractive | pytest; browser |
+| Summaries: Claude | pytest with a fake client (validation, tag normalisation, fallback). **Not called live** |
+| Ask: passages mode | pytest; browser over real and demo items |
+| Ask: Claude with citations | pytest with a fake client (invalid citations stripped, four failure fallbacks). **Not called live** |
+| Live preview | `scripts/preview.py` started via `preview_start project-02-stacks`; demo account signed in |
+
+- **Tests:** backend 60 passed, frontend 12 passed, `tsc` clean, `vite build` OK.
+- **Docs:** README (15 sections), PRD, ARCHITECTURE, `.env.example`, 9 screenshots.
+- **Release / GitHub:** see `SESSION_HISTORY.md`.
+
 ## Project 01: Personal Dashboard ("Daybook"), v1.0
 
 | Feature | Verification |
