@@ -1,0 +1,14 @@
+fastapi==0.162.2
+uvicorn==0.54.0
+SQLAlchemy==2.1.8
+alembic==1.20.1
+pydantic==2.14.3
+pydantic-settings==2.16.2
+email-validator==2.3.0
+python-multipart==0.0.33
+httpx==0.28.1
+trafilatura==2.3.1
+youtube-transcript-api==1.2.5
+pypdf==7.0.0
+anthropic==2.6.0
+tzdata==2026.6
