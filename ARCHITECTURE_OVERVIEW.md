@@ -77,6 +77,7 @@ has a matching `project-NN-<slug>` entry so it can be opened in the Claude deskt
 |---|---|---|
 | 01 Personal Dashboard | `python PROJECT_01/backend/scripts/preview.py` (after `npm run build` in `frontend/`) | http://127.0.0.1:8001 |
 | 02 Second Brain / Life Library | `python PROJECT_02/backend/scripts/preview.py` (after `npm run build` in `frontend/`) | http://127.0.0.1:8002 |
+| 03 Daily Review Agent | `python PROJECT_03/backend/scripts/preview.py` (no build step) | http://127.0.0.1:8003 |
 
 ## AI integration policy
 

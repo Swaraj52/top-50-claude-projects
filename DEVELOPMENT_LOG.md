@@ -3,6 +3,41 @@
 Architectural decisions, dependency changes, bugs and their fixes. Newest entries go at the top
 of each section.
 
+## 2026-11-09: Project 03, Daily Review Agent ("Shutdown")
+
+### Decisions
+
+- **Server-rendered with HTMX** instead of another React SPA. A short end-of-day ritual is a series
+  of forms, so Jinja2 pages work without JavaScript and HTMX swaps fragments in place. There's no
+  Node toolchain, and the preview has no build step.
+- **CSRF via a per-session synchronizer token** (hidden form field, plus `X-CSRF-Token` through
+  `hx-headers`), and a double-submit cookie before sign-in. Both are checked with a constant-time compare.
+- **The planner is deterministic and always runs.** Claude may only reorder existing candidate task ids,
+  and the result is refilled to capacity, so an AI failure can never produce an invalid plan.
+- **Carry counts are applied once per day** (`applied_carry_ids` in the review's plan), so regenerating
+  or recommitting a review doesn't inflate them.
+- **The review streak skips rest days** (days with no activity and no review), so weekends don't
+  reset it.
+- **Charts are inline SVG drawn on the server**, with `<title>` text and the same numbers in a
+  collapsible data table, so there's no chart library.
+- **Demo history is simulated day by day** with the real planner and reviewer, so History and Trends
+  show the app's genuine output.
+
+### Dependencies (PROJECT_03 only)
+
+- FastAPI 0.162.2, SQLAlchemy 2.1.8, Alembic 1.20.1, Pydantic 2.14.3, pydantic-settings 2.16.2,
+  Jinja2 3.1.6, python-multipart 0.0.33, anthropic 2.6.0, uvicorn 0.54.0, tzdata 2026.6.
+- HTMX 2.0.11 vendored into `app/static/` with its licence (no CDN, so the CSP stays `script-src 'self'`).
+
+### Bugs found and fixed
+
+- **Commit stored the word "carry" as a date**, and carry counts could double on recommit. Found by
+  reading the database after a browser run. Fixed and covered by the review test.
+- **"Later" needed JavaScript.** The date now has its own `later_{id}` field.
+- **The streak broke on weekends**; in-progress tasks were listed last; the review said "open for
+  0 day(s)"; the phone navigation overflowed. All found in the browser run and fixed.
+- `_auth_page` had a parameter named `name` that clashed with template values (`**values`). Renamed.
+
 ## 2026-11-08 to 11-09: Project 02, Second Brain / Life Library ("Stacks")
 
 ### Decisions

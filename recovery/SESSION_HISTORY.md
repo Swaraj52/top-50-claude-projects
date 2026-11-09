@@ -49,3 +49,25 @@
   local, tag present, 86/86 files).
 - **Not verified live:** Claude summaries and answers (no API key).
 - **Recovery instructions:** authorized project is NONE. Wait for `Start Project 3`.
+
+## Session 4: 2026-11-09, credit and data rule, then Project 03
+
+- **Owner requests:** "put my name in all projects Swayam and take the data for each project
+  required from me after the projects are completed", then "start with project 3".
+- **Credit change:** Swayam credited in Projects 01 and 02 (README author line, in-app credit, API
+  contact metadata, demo display name) and the rule added to `CLAUDE.md` and `MASTER_README.md`
+  (`91f2020`, tags `project-01-v1.2`, `project-02-v1.1`).
+- **Built:** Shutdown. A server-rendered FastAPI + Jinja2 + HTMX app: Today (tasks, work log,
+  blockers, check-in), end-of-day review (Claude or rules), triage of unfinished work, a capacity-aware
+  tomorrow plan, weekly trends with SVG charts, history and settings. Demo seed simulated day by day
+  with the real planner and reviewer; one-command preview; JSON data import.
+- **Verified:** 33 backend tests; browser run of the full triage, generate and commit flow, with the
+  database checked afterwards; trends, history, settings, both themes and mobile. Five issues found
+  in that run were fixed (in-progress order, weekend streak, "0 day(s)" wording, mobile nav, "later"
+  without JavaScript).
+- **Commits:** `8cb8fd7` docs, `460bbab` app, then the preview/seed/import commit and the release
+  commit tagged `project-03-v1.0` (hashes recorded in the publication commit).
+- **Not verified live:** the Claude-written review (no API key).
+- **Recovery instructions:** authorized project is NONE. Wait for `Start Project N`. The Project 01/02
+  follow-ups in `NEXT_ACTIONS.md` need the owner's go-ahead.
+

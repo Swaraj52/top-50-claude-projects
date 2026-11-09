@@ -12,6 +12,27 @@ Only items that were actually checked are listed here.
 | Root docs and recovery system | Written and generated; `CLAUDE.md` enforces the start-command rule |
 | Public GitHub repo `Swaraj52/top-50-claude-projects` | `gh api`: public, owner Swaraj52; remote `main` matched local after each push |
 
+## Project 03: Daily Review Agent ("Shutdown"), v1.0
+
+| Feature | Verification |
+|---|---|
+| Accounts, CSRF (forms and HTMX), rate limits, per-user isolation, security headers | pytest; browser |
+| Today: tasks, work log, blockers (resolve/reopen), check-in | pytest (plain-form and HTMX paths); browser |
+| Daily recap, rule-based | pytest; browser (generated for the demo day) |
+| Daily recap, Claude | pytest with a fake client (plan reordered, invented ids removed, 4 failure fallbacks). **Not called live (no API key)** |
+| Triage and commit (carry, later with a date, drop) | pytest; **browser run, then the database was checked**: dropped task dropped, "later" task moved to its date without a carry increment, carried tasks planned for tomorrow with `carry_count + 1`, note saved |
+| Tomorrow plan (scoring, capacity, oversized warning, preferred order) | pytest |
+| Weekly trends, streak across rest days, SVG charts | pytest; browser (7 and 14 days) |
+| History, settings (name, timezone, capacity) | pytest; browser |
+| Dusk/Dawn themes, mobile layout | Browser screenshots at 1440 px and 390 px |
+| Migrations | pytest: migrated schema matches the models |
+| Data import (`scripts/import_data.py`) | pytest; run by hand against a scratch database (unknown account refused, import into an existing account) |
+| Live preview: `scripts/preview.py` | Started via `preview_start project-03-shutdown`; demo account signed in |
+
+- **Tests:** backend 33 passed.
+- **Docs:** README (15 sections), PRD, ARCHITECTURE, YOUR_DATA, `.env.example`, 9 screenshots.
+- **Release / GitHub:** see `SESSION_HISTORY.md`.
+
 ## Project 02: Second Brain / Life Library ("Stacks"), v1.0
 
 | Feature | Verification |

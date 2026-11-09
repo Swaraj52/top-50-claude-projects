@@ -707,16 +707,16 @@
       "notes": "Stacks v1.0: 60 backend + 12 frontend tests; live capture of a real Wikipedia article and a real YouTube transcript verified in a browser. Claude summaries/answers not verified live (no key)."
     },
     "3": {
-      "status": "In Development",
+      "status": "Completed",
       "planning": "Done",
-      "frontend": "",
-      "backend": "In progress",
-      "database": "In progress",
-      "testing": "",
-      "docs": "",
-      "github": "",
+      "frontend": "Done",
+      "backend": "Done",
+      "database": "Done",
+      "testing": "Done",
+      "docs": "Done",
+      "github": "In progress",
       "stack": "FastAPI · Jinja2 + HTMX · SQLite · Claude API",
-      "notes": ""
+      "notes": "Shutdown v1.0: 33 backend tests; triage, review and commit verified end-to-end in a browser with the database checked afterwards. Claude review not verified live (no key)."
     }
   }
 }

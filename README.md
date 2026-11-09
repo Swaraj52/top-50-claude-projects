@@ -17,6 +17,8 @@ features have been run and tested.
 |---|---|
 | [![Daybook](PROJECT_01/docs/screenshots/02-today.png)](PROJECT_01/) | [![Stacks](PROJECT_02/docs/screenshots/03-library.png)](PROJECT_02/) |
 | **[01 Personal Dashboard: "Daybook"](PROJECT_01/)**<br>Calendar (ICS), tasks, reminders, IMAP email and three daily priorities on one newspaper-style page, with a daily briefing by Claude (or a labelled rule engine). FastAPI · SQLite · React, 104 tests. | **[02 Second Brain / Life Library: "Stacks"](PROJECT_02/)**<br>Save articles, YouTube videos (with transcripts), newsletters and PDFs; full-text search; summaries; and "Ask your library" answers with citations. FastAPI · SQLite FTS5 · React, 72 tests. |
+| [![Shutdown](PROJECT_03/docs/screenshots/04-review-plan.png)](PROJECT_03/) | |
+| **[03 Daily Review Agent: "Shutdown"](PROJECT_03/)**<br>An end-of-day review: recap of what got done, blockers, triage of unfinished work (carry, later, drop) and a tomorrow plan that fits your capacity, plus weekly trends. Review by Claude (or labelled rules). FastAPI · Jinja2 + HTMX · SQLite, 33 tests. | |
 
 Each project can be previewed locally with one command and demo data (see the project README).
 
@@ -59,7 +61,7 @@ top-50-claude-projects/
 |---|---|---|---|---|
 | 01 | [Personal Dashboard](PROJECT_01/) | Brings calendar, tasks, reminders, emails and daily priorities together in one clean dashboard. | FastAPI · SQLite · React + TypeScript · Claude API | Completed |
 | 02 | [Second Brain / Life Library](PROJECT_02/) | Saves articles, newsletters, YouTube videos and web pages so you can ask questions about them later. | FastAPI · SQLite FTS5 · React + TypeScript · Claude API | Completed |
-| 03 | [Daily Review Agent](PROJECT_03/) | At the end of the day, builds a review of completed work, pending tasks and tomorrow's priorities. | FastAPI · Jinja2 + HTMX · SQLite · Claude API | In Development |
+| 03 | [Daily Review Agent](PROJECT_03/) | At the end of the day, builds a review of completed work, pending tasks and tomorrow's priorities. | FastAPI · Jinja2 + HTMX · SQLite · Claude API | Completed |
 | 04 | [Personal Goal Tracker](PROJECT_04/) | Breaks long-term goals down into milestones and weekly actions. | — | Pending |
 | 05 | [Habit & Routine Coach](PROJECT_05/) | Tracks the user's routines and gives realistic habit suggestions. | — | Pending |
 | 06 | [Meeting Memory Assistant](PROJECT_06/) | Converts meeting notes into decisions, owners and follow-ups. | — | Pending |
