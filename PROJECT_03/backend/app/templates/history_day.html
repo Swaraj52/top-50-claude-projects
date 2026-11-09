@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Review {{ review.day }}{% endblock %}
+{% block content %}
+{% set c = review.content %}
+<div class="page-head"><div><p class="eyebrow"><a href="/history">History</a> · {{ review.day | day("long") }}</p><h1>{{ c.headline }}</h1></div>
+  {% if review.source == "ai" %}<span class="pill ai">✦ Claude · {{ review.model }}</span>{% else %}<span class="pill">Rule-based review</span>{% endif %}
+</div>
+<article class="card review">
+  {% if review.note %}<p class="notice">{{ review.note }}</p>{% endif %}
+  <p class="recap">{{ c.recap }}</p>
+  <div class="recap-grid">
+    {% if c.wins %}<div><h3>Wins</h3><ul class="plain">{% for w in c.wins %}<li>★ {{ w }}</li>{% endfor %}</ul></div>{% endif %}
+    {% if c.blockers %}<div><h3>Blockers</h3><ul class="plain">{% for b in c.blockers %}<li>{{ b }}</li>{% endfor %}</ul></div>{% endif %}
+  </div>
+  <h3>Plan for the next day</h3>
+  <ol class="plan">{% for item in review.plan["items"] %}<li><b>{{ item.title }}</b> <span class="muted small">{{ item.estimate_min | minutes }}</span></li>{% else %}<li class="muted">No plan.</li>{% endfor %}</ol>
+  <h3>{{ c.reflection_question }}</h3>
+  <p>{{ review.notes or "No answer written." }}</p>
+</article>
+{% endblock %}

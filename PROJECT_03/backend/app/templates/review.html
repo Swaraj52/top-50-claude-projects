@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Review{% endblock %}
+{% block content %}
+{% set r = snap.review %}
+<div class="page-head">
+  <div>
+    <p class="eyebrow">Shutdown review · {{ today | day("long") }}</p>
+    <h1>Close the day</h1>
+  </div>
+  {% if r and r.committed %}<span class="pill ok big">Plan committed ✓</span>{% endif %}
+</div>
+
+<ol class="steps">
+  <li class="card step">
+    <h2><span class="num">1</span> Recap</h2>
+    <div class="recap-grid">
+      <div>
+        <h3>Finished ({{ snap.done | length }})</h3>
+        {% if snap.done %}<ul class="plain">{% for t in snap.done %}<li>✓ {{ t.title }} <span class="muted small">{{ t.estimate_min | minutes }}</span></li>{% endfor %}</ul>
+        {% else %}<p class="muted">No tasks marked done.</p>{% endif %}
+      </div>
+      <div>
+        <h3>Logged</h3>
+        {% if snap.log %}<ul class="plain">{% for e in snap.log %}<li><span class="kind-tag {{ e.kind }}">{{ e.kind }}</span> {{ e.text }}</li>{% endfor %}</ul>
+        {% else %}<p class="muted">Nothing logged. <a href="/today">Add a few lines</a> for a better recap.</p>{% endif %}
+      </div>
+    </div>
+  </li>
+
+  <li class="card step">
+    <h2><span class="num">2</span> Decide what happens to unfinished work</h2>
+    <form id="decisions" method="post" action="/review/generate">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      {% if snap.open_today %}
+      <table class="decide">
+        <thead><tr><th scope="col">Task</th><th scope="col">Tomorrow</th><th scope="col">Later</th><th scope="col">Drop</th></tr></thead>
+        <tbody>
+        {% for t in snap.open_today %}
+        {% set d = ((r.plan or {}).get("decisions") or {}).get(t.id | string, "carry") if r else "carry" %}
+        <tr>
+          <th scope="row">{{ t.title }} <span class="muted small">P{{ t.priority }} · {{ t.estimate_min | minutes }}{% if t.carry_count %} · ↻ {{ t.carry_count }}{% endif %}</span></th>
+          <td><input type="radio" name="decision_{{ t.id }}" value="carry" aria-label="Carry “{{ t.title }}” to tomorrow" {% if d == "carry" %}checked{% endif %}></td>
+          <td class="later">
+            <input type="radio" name="decision_{{ t.id }}" value="later" aria-label="Move “{{ t.title }}” to a later date" {% if d not in ("carry", "drop") %}checked{% endif %}>
+            <input type="date" class="later-date" name="later_{{ t.id }}" aria-label="Date for “{{ t.title }}”" min="{{ tomorrow }}" value="{{ d if d not in ('carry', 'drop') else '' }}">
+          </td>
+          <td><input type="radio" name="decision_{{ t.id }}" value="drop" aria-label="Drop “{{ t.title }}”" {% if d == "drop" %}checked{% endif %}></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p class="muted">Nothing left over today. Clean slate.</p>
+      {% endif %}
+    </form>
+  </li>
+
+  <li class="step">
+    <div class="split">
+      {% include "partials/blockers.html" %}
+      {% include "partials/checkin.html" %}
+    </div>
+    {% if recurring %}
+    <div class="notice">{% for line in recurring %}<div>⚠ {{ line }}</div>{% endfor %}</div>
+    {% endif %}
+  </li>
+
+  <li class="card step">
+    <h2><span class="num">3</span> Write the review and plan tomorrow</h2>
+    <p class="muted">
+      {% if ai_enabled %}Claude ({{ ai_model }}) writes the review and orders tomorrow’s plan. It can only choose tasks you already have, within your {{ (snap.capacity_min) | minutes }} capacity.
+      {% else %}A rule-based review ranks tomorrow by priority, due dates and carry-overs, within your {{ (snap.capacity_min) | minutes }} capacity. Add an ANTHROPIC_API_KEY to have Claude write it.{% endif %}
+    </p>
+    <button class="btn primary" form="decisions">{{ 'Rewrite review' if r else 'Write my review' }}</button>
+  </li>
+</ol>
+
+{% if r %}
+{% set c = r.content %}
+<article id="plan" class="card review">
+  <div class="review-head">
+    {% if r.source == "ai" %}<span class="pill ai">✦ Written by Claude · {{ r.model }}</span>{% else %}<span class="pill">Rule-based review</span>{% endif %}
+  </div>
+  {% if r.note %}<p class="notice">{{ r.note }}</p>{% endif %}
+  <h2 class="headline">{{ c.headline }}</h2>
+  <p class="recap">{{ c.recap }}</p>
+  <div class="recap-grid">
+    {% if c.wins %}<div><h3>Wins</h3><ul class="plain">{% for w in c.wins %}<li>★ {{ w }}</li>{% endfor %}</ul></div>{% endif %}
+    {% if c.blockers %}<div><h3>Blockers</h3><ul class="plain">{% for b in c.blockers %}<li>{{ b }}</li>{% endfor %}</ul></div>{% endif %}
+  </div>
+
+  <h3>Tomorrow, {{ tomorrow | day }}</h3>
+  {% set p = r.plan %}
+  {% set pct = (100 * p.load_min / p.capacity_min) | round | int if p.capacity_min else 0 %}
+  <div class="load" role="img" aria-label="Planned {{ p.load_min | minutes }} of {{ p.capacity_min | minutes }}">
+    <div class="load-bar {{ 'over' if p.over_capacity else '' }}" style="width: {{ [pct, 100] | min }}%"></div>
+  </div>
+  <p class="muted small">{{ p.load_min | minutes }} planned of {{ p.capacity_min | minutes }} capacity{% if p.over_capacity %}: one task is bigger than your whole day, so consider splitting it{% endif %}.</p>
+  {% set why = {} %}{% for f in c.tomorrow_focus %}{% set _ = why.update({f.task_id: f.why}) %}{% endfor %}
+  <ol class="plan">
+    {% for item in p["items"] %}
+    <li><b>{{ item.title }}</b> <span class="muted small">{{ item.estimate_min | minutes }}</span>
+      <div class="why">{{ why.get(item.task_id) or (item.reasons | join("; ")) }}</div></li>
+    {% else %}
+    <li class="muted">Nothing to plan. Add tasks for tomorrow on the Today page.</li>
+    {% endfor %}
+  </ol>
+
+  <form method="post" action="/review/commit" class="commit">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label class="question">{{ c.reflection_question }}
+      <textarea name="notes" rows="3" maxlength="2000" placeholder="A sentence or two, just for you">{{ r.notes }}</textarea>
+    </label>
+    <button class="btn primary">{{ 'Update plan' if r.committed else 'Commit plan & shut down' }}</button>
+    {% if r.committed %}<a class="btn ghost" href="/trends">See this week’s trends →</a>{% endif %}
+  </form>
+</article>
+{% endif %}
+{% endblock %}

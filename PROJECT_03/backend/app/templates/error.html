@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Error{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <p class="eyebrow">Error {{ status_code }}</p>
+  <h1>{{ message }}</h1>
+  <p><a class="btn" href="{{ '/today' if user else '/login' }}">Back to {{ 'Today' if user else 'sign in' }}</a></p>
+</section>
+{% endblock %}

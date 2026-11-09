@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="Swayam">
+  <meta name="description" content="Shutdown: a five-minute end-of-day review with tomorrow's plan and weekly trends.">
+  <title>{% block title %}Shutdown{% endblock %} · Daily Review</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/app.css?v={{ version }}">
+  <script src="/static/htmx.min.js" defer></script>
+  <script src="/static/app.js?v={{ version }}" defer></script>
+</head>
+<body hx-headers='{"X-CSRF-Token": "{{ csrf_token }}"}'>
+  {% if user %}
+  <header class="top">
+    <div class="top-inner">
+      <a class="brand" href="/today"><span class="moon" aria-hidden="true"></span>Shutdown</a>
+      <nav aria-label="Main">
+        {% for href, label in [("/today", "Today"), ("/review", "Review"), ("/trends", "Trends"), ("/history", "History"), ("/settings", "Settings")] %}
+        <a href="{{ href }}" {% if path.startswith(href) %}aria-current="page"{% endif %}>{{ label }}</a>
+        {% endfor %}
+      </nav>
+      <form method="post" action="/logout" class="logout">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn ghost small" title="{{ user.email }}">Sign out</button>
+      </form>
+    </div>
+  </header>
+  {% endif %}
+  <main class="wrap" id="main">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="foot">Shutdown · designed and built by Swayam</footer>
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+</body>
+</html>

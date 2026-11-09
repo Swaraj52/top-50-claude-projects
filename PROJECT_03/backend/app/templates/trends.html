@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Trends{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="eyebrow">Last {{ span }} days</p>
+    <h1>Trends</h1>
+  </div>
+  <nav class="seg-links" aria-label="Range">
+    <a href="/trends?span=7" {% if span == 7 %}aria-current="page"{% endif %}>7 days</a>
+    <a href="/trends?span=14" {% if span == 14 %}aria-current="page"{% endif %}>14 days</a>
+  </nav>
+</div>
+
+<div class="stats">
+  <div class="stat"><b>{{ t.total_completed }}</b><span>tasks done</span></div>
+  <div class="stat"><b>{{ t.completion_rate if t.completion_rate is not none else '–' }}{% if t.completion_rate is not none %}%{% endif %}</b><span>finished vs carried</span></div>
+  <div class="stat"><b>{{ t.avg_focus if t.avg_focus is not none else '–' }}{% if t.avg_focus is not none %}h{% endif %}</b><span>avg focus / day</span></div>
+  <div class="stat"><b>{{ t.avg_energy if t.avg_energy is not none else '–' }}</b><span>avg energy (1-5)</span></div>
+  <div class="stat"><b>{{ t.streak }}</b><span>day review streak</span></div>
+  <div class="stat"><b>{{ t.best_day or '–' }}</b><span>best day</span></div>
+</div>
+
+<div class="charts">
+  <figure class="card">{{ figures.completed }}<figcaption>Tasks completed. Today is highlighted.</figcaption></figure>
+  <figure class="card">{{ figures.focus }}<figcaption>Deep-focus hours from your check-ins</figcaption></figure>
+  <figure class="card">{{ figures.wellbeing }}<figcaption><span class="key energy"></span> Energy <span class="key mood"></span> Mood</figcaption></figure>
+  <section class="card">
+    <h2>Where the work went</h2>
+    {% if t.area_minutes %}
+    {% set top = t.area_minutes[0][1] or 1 %}
+    <ul class="areas">
+      {% for name, mins in t.area_minutes %}
+      <li><span>{{ name }}</span><span class="bar-h"><span style="width: {{ (100 * mins / top) | round | int }}%"></span></span><span class="muted small">{{ mins | minutes }}</span></li>
+      {% endfor %}
+    </ul>
+    {% else %}<p class="empty">Finish a few tasks with areas to see this.</p>{% endif %}
+    <h2>Blockers</h2>
+    <p class="muted small">{{ t.blockers_opened | sum }} opened · {{ t.blockers_resolved | sum }} resolved · {{ t.total_carried }} task carry-overs</p>
+    {% for line in recurring %}<p class="notice">⚠ {{ line }}</p>{% else %}<p class="muted small">No recurring blockers.</p>{% endfor %}
+  </section>
+</div>
+
+<details class="card data-table">
+  <summary>Show the numbers</summary>
+  <table>
+    <thead><tr><th scope="col">Day</th><th scope="col">Done</th><th scope="col">Carried</th><th scope="col">Focus h</th><th scope="col">Energy</th><th scope="col">Mood</th><th scope="col">Blockers +/−</th></tr></thead>
+    <tbody>
+    {% for i in range(t.days | length) %}
+    <tr><th scope="row">{{ t.labels[i] }}</th><td>{{ t.completed[i] }}</td><td>{{ t.carried[i] }}</td><td>{{ t.focus[i] if t.focus[i] is not none else '–' }}</td>
+      <td>{{ t.energy[i] | int if t.energy[i] is not none else '–' }}</td><td>{{ t.mood[i] | int if t.mood[i] is not none else '–' }}</td><td>{{ t.blockers_opened[i] }} / {{ t.blockers_resolved[i] }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</details>
+{% endblock %}

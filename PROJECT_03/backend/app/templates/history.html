@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}History{% endblock %}
+{% block content %}
+<div class="page-head"><div><p class="eyebrow">Past reviews</p><h1>History</h1></div></div>
+{% if reviews %}
+<ul class="history">
+  {% for r in reviews %}
+  <li class="card">
+    <a href="/history/{{ r.day }}">
+      <span class="date">{{ r.day | day("long") }}</span>
+      <span class="headline">{{ r.content.headline }}</span>
+      <span class="meta">
+        {% if r.source == "ai" %}<span class="pill ai">Claude</span>{% else %}<span class="pill">rules</span>{% endif %}
+        {% if r.committed %}<span class="pill ok">committed</span>{% else %}<span class="pill warn">not committed</span>{% endif %}
+        <span class="muted small">{{ (r.plan["items"] | length) if r.plan else 0 }} planned</span>
+      </span>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="empty card">No reviews yet. Your first one is <a href="/review">one click away</a>.</p>
+{% endif %}
+{% endblock %}

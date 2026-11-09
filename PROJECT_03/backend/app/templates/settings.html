@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<div class="page-head"><div><p class="eyebrow">Your setup</p><h1>Settings</h1></div></div>
+<div class="split">
+  <form class="card stack" method="post" action="/settings">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <h2>Profile</h2>
+    {% if saved %}<p class="notice ok" role="status">Saved.</p>{% endif %}
+    <p class="muted">{{ user.email }}</p>
+    <label>Name <input name="name" value="{{ user.name }}" maxlength="80" required></label>
+    <label>Timezone <input name="timezone" value="{{ user.timezone }}" list="zones" required></label>
+    <datalist id="zones" data-fill-timezones></datalist>
+    <label>Daily capacity (hours you can plan for)
+      <input name="capacity_hours" type="number" min="0.5" max="16" step="0.5" value="{{ user.capacity_hours }}">
+    </label>
+    <button class="btn primary">Save</button>
+  </form>
+  <section class="card">
+    <h2>Claude</h2>
+    {% if ai_enabled %}
+    <p>Connected. Reviews are written by <code>{{ ai_model }}</code>. Only today’s tasks, log, blockers and check-in are sent, and only when you press “Write my review”.</p>
+    {% else %}
+    <p>Not configured. Reviews use transparent rules. To let Claude write them, set <code>ANTHROPIC_API_KEY</code> in <code>PROJECT_03/.env</code> and restart.</p>
+    {% endif %}
+    <h2>How the planner decides</h2>
+    <p class="muted small">Priority 1/2/3 counts most; overdue and due-tomorrow tasks rise; every carry-over adds urgency; tasks already in progress get a boost. Tasks are added in that order until your capacity is full.</p>
+  </section>
+</div>
+{% endblock %}

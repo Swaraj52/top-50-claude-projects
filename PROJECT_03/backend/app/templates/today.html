@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Today{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <p class="eyebrow">{{ today | day("long") }}</p>
+    <h1>Today, {{ user.name.split(" ")[0] }}</h1>
+  </div>
+  <a class="btn primary" href="/review">{% if snap.review and snap.review.committed %}See today’s review{% else %}Start shutdown review →{% endif %}</a>
+</div>
+
+<div class="grid-today">
+  <div class="col-main">
+    {% include "partials/tasks.html" %}
+    {% include "partials/log.html" %}
+  </div>
+  <aside class="col-side">
+    {% include "partials/blockers.html" %}
+    {% include "partials/checkin.html" %}
+  </aside>
+</div>
+{% endblock %}

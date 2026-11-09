@@ -1,0 +1,95 @@
+<section id="tasks" class="card" aria-labelledby="tasks-h">
+  <div class="card-head">
+    <h2 id="tasks-h">Tasks</h2>
+    <span class="muted small">{{ snap.done | length }} done · {{ snap.open_today | length }} open · {{ (snap.open_today | sum(attribute="estimate_min")) | minutes }} planned</span>
+  </div>
+
+  <form class="add-task" method="post" action="/tasks" hx-post="/tasks" hx-target="#tasks" hx-swap="outerHTML">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input name="title" placeholder="Add a task…" aria-label="Task title" maxlength="200" required>
+    <input name="area" placeholder="area" aria-label="Area" maxlength="40" class="w-area" list="areas">
+    <select name="priority" aria-label="Priority"><option value="1">P1</option><option value="2" selected>P2</option><option value="3">P3</option></select>
+    <select name="estimate_min" aria-label="Estimate">
+      {% for m in [15, 30, 45, 60, 90, 120, 180] %}<option value="{{ m }}" {% if m == 30 %}selected{% endif %}>{{ m | minutes }}</option>{% endfor %}
+    </select>
+    <select name="when" aria-label="When"><option value="today">Today</option><option value="tomorrow">Tomorrow</option><option value="backlog">Backlog</option></select>
+    <button class="btn primary">Add</button>
+  </form>
+  <datalist id="areas">{% for a in (snap.open_today + snap.backlog + snap.done) | map(attribute="area") | select | unique %}<option value="{{ a }}">{% endfor %}</datalist>
+
+  {% if not snap.open_today and not snap.done %}
+  <p class="empty">Nothing planned for today yet. Add a task, or pull one in from the backlog below.</p>
+  {% endif %}
+
+  <ul class="tasks">
+    {% for t in snap.open_today %}
+    <li class="task {{ t.status }} p{{ t.priority }}">
+      <form method="post" action="/tasks/{{ t.id }}/status" hx-post="/tasks/{{ t.id }}/status" hx-target="#tasks" hx-swap="outerHTML">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="check" name="status" value="done" aria-label="Mark “{{ t.title }}” done" title="Done"></button>
+      </form>
+      <div class="task-main">
+        <span class="task-title">{{ t.title }}</span>
+        <span class="meta">
+          <span class="pill p{{ t.priority }}">P{{ t.priority }}</span>
+          {% if t.area %}<span class="pill area">{{ t.area }}</span>{% endif %}
+          <span>{{ t.estimate_min | minutes }}</span>
+          {% if t.carry_count %}<span class="pill warn" title="Carried over {{ t.carry_count }} times">↻ {{ t.carry_count }}</span>{% endif %}
+          {% if t.due_date %}<span class="{{ 'late' if t.due_date < today else '' }}">due {{ t.due_date | day }}</span>{% endif %}
+          {% if t.status == "doing" %}<span class="pill doing">in progress</span>{% endif %}
+        </span>
+      </div>
+      <div class="task-actions">
+        {% if t.status == "todo" %}
+        <form method="post" action="/tasks/{{ t.id }}/status" hx-post="/tasks/{{ t.id }}/status" hx-target="#tasks" hx-swap="outerHTML">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="btn ghost small" name="status" value="doing">Start</button>
+        </form>
+        {% endif %}
+        <details class="edit">
+          <summary class="btn ghost small">Edit</summary>
+          <form class="edit-form" method="post" action="/tasks/{{ t.id }}/update" hx-post="/tasks/{{ t.id }}/update" hx-target="#tasks" hx-swap="outerHTML">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <label>Title <input name="title" value="{{ t.title }}" maxlength="200" required></label>
+            <label>Area <input name="area" value="{{ t.area }}" maxlength="40"></label>
+            <label>Priority <select name="priority">{% for p in [1, 2, 3] %}<option value="{{ p }}" {% if p == t.priority %}selected{% endif %}>P{{ p }}</option>{% endfor %}</select></label>
+            <label>Estimate (min) <input name="estimate_min" type="number" min="5" max="480" step="5" value="{{ t.estimate_min }}"></label>
+            <label>Due <input name="due_date" type="date" value="{{ t.due_date or '' }}"></label>
+            <div class="row-end">
+              <button class="btn primary small">Save</button>
+              <button class="btn danger small" formaction="/tasks/{{ t.id }}/delete" hx-post="/tasks/{{ t.id }}/delete" hx-confirm="Delete “{{ t.title }}”?" data-confirm="Delete “{{ t.title }}”?">Delete</button>
+            </div>
+          </form>
+        </details>
+      </div>
+    </li>
+    {% endfor %}
+    {% for t in snap.done %}
+    <li class="task done">
+      <form method="post" action="/tasks/{{ t.id }}/status" hx-post="/tasks/{{ t.id }}/status" hx-target="#tasks" hx-swap="outerHTML">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="check on" name="status" value="todo" aria-label="Mark “{{ t.title }}” not done" title="Undo"></button>
+      </form>
+      <div class="task-main"><span class="task-title">{{ t.title }}</span><span class="meta">{{ t.estimate_min | minutes }}{% if t.area %} · {{ t.area }}{% endif %}</span></div>
+    </li>
+    {% endfor %}
+  </ul>
+
+  {% if snap.backlog or snap.upcoming %}
+  <details class="more">
+    <summary>Backlog {{ snap.backlog | length }} · upcoming {{ snap.upcoming | length }}</summary>
+    <ul class="tasks compact">
+      {% for t in snap.upcoming + snap.backlog %}
+      <li class="task">
+        <div class="task-main"><span class="task-title">{{ t.title }}</span>
+          <span class="meta"><span class="pill p{{ t.priority }}">P{{ t.priority }}</span> {{ t.estimate_min | minutes }}{% if t.planned_for %} · planned {{ t.planned_for | day }}{% else %} · backlog{% endif %}</span></div>
+        <form method="post" action="/tasks/{{ t.id }}/status" hx-post="/tasks/{{ t.id }}/status" hx-target="#tasks" hx-swap="outerHTML">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="btn ghost small" name="status" value="todo">Do today</button>
+        </form>
+      </li>
+      {% endfor %}
+    </ul>
+  </details>
+  {% endif %}
+</section>

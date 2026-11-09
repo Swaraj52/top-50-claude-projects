@@ -1,0 +1,33 @@
+<section id="blockers" class="card" aria-labelledby="blockers-h">
+  <div class="card-head">
+    <h2 id="blockers-h">Blockers</h2>
+    <span class="muted small">{{ snap.blockers_open | length }} open</span>
+  </div>
+  <form class="inline" method="post" action="/blockers" hx-post="/blockers" hx-target="#blockers" hx-swap="outerHTML">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input name="text" placeholder="What’s in the way?" aria-label="New blocker" maxlength="300" required>
+    <button class="btn">Add</button>
+  </form>
+  <ul class="blockers">
+    {% for b in snap.blockers_open %}
+    {% set age = (snap.day - b.opened_on).days %}
+    <li class="blocker {{ 'stale' if age > 3 else '' }}">
+      <span>{{ b.text }} <span class="muted small">· {% if age == 0 %}today{% else %}{{ age }} day{{ 's' if age != 1 }}{% endif %}</span></span>
+      <form method="post" action="/blockers/{{ b.id }}/resolve" hx-post="/blockers/{{ b.id }}/resolve" hx-target="#blockers" hx-swap="outerHTML">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn ghost small">Resolved</button>
+      </form>
+    </li>
+    {% endfor %}
+    {% for b in snap.blockers_resolved_today %}
+    <li class="blocker resolved">
+      <s>{{ b.text }}</s>
+      <form method="post" action="/blockers/{{ b.id }}/resolve" hx-post="/blockers/{{ b.id }}/resolve" hx-target="#blockers" hx-swap="outerHTML">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn ghost small" aria-label="Reopen “{{ b.text }}”">Reopen</button>
+      </form>
+    </li>
+    {% endfor %}
+  </ul>
+  {% if not snap.blockers_open and not snap.blockers_resolved_today %}<p class="empty">Nothing blocking you. Nice.</p>{% endif %}
+</section>

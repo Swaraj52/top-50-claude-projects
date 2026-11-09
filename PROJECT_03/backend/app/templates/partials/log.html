@@ -1,0 +1,34 @@
+{% set labels = {"done": "Did", "win": "Win", "learning": "Learned", "note": "Note"} %}
+<section id="log" class="card" aria-labelledby="log-h">
+  <div class="card-head">
+    <h2 id="log-h">Work log</h2>
+    <span class="muted small">{{ snap.log | length }} entries today</span>
+  </div>
+  <form class="add-log" method="post" action="/log" hx-post="/log" hx-target="#log" hx-swap="outerHTML">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <fieldset class="seg" aria-label="Entry type">
+      {% for k in ["done", "win", "learning", "note"] %}
+      <label><input type="radio" name="kind" value="{{ k }}" {% if loop.first %}checked{% endif %}><span>{{ labels[k] }}</span></label>
+      {% endfor %}
+    </fieldset>
+    <input name="text" placeholder="What happened? e.g. reviewed Priya’s PR" aria-label="Entry" maxlength="500" required>
+    <input name="minutes" inputmode="numeric" placeholder="min" aria-label="Minutes (optional)" class="w-min">
+    <button class="btn">Log</button>
+  </form>
+  {% if snap.log %}
+  <ul class="log">
+    {% for e in snap.log | reverse %}
+    <li class="entry {{ e.kind }}">
+      <span class="kind">{{ labels[e.kind] }}</span>
+      <span class="entry-text">{{ e.text }}{% if e.minutes %} <span class="muted">· {{ e.minutes | minutes }}</span>{% endif %}</span>
+      <form method="post" action="/log/{{ e.id }}/delete" hx-post="/log/{{ e.id }}/delete" hx-target="#log" hx-swap="outerHTML">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn ghost small" aria-label="Delete entry “{{ e.text }}”">×</button>
+      </form>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="empty">Log work as you go. It becomes tonight’s recap automatically.</p>
+  {% endif %}
+</section>

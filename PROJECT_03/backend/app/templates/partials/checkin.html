@@ -1,0 +1,24 @@
+{% set ci = snap.checkin %}
+<section id="checkin" class="card" aria-labelledby="checkin-h">
+  <div class="card-head">
+    <h2 id="checkin-h">Check-in</h2>
+    {% if ci %}<span class="saved small">saved ✓</span>{% endif %}
+  </div>
+  <form method="post" action="/checkin" hx-post="/checkin" hx-target="#checkin" hx-swap="outerHTML" class="checkin">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    {% for field, label, lo, hi in [("energy", "Energy", "drained", "charged"), ("mood", "Mood", "low", "great")] %}
+    <fieldset class="scale">
+      <legend>{{ label }}</legend>
+      <span class="muted small">{{ lo }}</span>
+      {% for n in range(1, 6) %}
+      <label><input type="radio" name="{{ field }}" value="{{ n }}" {% if (ci and ci[field] == n) or (not ci and n == 3) %}checked{% endif %}><span>{{ n }}</span></label>
+      {% endfor %}
+      <span class="muted small">{{ hi }}</span>
+    </fieldset>
+    {% endfor %}
+    <label class="focus">Deep-focus hours
+      <input name="focus_hours" type="number" min="0" max="16" step="0.25" value="{{ ci.focus_hours if ci else 0 }}">
+    </label>
+    <button class="btn">{{ 'Update' if ci else 'Save check-in' }}</button>
+  </form>
+</section>
