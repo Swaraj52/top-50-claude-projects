@@ -59,6 +59,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app = FastAPI(
         title="Personal Dashboard API",
+        contact={"name": "Swayam"},
         version=__version__,
         lifespan=lifespan,
         docs_url="/docs",

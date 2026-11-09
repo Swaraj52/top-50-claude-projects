@@ -52,7 +52,7 @@ def main() -> None:
         db.execute(delete(User).where(User.email == DEMO_EMAIL))
         db.commit()
 
-        user = User(email=DEMO_EMAIL, name="Ana", password_hash=hash_password(DEMO_PASSWORD), timezone=args.tz)
+        user = User(email=DEMO_EMAIL, name="Swayam", password_hash=hash_password(DEMO_PASSWORD), timezone=args.tz)
         db.add(user)
         db.flush()
         uid = user.id

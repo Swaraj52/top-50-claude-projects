@@ -92,6 +92,7 @@ export function Layout() {
       <main className="main" id="main">
         <Outlet />
       </main>
+      <footer className="site-foot">Stacks · designed and built by Swayam</footer>
     </>
   );
 }

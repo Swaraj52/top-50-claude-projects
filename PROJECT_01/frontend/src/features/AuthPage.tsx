@@ -55,6 +55,7 @@ export function AuthPage() {
             <span>Your Google, Outlook or Apple calendar via ICS, and any IMAP inbox, read-only.</span>
           </li>
         </ul>
+        <p className="credit">Daybook · designed and built by Swayam</p>
       </div>
       <form className="auth-form" onSubmit={submit} noValidate>
         <div>

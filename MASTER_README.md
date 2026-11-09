@@ -47,6 +47,8 @@ A project is marked **Completed** only when all of these are true:
 6. A secrets scan is clean and work is committed with a `release(project-NN)` commit and a
    `project-NN-v1.0` tag.
 7. `projects.json` is updated and the docs are regenerated.
+8. The owner, **Swayam**, is credited (README author line, in-app credit, demo name), and
+   `docs/YOUR_DATA.md` lists the data the project can use and how to provide it.
 
 GitHub publication is tracked separately. A project can be complete locally while its push is blocked.
 
@@ -63,7 +65,9 @@ GitHub publication is tracked separately. A project can be complete locally whil
 8. Push to GitHub and check the files appear there.
 9. Open the live preview for the owner in the Browser pane (`preview_start` with the project's
    `.claude/launch.json` entry), signed in to the demo account where the app needs one.
-10. Update every file in `recovery/` with the final state. **Stop and report.**
+10. Ask the owner for the project's data (`docs/YOUR_DATA.md`). Load chat-safe data with
+    `scripts/import_data.py`; secrets are entered by the owner in the app or `.env`.
+11. Update every file in `recovery/` with the final state. **Stop and report.**
 
 ## 4. Quality bar
 

@@ -1,6 +1,6 @@
 # Project 01: Personal Dashboard ("Daybook")
 
-**Category:** 1. Personal Productivity & Life Management · **Status:** Completed (v1.0)
+**Author:** Swayam · **Category:** 1. Personal Productivity & Life Management · **Status:** Completed (v1.2)
 
 Daybook puts your calendar, tasks, reminders, email and daily priorities on one page, laid
 out like a morning newspaper. A daily briefing (written by Claude when an API key is

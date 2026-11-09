@@ -79,6 +79,7 @@ export function Layout() {
           <button className="btn btn-ghost btn-sm" onClick={cycleTheme} aria-label={`Theme: ${theme}. Change theme`}>
             Theme: {theme === 'system' ? 'Auto' : theme === 'light' ? 'Morning' : 'Night'}
           </button>
+          <p className="credit">Built by Swayam</p>
           <div className="rail-user">
             <span title={me?.email} style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {me?.name}

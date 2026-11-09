@@ -27,3 +27,13 @@ gh auth status
 cd PROJECT_02/backend && .venv/Scripts/python -m pytest   # 60 passed
 cd PROJECT_02/frontend && npm test                        # 12 passed
 ```
+
+## Pending follow-ups for Projects 01 and 02 (owner request, 2026-11-09)
+
+The "credit Swayam" change is done and pushed (READMEs, in-app credit, API metadata, demo name).
+Still to do, after the current project (03) is finished:
+1. Retake the screenshots that show the demo user's name or the credit
+   (P01: most pages; P02: inbox, mobile, sign-in) so they show "Swayam".
+2. Add `docs/YOUR_DATA.md` and `scripts/import_data.py` to Projects 01 and 02. The importer
+   creates a temporary session for the owner's account and calls the app's own API, so no password
+   is needed. Then ask the owner for each project's data.

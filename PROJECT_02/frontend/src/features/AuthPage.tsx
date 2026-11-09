@@ -41,6 +41,7 @@ export function AuthPage() {
           <div><span className="mono">NWS 0213</span>Markets: inflation cools again</div>
         </div>
         <p style={{ margin: 0, opacity: 0.85 }}>Save articles, YouTube videos, newsletters and PDFs. Search them all, then ask questions with cited answers.</p>
+        <p className="credit">Designed and built by Swayam</p>
       </div>
       <form className="auth-form" onSubmit={submit} noValidate>
         <div>

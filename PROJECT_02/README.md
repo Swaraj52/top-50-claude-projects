@@ -1,6 +1,6 @@
 # Project 02: Second Brain / Life Library ("Stacks")
 
-**Category:** 1. Personal Productivity & Life Management · **Status:** Completed (v1.0)
+**Author:** Swayam · **Category:** 1. Personal Productivity & Life Management · **Status:** Completed (v1.1)
 
 Stacks is a personal reading library. Save articles, YouTube videos, newsletters, PDFs and
 notes; triage them in an inbox; find anything with full-text search; get summaries; and

@@ -1495,3 +1495,12 @@ textarea {
   padding: 0;
   box-shadow: var(--shadow);
 }
+
+.credit {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}

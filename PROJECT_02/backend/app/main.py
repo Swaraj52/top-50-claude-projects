@@ -44,7 +44,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         yield
         app.state.engine.dispose()
 
-    app = FastAPI(title="Life Library API", version=__version__, lifespan=lifespan, docs_url="/docs", redoc_url=None)
+    app = FastAPI(title="Life Library API", version=__version__, contact={"name": "Swayam"}, lifespan=lifespan, docs_url="/docs", redoc_url=None)
     engine = make_engine(settings.database_url)
     app.state.settings = settings
     app.state.engine = engine

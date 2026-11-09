@@ -277,3 +277,20 @@ mark { background: var(--mark); color: inherit; padding: 0 2px; border-radius: 2
   .auth { grid-template-columns: minmax(0, 1fr); }
   .auth-art .catalog { display: none; }
 }
+
+.site-foot {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 18px 24px 28px;
+  border-top: 1px solid var(--rule);
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.credit {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  opacity: 0.8;
+}

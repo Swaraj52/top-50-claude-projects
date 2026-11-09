@@ -1,6 +1,6 @@
 # Top 50 Claude Projects
 
-A portfolio of 50 independently runnable software applications, built one at a time from the
+A portfolio by **Swayam**: 50 independently runnable software applications, built one at a time from the
 *Top 50 Claude Project Ideas* list. The projects span personal productivity, business operations,
 marketing, learning, finance, developer tooling and team/community work.
 

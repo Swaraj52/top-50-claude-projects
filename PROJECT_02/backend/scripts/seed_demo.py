@@ -119,7 +119,7 @@ def main() -> None:
             db.execute(delete(User).where(User.id == old.id))
             db.commit()
 
-        user = User(email=DEMO_EMAIL, name="Rhea Kapoor", password_hash=hash_password(DEMO_PASSWORD))
+        user = User(email=DEMO_EMAIL, name="Swayam", password_hash=hash_password(DEMO_PASSWORD))
         db.add(user)
         db.flush()
         tags: dict[str, Tag] = {}

@@ -28,6 +28,14 @@ The current authorization lives in `recovery/CURRENT_STATE.md` → **Authorized 
   databases, and never force-push.
 - Never spend API credits or deploy publicly without the owner's explicit permission.
 - Update the `recovery/` files before ending a session or finishing a project.
+- **Credit the owner, Swayam, in every project:** an `**Author:** Swayam` line in the project
+  README, a visible "built by Swayam" credit in the app UI, `author` / API-docs contact metadata,
+  and "Swayam" as the demo account's display name.
+- **After each project is complete, ask the owner for its data** using the project's
+  `docs/YOUR_DATA.md` checklist. Non-secret data (lists, links, tasks, preferences) can be given in
+  chat and loaded with the project's `scripts/import_data.py`. **Never ask for secrets in chat**
+  (passwords, API keys, app passwords, private calendar links): the owner enters those in the app's
+  own forms or in the project `.env`.
 - **Every project gets a live preview** (owner's standing request): a one-command preview with demo
   data, a `project-NN-<slug>` entry in `.claude/launch.json`, and the running app opened in the
   Browser pane for the owner when the project is finished. If the owner asks to see a finished
