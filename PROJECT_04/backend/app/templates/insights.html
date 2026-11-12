@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Insights{% endblock %}
+{% block header %}
+<div>
+  <p class="eyebrow">Eight-week view</p>
+  <h1>Progress, honestly measured</h1>
+  <p class="lede">Completion, confidence and which goals are actually moving.</p>
+</div>
+{% endblock %}
+{% block content %}
+<section class="stat-grid three">
+  <article class="stat"><p class="stat-label">Actions completed</p><p class="stat-value">{{ total_actions }}</p><p class="stat-note">in the last eight weeks</p></article>
+  <article class="stat"><p class="stat-label">Average completion</p><p class="stat-value">{{ avg_rate }}%</p><p class="stat-note">of planned actions per week</p></article>
+  <article class="stat"><p class="stat-label">Active goals</p><p class="stat-value">{{ active_count }}</p><p class="stat-note">milestones weighted by importance</p></article>
+</section>
+
+<div class="chart-grid">
+  <section class="panel"><div class="panel-head"><div><p class="eyebrow">Volume</p><h2>Completed actions</h2></div></div>{{ figures.volume }}</section>
+  <section class="panel"><div class="panel-head"><div><p class="eyebrow">Consistency</p><h2>Completion rate</h2></div></div>{{ figures.rate }}</section>
+  <section class="panel span-all"><div class="panel-head"><div><p class="eyebrow">Signal</p><h2>Confidence over time</h2></div></div>{{ figures.confidence }}
+    <p class="panel-foot muted">Weekly average of your 1–5 check-ins. Empty weeks are gaps in the data, not zeroes.</p>
+  </section>
+</div>
+
+<div class="split">
+  <section class="panel">
+    <div class="panel-head"><div><p class="eyebrow">Portfolio</p><h2>Where the goals sit</h2></div></div>
+    {% if categories %}
+    <ul class="category-list">
+      {% for row in categories %}
+      <li>
+        <span class="chip cat-{{ row.category }}">{{ row.category|capitalize }}</span>
+        <div class="progress"><span style="width: {{ row.progress }}%"></span></div>
+        <strong>{{ row.progress }}%</strong>
+        <span class="muted">{{ row.count }} goal{{ '' if row.count == 1 else 's' }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="muted">No goals yet.</p>
+    {% endif %}
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><div><p class="eyebrow">Diagnosis</p><h2>Goal health</h2></div></div>
+    {% if health %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Goal</th><th>Progress</th><th>Pace</th><th>Next milestone</th></tr></thead>
+        <tbody>
+          {% for row in health %}
+          <tr>
+            <td><a href="/goals/{{ row.goal.id }}">{{ row.goal.title }}</a></td>
+            <td><strong>{{ row.progress }}%</strong></td>
+            <td><span class="badge {{ row.pace.state }}">{{ row.pace.state.replace('-', ' ') }}</span></td>
+            <td class="muted">{{ row.next.title if row.next else '—' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="muted">No active goals to diagnose.</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

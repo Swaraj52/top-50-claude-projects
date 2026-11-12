@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block title %}{{ goal.title }}{% endblock %}
+{% block header %}
+<div>
+  <p class="eyebrow"><a class="quiet-link" href="/goals">← All goals</a> · {{ categories[goal.category] }}</p>
+  <h1>{{ goal.title }}</h1>
+  <p class="lede">
+    <span class="badge {{ pace.state }}">{{ pace.state.replace('-', ' ') }}</span>
+    {% if goal.target_date %}Target {{ goal.target_date|datefmt('long') }}{% if pace.days_left is not none %} · {{ pace.days_left }} days{% if pace.days_left >= 0 %} left{% else %} ago{% endif %}{% endif %}{% else %}No target date{% endif %}
+  </p>
+</div>
+<details class="menu">
+  <summary class="btn ghost">Goal actions</summary>
+  <div class="menu-pop">
+    {% if goal.status != 'active' %}<form method="post" action="/goals/{{ goal.id }}/status"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="status" value="active"><button class="menu-item" type="submit">Reactivate</button></form>{% endif %}
+    {% if goal.status == 'active' %}<form method="post" action="/goals/{{ goal.id }}/status"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="status" value="achieved"><button class="menu-item" type="submit">Mark achieved</button></form>{% endif %}
+    {% if goal.status != 'paused' %}<form method="post" action="/goals/{{ goal.id }}/status"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="status" value="paused"><button class="menu-item" type="submit">Pause</button></form>{% endif %}
+    {% if goal.status != 'archived' %}<form method="post" action="/goals/{{ goal.id }}/status"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="status" value="archived"><button class="menu-item" type="submit">Archive</button></form>{% endif %}
+    <a class="menu-item" href="/goals/{{ goal.id }}/review">Printable review</a>
+    <form method="post" action="/goals/{{ goal.id }}/delete" data-confirm-form="Delete “{{ goal.title }}”, its milestones, actions and check-ins? This cannot be undone.">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button class="menu-item danger" type="submit">Delete goal</button>
+    </form>
+  </div>
+</details>
+{% endblock %}
+{% block content %}
+{% if planned %}
+<div class="notice success" role="status">
+  <strong>{{ planned }} action{{ '' if planned == 1 else 's' }} added to the week.</strong>
+  {% if coach_source == "claude" %}Claude wrote the plan, validated against your goals and milestones.{% else %}The local planner wrote the plan (no API key configured).{% endif %}
+</div>
+{% endif %}
+{% if saved %}<div class="notice success" role="status">Goal updated.</div>{% endif %}
+
+<section class="hero-goal">
+  <div class="ring" style="--p: {{ progress }}">
+    <div class="ring-in"><strong>{{ progress }}%</strong><span>milestones</span></div>
+  </div>
+  <div class="hero-copy">
+    {% if goal.why %}<p class="quote">“{{ goal.why }}”</p>{% endif %}
+    {% if goal.description %}<p>{{ goal.description }}</p>{% endif %}
+    <div class="hero-facts">
+      <div><span>Next up</span><strong>{{ next_ms.title if next_ms else 'Add a milestone' }}</strong></div>
+      <div><span>Milestones</span><strong>{{ goal.milestones|selectattr('status','eq','done')|list|length }} of {{ goal.milestones|length }} done</strong></div>
+      <div><span>Pace</span><strong>{% if pace.expected is not none %}{{ pace.actual }}% vs {{ pace.expected }}% expected{% else %}No target date{% endif %}</strong></div>
+    </div>
+  </div>
+</section>
+
+<div class="split">
+  <section class="panel">
+    <div class="panel-head">
+      <div><p class="eyebrow">Checkpoints</p><h2>Milestones</h2></div>
+      <span class="muted">{{ progress }}% weighted</span>
+    </div>
+    {% if goal.milestones %}
+    <ol class="milestones">
+      {% for m in goal.milestones %}
+      <li class="milestone {{ 'done' if m.status == 'done' }}">
+        <form method="post" action="/milestones/{{ m.id }}/toggle">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="tick" type="submit" aria-pressed="{{ 'true' if m.status == 'done' else 'false' }}" aria-label="Toggle {{ m.title }}">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m4 10 4 4 8-9"/></svg>
+          </button>
+        </form>
+        <div class="milestone-main">
+          <span class="milestone-title">{{ m.title }}</span>
+          {% if m.detail %}<span class="milestone-detail">{{ m.detail }}</span>{% endif %}
+          <span class="milestone-meta">
+            {% if m.due_date %}Due {{ m.due_date|datefmt }}{% else %}No due date{% endif %}
+            · weight {{ m.weight }}/5
+            {% if m.completed_at %}· completed{% endif %}
+          </span>
+        </div>
+        <form method="post" action="/milestones/{{ m.id }}/delete" class="row-del" data-confirm-form="Delete this milestone?">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="icon-btn" type="submit" aria-label="Delete {{ m.title }}">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5h10M8 5V3h4v2M7 8v8M13 8v8M6 5l1 13h6l1-13"/></svg>
+          </button>
+        </form>
+      </li>
+      {% endfor %}
+    </ol>
+    {% else %}
+    <div class="empty compact"><h3>Progress is invisible</h3><p>Add two or three milestones; weight the important ones higher.</p></div>
+    {% endif %}
+
+    <details class="add-box">
+      <summary class="btn small">Add milestone</summary>
+      <form method="post" action="/goals/{{ goal.id }}/milestones" class="form-grid compact-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label class="span-2">Milestone
+          <input type="text" name="title" maxlength="160" required placeholder="e.g. Run 10 km without stopping">
+        </label>
+        <label>Due date <input type="date" name="due_date"></label>
+        <label>Weight
+          <select name="weight"><option value="1">1 · small</option><option value="2">2</option><option value="3" selected>3 · meaningful</option><option value="4">4</option><option value="5">5 · major</option></select>
+        </label>
+        <label class="span-2">Detail <span class="hint">optional</span><textarea name="detail" rows="2" maxlength="1000"></textarea></label>
+        <div class="span-2"><button class="btn primary small" type="submit">Add milestone</button></div>
+      </form>
+    </details>
+  </section>
+
+  <div class="column">
+    <section class="panel">
+      <div class="panel-head">
+        <div><p class="eyebrow">{{ week_label }}</p><h2>Actions this week</h2></div>
+        <a class="quiet-link" href="/weekly?week={{ week_start.isoformat() }}">Week plan →</a>
+      </div>
+      {% if actions %}
+      <div class="action-list">
+        {% for action in actions %}{% include "partials/action_row.html" %}{% endfor %}
+      </div>
+      {% else %}
+      <div class="empty compact"><h3>No actions yet</h3><p>Generate a plan or add one action on the weekly page.</p></div>
+      {% endif %}
+      <div class="coach-box">
+        <div>
+          <strong>Weekly coach</strong>
+          <p class="muted small">{% if ai_enabled %}Claude reads this goal's milestones and check-ins, then proposes up to five actions. Every output is validated; failures fall back to the local planner.{% else %}The local planner proposes actions from your milestones and pace. Add an API key to use Claude instead.{% endif %}</p>
+        </div>
+        <form method="post" action="/goals/{{ goal.id }}/coach">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="btn primary small" type="submit">{{ 'Ask Claude' if ai_enabled else 'Generate a plan' }}</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><div><p class="eyebrow">Honest signal</p><h2>Check in</h2></div></div>
+      <form method="post" action="/goals/{{ goal.id }}/checkins" class="stack">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <fieldset class="scale">
+          <legend>How confident are you this goal stays on track?</legend>
+          {% for n in [1,2,3,4,5] %}
+          <label><input type="radio" name="confidence" value="{{ n }}" {% if n == (checkins[0].confidence if checkins and checkins[0].day == today else 3) %}checked{% endif %} required><span>{{ n }}</span></label>
+          {% endfor %}
+        </fieldset>
+        <label>What is in the way, or what changed?
+          <textarea name="note" rows="2" maxlength="500" placeholder="One honest sentence."></textarea>
+        </label>
+        <button class="btn" type="submit">Save today's check-in</button>
+      </form>
+      {% if checkins %}
+      <ol class="timeline">
+        {% for k in checkins %}
+        <li>
+          <span class="dot c{{ k.confidence }}"></span>
+          <div><strong>{{ k.day|datefmt('long') }} · {{ k.confidence }}/5</strong>{% if k.note %}<p>{{ k.note }}</p>{% endif %}</div>
+        </li>
+        {% endfor %}
+      </ol>
+      {% endif %}
+    </section>
+  </div>
+</div>
+
+<section class="panel form-panel">
+  <details>
+    <summary><strong>Edit goal details</strong></summary>
+    <form method="post" action="/goals/{{ goal.id }}/update" class="form-grid">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label class="span-2">Title <input type="text" name="title" value="{{ goal.title }}" maxlength="160" required></label>
+      <label>Category
+        <select name="category">{% for key, label in categories.items() %}<option value="{{ key }}" {% if goal.category == key %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+      </label>
+      <label>Target date <input type="date" name="target_date" value="{{ goal.target_date.isoformat() if goal.target_date else '' }}"></label>
+      <label class="span-2">Why <textarea name="why" rows="2" maxlength="1200">{{ goal.why }}</textarea></label>
+      <label class="span-2">Description <textarea name="description" rows="3" maxlength="4000">{{ goal.description }}</textarea></label>
+      <div class="span-2"><button class="btn primary" type="submit">Save changes</button></div>
+    </form>
+  </details>
+</section>
+{% endblock %}

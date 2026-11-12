@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block auth_content %}
+<div class="auth-split">
+  <section class="auth-art" aria-hidden="true">
+    <svg viewBox="0 0 600 520" class="ridges">
+      <path d="M-20 470 140 210l90 130 70-110 160 240Z" class="ridge back"/>
+      <path d="M-20 520 190 280l80 100 110-170 240 310Z" class="ridge front"/>
+      <path d="M310 380 400 210l40 55 30-40 90 155Z" class="ridge snow"/>
+      <circle cx="455" cy="105" r="38" class="sun"/>
+    </svg>
+    <div class="auth-art-copy">
+      <p class="eyebrow">Personal Goal Tracker</p>
+      <h1>Long goals.<br>Small weeks.</h1>
+      <p>Break a distant ambition into milestones you can see, actions you can finish this week, and check-ins that tell the truth.</p>
+    </div>
+  </section>
+  <section class="auth-panel">
+    <div class="auth-card">
+      <p class="eyebrow">Welcome back</p>
+      <h2>Sign in to Summit</h2>
+      {% if error %}<div class="notice error" role="alert">{{ error }}</div>{% endif %}
+      <form method="post" action="/login" class="stack">
+        <input type="hidden" name="csrf_token" value="{{ form_csrf }}">
+        <label>Email
+          <input type="email" name="email" value="{{ values.email or '' }}" autocomplete="email" required autofocus>
+        </label>
+        <label>Password
+          <input type="password" name="password" autocomplete="current-password" required>
+        </label>
+        <button class="btn primary wide" type="submit">Sign in</button>
+      </form>
+      <p class="auth-alt">New here? <a href="/register">Create an account</a></p>
+    </div>
+  </section>
+</div>
+{% endblock %}

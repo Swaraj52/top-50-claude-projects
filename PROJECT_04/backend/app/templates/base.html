@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="Swayam">
+  <meta name="description" content="Summit turns long-term goals into milestones, weekly actions and honest check-ins.">
+  <title>{% block title %}Summit{% endblock %} · Goal Tracker</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/app.css?v={{ version }}">
+  <script src="/static/htmx.min.js" defer></script>
+  <script src="/static/app.js?v={{ version }}" defer></script>
+</head>
+<body hx-headers='{"X-CSRF-Token": "{{ csrf_token }}"}'>
+  {% if user %}
+  <div class="shell">
+    <aside class="sidebar">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M3 32 15 9l7 12 5-7 10 18Z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M15 9v23M27 14v18" stroke="currentColor" stroke-width="2.4"/></svg>
+        <span class="brand-text">Summit<small>goals into weeks</small></span>
+      </a>
+      <nav class="nav" aria-label="Main">
+        <a href="/" {% if path == "/" %}aria-current="page"{% endif %}>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h6v7H4zM10 7h6v13h-6zM16 4h4v16h-4z"/></svg>
+          Overview
+        </a>
+        <a href="/goals" {% if path.startswith("/goals") and not path.endswith("/review") %}aria-current="page"{% endif %}>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+          Goals
+        </a>
+        <a href="/weekly" {% if path.startswith("/weekly") %}aria-current="page"{% endif %}>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 14h3M8 17h6"/></svg>
+          This week
+        </a>
+        <a href="/insights" {% if path.startswith("/insights") %}aria-current="page"{% endif %}>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h16M8 15l4-5 3 3 5-7"/></svg>
+          Insights
+        </a>
+        <a href="/settings" {% if path.startswith("/settings") %}aria-current="page"{% endif %}>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.4-2.4 1a7 7 0 0 0-1.7-1L14.5 3h-4l-.4 3.1a7 7 0 0 0-1.7 1l-2.4-1-2 3.4L6 11a7 7 0 0 0 0 2l-2 1.5 2 3.4 2.4-1a7 7 0 0 0 1.7 1l.4 3.1h4l.4-3.1a7 7 0 0 0 1.7-1l2.4 1 2-3.4-2-1.5c.1-.3.1-.7.1-1Z"/></svg>
+          Settings
+        </a>
+      </nav>
+      <div class="sidebar-foot">
+        <p class="week-chip">Week of {{ week_start|datefmt("long") if week_start else "" }}</p>
+        <div class="who">
+          <span class="avatar" aria-hidden="true">{{ user.name[0]|upper }}</span>
+          <span class="who-text"><strong>{{ user.name }}</strong><small>{{ user.email }}</small></span>
+        </div>
+        <form method="post" action="/logout">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="btn ghost small" type="submit">Sign out</button>
+        </form>
+      </div>
+    </aside>
+    <div class="content">
+      <header class="topbar">{% block header %}{% endblock %}</header>
+      <main id="main">{% block content %}{% endblock %}</main>
+      <footer class="foot">Summit · designed and built by Swayam</footer>
+    </div>
+  </div>
+  {% else %}
+  <main class="auth-main" id="main">{% block auth_content %}{% endblock %}</main>
+  <footer class="foot auth-foot">Summit · designed and built by Swayam</footer>
+  {% endif %}
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+</body>
+</html>

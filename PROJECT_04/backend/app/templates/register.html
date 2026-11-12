@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Create account{% endblock %}
+{% block auth_content %}
+<div class="auth-split">
+  <section class="auth-art" aria-hidden="true">
+    <svg viewBox="0 0 600 520" class="ridges">
+      <path d="M-20 470 140 210l90 130 70-110 160 240Z" class="ridge back"/>
+      <path d="M-20 520 190 280l80 100 110-170 240 310Z" class="ridge front"/>
+      <path d="M310 380 400 210l40 55 30-40 90 155Z" class="ridge snow"/>
+      <circle cx="455" cy="105" r="38" class="sun"/>
+    </svg>
+    <div class="auth-art-copy">
+      <p class="eyebrow">Start at the trailhead</p>
+      <h1>Make the goal<br>measurable.</h1>
+      <p>Three milestones, one weekly plan, one honest check-in. That is enough to turn intention into progress.</p>
+    </div>
+  </section>
+  <section class="auth-panel">
+    <div class="auth-card">
+      <p class="eyebrow">New account</p>
+      <h2>Create your Summit</h2>
+      {% if error %}<div class="notice error" role="alert">{{ error }}</div>{% endif %}
+      <form method="post" action="/register" class="stack">
+        <input type="hidden" name="csrf_token" value="{{ form_csrf }}">
+        <label>Name
+          <input type="text" name="name" value="{{ values.name or '' }}" maxlength="80" autocomplete="name" required autofocus>
+        </label>
+        <label>Email
+          <input type="email" name="email" value="{{ values.email or '' }}" autocomplete="email" required>
+        </label>
+        <label>Password
+          <input type="password" name="password" minlength="8" maxlength="128" autocomplete="new-password" required>
+          <small>At least 8 characters.</small>
+        </label>
+        <input type="hidden" name="timezone" value="UTC" data-browser-timezone>
+        <button class="btn primary wide" type="submit">Create account</button>
+      </form>
+      <p class="auth-alt">Already have an account? <a href="/login">Sign in</a></p>
+    </div>
+  </section>
+</div>
+{% endblock %}

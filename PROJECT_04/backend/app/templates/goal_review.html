@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}{{ goal.title }} · Review{% endblock %}
+{% block header %}
+<div>
+  <p class="eyebrow">One-page review</p>
+  <h1>{{ goal.title }}</h1>
+  <p class="lede">{{ goal.category|capitalize }} · {{ goal.status }} · {{ progress }}% of weighted milestones</p>
+</div>
+<button class="btn ghost" type="button" data-print>Print / save PDF</button>
+{% endblock %}
+{% block content %}
+<section class="panel review-sheet">
+  <div class="review-head">
+    <div><span class="muted">Target</span><strong>{{ goal.target_date|datefmt('long') if goal.target_date else 'No target date' }}</strong></div>
+    <div><span class="muted">Pace</span><strong>{{ pace.state.replace('-', ' ') }}{% if pace.expected is not none %} · {{ progress }}% vs {{ pace.expected }}% expected{% endif %}</strong></div>
+    <div><span class="muted">Check-ins</span><strong>{{ checkins|length }} recent</strong></div>
+  </div>
+  {% if goal.why %}<blockquote>“{{ goal.why }}”</blockquote>{% endif %}
+  {% if goal.description %}<p>{{ goal.description }}</p>{% endif %}
+
+  <h2>Milestones</h2>
+  {% if goal.milestones %}
+  <ul class="review-list">
+    {% for m in goal.milestones %}
+    <li><span class="mark {{ 'done' if m.status == 'done' }}">{{ '✓' if m.status == 'done' else '○' }}</span> <strong>{{ m.title }}</strong> <span class="muted">weight {{ m.weight }}{% if m.due_date %} · due {{ m.due_date|datefmt }}{% endif %}</span></li>
+    {% endfor %}
+  </ul>
+  {% else %}<p class="muted">No milestones.</p>{% endif %}
+
+  <h2>This week's actions</h2>
+  {% if actions %}
+  <ul class="review-list">
+    {% for a in actions %}<li><span class="mark {{ 'done' if a.status == 'done' }}">{{ '✓' if a.status == 'done' else '○' }}</span> {{ a.title }} <span class="muted">{{ a.estimate_min|mins }}</span></li>{% endfor %}
+  </ul>
+  {% else %}<p class="muted">No actions planned this week.</p>{% endif %}
+
+  <h2>Recent check-ins</h2>
+  {% if checkins %}
+  <ul class="review-list">
+    {% for k in checkins %}<li><strong>{{ k.day|datefmt('long') }}</strong> · confidence {{ k.confidence }}/5{% if k.note %} — {{ k.note }}{% endif %}</li>{% endfor %}
+  </ul>
+  {% else %}<p class="muted">No check-ins yet.</p>{% endif %}
+
+  <p class="review-foot">Generated from Summit on {{ today|datefmt('long') }} · built by Swayam</p>
+</section>
+{% endblock %}

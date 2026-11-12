@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block header %}
+<div><p class="eyebrow">Your account</p><h1>Settings</h1><p class="lede">Time, capacity, security and a copy of your data.</p></div>
+{% endblock %}
+{% block content %}
+{% if saved %}<div class="notice success" role="status">Changes saved.</div>{% endif %}
+<div class="split">
+  <section class="panel">
+    <div class="panel-head"><div><p class="eyebrow">Profile</p><h2>How Summit works for you</h2></div></div>
+    <form method="post" action="/settings" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label>Name <input type="text" name="name" value="{{ user.name }}" maxlength="80" required></label>
+      <label>Email <input type="email" value="{{ user.email }}" disabled><small>Email changes are not supported in v1.</small></label>
+      <label>Timezone
+        <input type="text" name="timezone" value="{{ user.timezone }}" list="timezones" required>
+        <datalist id="timezones" data-fill-timezones></datalist>
+        <small>Weeks and check-in days follow this timezone.</small>
+      </label>
+      <label>Weekly capacity (minutes)
+        <input type="number" name="weekly_capacity_min" value="{{ user.weekly_capacity_min }}" min="30" max="3000" step="15" required>
+        <small>The plan warns you when the week exceeds this. Default: {{ 300|mins }}.</small>
+      </label>
+      <button class="btn primary" type="submit">Save settings</button>
+    </form>
+  </section>
+
+  <div class="column">
+    <section class="panel">
+      <div class="panel-head"><div><p class="eyebrow">Security</p><h2>Change password</h2></div></div>
+      <form method="post" action="/settings/password" class="stack">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label>Current password <input type="password" name="current_password" autocomplete="current-password" required></label>
+        <label>New password <input type="password" name="new_password" minlength="8" maxlength="128" autocomplete="new-password" required></label>
+        <button class="btn" type="submit">Update password</button>
+        <small class="muted">Other devices are signed out.</small>
+      </form>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><div><p class="eyebrow">Portability</p><h2>Export your data</h2></div></div>
+      <p class="muted">Goals, milestones, actions and check-ins as JSON. No secrets or session data.</p>
+      <a class="btn" href="/settings/export" download>Download JSON</a>
+    </section>
+
+    <section class="panel danger-zone">
+      <div class="panel-head"><div><p class="eyebrow">Danger zone</p><h2>Delete account</h2></div></div>
+      <details>
+        <summary class="btn danger small">Delete everything</summary>
+        <p class="muted small">This removes your account and all goals immediately. Export first if you may want the data.</p>
+        <form method="post" action="/settings/delete" class="stack" data-confirm-form="Permanently delete your account and all goal data?">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <label>Password <input type="password" name="password" autocomplete="current-password" required></label>
+          <label>Type DELETE to confirm <input type="text" name="confirm" required pattern="DELETE"></label>
+          <button class="btn danger" type="submit">Delete my account</button>
+        </form>
+      </details>
+    </section>
+  </div>
+</div>
+{% endblock %}

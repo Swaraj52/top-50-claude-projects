@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}This week{% endblock %}
+{% block header %}
+<div>
+  <p class="eyebrow">Weekly plan</p>
+  <h1>{{ week_label }}</h1>
+  <p class="lede">{{ stats.done }} of {{ stats.total }} actions done · {{ stats.done_minutes|mins }} of {{ stats.minutes|mins }} planned time completed.</p>
+</div>
+<div class="week-nav">
+  <a class="btn ghost small" href="/weekly?week={{ prev_week }}" aria-label="Previous week">←</a>
+  {% if not is_current %}<a class="btn ghost small" href="/weekly">This week</a>{% endif %}
+  <a class="btn ghost small" href="/weekly?week={{ next_week }}" aria-label="Next week">→</a>
+</div>
+{% endblock %}
+{% block content %}
+{% if carried %}<div class="notice success" role="status">{{ carried }} unfinished action{{ '' if carried == 1 else 's' }} carried into this week.</div>{% endif %}
+
+<section class="capacity {{ 'over' if stats.minutes > capacity }}">
+  <div class="capacity-copy">
+    <strong>Load {{ stats.minutes|mins }} / {{ capacity|mins }}</strong>
+    <span class="muted">{% if stats.minutes > capacity %}Over capacity by {{ (stats.minutes - capacity)|mins }}. Cut something before the week cuts you.{% else %}{{ (capacity - stats.minutes)|mins }} of slack left this week.{% endif %}</span>
+  </div>
+  <div class="meter large" aria-hidden="true"><span style="width: {{ (100 * stats.minutes / capacity)|round|int if capacity else 0 }}%"></span></div>
+</section>
+
+<div class="split">
+  <section class="panel">
+    <div class="panel-head">
+      <div><p class="eyebrow">Commitments</p><h2>Actions by goal</h2></div>
+      <form method="post" action="/weekly/carry">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="week_start" value="{{ week_start.isoformat() }}">
+        <button class="btn ghost small" type="submit" data-confirm="Copy last week's unfinished actions into this week?">Carry from last week</button>
+      </form>
+    </div>
+    {% if actions %}
+      {% for goal_id, items in grouped.items() %}
+      <div class="week-group">
+        <div class="week-group-head">
+          <a href="/goals/{{ goal_id }}">{{ goal_map[goal_id].title }}</a>
+          <span class="muted">{{ items|selectattr('status','eq','done')|list|length }}/{{ items|length }}</span>
+        </div>
+        <div class="action-list">
+          {% for action in items %}
+            {% set next_url = '/weekly?week=' ~ week_start.isoformat() %}
+            {% set show_delete = true %}
+            {% include "partials/action_row.html" %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty">
+        <h3>Nothing planned</h3>
+        <p>A week without a plan becomes a week of reacting. Add two actions you can finish in a sitting.</p>
+      </div>
+    {% endif %}
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><div><p class="eyebrow">Add</p><h2>One action</h2></div></div>
+    {% if goals %}
+    <form method="post" action="/weekly/actions" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="week_start" value="{{ week_start.isoformat() }}">
+      <label>Action
+        <input type="text" name="title" maxlength="200" required placeholder="e.g. Draft the first chapter">
+      </label>
+      <label>Goal
+        <select name="goal_id" required>
+          {% for g in goals %}<option value="{{ g.id }}">{{ g.title }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>Milestone <span class="hint">optional</span>
+        <select name="milestone_id">
+          <option value="">— none —</option>
+          {% for g in goals %}
+            {% if g.milestones %}
+            <optgroup label="{{ g.title }}">
+              {% for m in g.milestones %}{% if m.status != 'done' %}<option value="{{ m.id }}">{{ m.title }}</option>{% endif %}{% endfor %}
+            </optgroup>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </label>
+      <label>Estimate
+        <select name="estimate_min">
+          <option value="15">15 minutes</option>
+          <option value="30">30 minutes</option>
+          <option value="45" selected>45 minutes</option>
+          <option value="60">1 hour</option>
+          <option value="90">1.5 hours</option>
+          <option value="120">2 hours</option>
+        </select>
+      </label>
+      <button class="btn primary" type="submit">Add to this week</button>
+    </form>
+    {% else %}
+    <div class="empty compact"><h3>No active goals</h3><p><a href="/goals#new">Create a goal</a> before planning actions.</p></div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

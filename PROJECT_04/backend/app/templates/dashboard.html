@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}Overview{% endblock %}
+{% block header %}
+<div>
+  <p class="eyebrow">Week of {{ week_label }}</p>
+  <h1>{{ user.name.split(' ')[0] }}'s summit</h1>
+  <p class="lede">What matters this week, and whether last week's plan actually happened.</p>
+</div>
+<a class="btn primary" href="/goals#new">New goal</a>
+{% endblock %}
+{% block content %}
+{% if planned %}
+<div class="notice success" role="status">
+  <strong>{{ planned }} coach action{{ '' if planned == 1 else 's' }} added to this week.</strong>
+  {% if coach_source == "claude" %}Written by Claude and checked against your milestones.{% else %}Written by the local planner (no API key configured).{% endif %}
+</div>
+{% endif %}
+
+<section class="stat-grid" aria-label="This week at a glance">
+  <article class="stat">
+    <p class="stat-label">Active goals</p>
+    <p class="stat-value">{{ goals|length }}</p>
+    <p class="stat-note">{{ avg_progress }}% average milestone progress</p>
+  </article>
+  <article class="stat">
+    <p class="stat-label">Done this week</p>
+    <p class="stat-value">{{ week_stats.done }}<span class="stat-of">/{{ week_stats.total }}</span></p>
+    <div class="meter" aria-hidden="true"><span style="width: {{ week_stats.rate }}%"></span></div>
+    <p class="stat-note">{{ week_stats.rate }}% of planned actions</p>
+  </article>
+  <article class="stat">
+    <p class="stat-label">Planned time</p>
+    <p class="stat-value">{{ week_stats.minutes|mins }}</p>
+    <p class="stat-note">of {{ user.weekly_capacity_min|mins }} weekly capacity{% if week_stats.minutes > user.weekly_capacity_min %} · <span class="warn">over capacity</span>{% endif %}</p>
+  </article>
+  <article class="stat">
+    <p class="stat-label">Check-in streak</p>
+    <p class="stat-value">{{ streak }}<span class="stat-of"> day{{ '' if streak == 1 else 's' }}</span></p>
+    <p class="stat-note">{% if streak %}Keep the honest signal going.{% else %}Check in on a goal below to start.{% endif %}</p>
+  </article>
+</section>
+
+<div class="split">
+  <section class="panel">
+    <div class="panel-head">
+      <div><p class="eyebrow">Focus</p><h2>Active goals</h2></div>
+      <a class="quiet-link" href="/goals">All goals →</a>
+    </div>
+    {% if goals %}
+    <ul class="goal-stack">
+      {% for goal in goals %}
+      {% set p = namespace(value=0) %}
+      {% for m in goal.milestones %}{% if m.status == 'done' %}{% set p.value = p.value + m.weight %}{% endif %}{% endfor %}
+      {% set total = goal.milestones|sum(attribute='weight') %}
+      {% set pct = ((p.value * 100 / total)|round|int) if total else 0 %}
+      <li class="goal-row">
+        <a class="goal-row-main" href="/goals/{{ goal.id }}">
+          <span class="chip cat-{{ goal.category }}">{{ categories[goal.category] }}</span>
+          <span class="goal-title">{{ goal.title }}</span>
+          <span class="goal-meta">
+            {% set nm = goal.milestones|selectattr('status','ne','done')|sort(attribute='position')|list %}
+            {% if nm %}{{ nm[0].title }}{% else %}No open milestones{% endif %}
+            {% if goal.target_date %} · target {{ goal.target_date|datefmt }}{% endif %}
+          </span>
+        </a>
+        <div class="goal-row-side">
+          <div class="progress" title="{{ pct }}% complete"><span style="width: {{ pct }}%"></span></div>
+          <span class="pct">{{ pct }}%</span>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M6 52 26 18l10 18 6-10 16 26Z" fill="none" stroke="currentColor" stroke-width="3"/><path d="M26 18v34" stroke="currentColor" stroke-width="3"/></svg>
+      <h3>No goals yet</h3>
+      <p>Start with one outcome you actually care about, then give it three milestones.</p>
+      <a class="btn primary" href="/goals#new">Set your first goal</a>
+    </div>
+    {% endif %}
+  </section>
+
+  <div class="column">
+    <section class="panel">
+      <div class="panel-head">
+        <div><p class="eyebrow">Plan</p><h2>This week</h2></div>
+        <a class="quiet-link" href="/weekly">Open →</a>
+      </div>
+      {% if week_actions %}
+      <div class="action-list">
+        {% for action in week_actions[:6] %}{% include "partials/action_row.html" %}{% endfor %}
+      </div>
+      {% if week_actions|length > 6 %}<p class="panel-foot">+ {{ week_actions|length - 6 }} more on the weekly plan</p>{% endif %}
+      {% else %}
+      <div class="empty compact">
+        <h3>The week is unplanned</h3>
+        <p>Turn one milestone into two or three actions you can finish in a sitting.</p>
+        <a class="btn primary" href="/weekly">Plan this week</a>
+      </div>
+      {% endif %}
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><div><p class="eyebrow">Signal</p><h2>Needs attention</h2></div></div>
+      {% if at_risk %}
+      <ul class="risk-list">
+        {% for row in at_risk %}
+        <li>
+          <a href="/goals/{{ row.goal.id }}">{{ row.goal.title }}</a>
+          <span class="badge {{ row.pace.state }}">{{ 'overdue' if row.pace.state == 'overdue' else 'behind pace' }}</span>
+          <small>{{ row.progress }}% done{% if row.pace.days_left is not none %} · {{ row.pace.days_left }} days left{% endif %}</small>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="muted">Nothing is off pace. That is either real progress or a missing check-in. Verify with a note.</p>
+      {% endif %}
+    </section>
+  </div>
+</div>
+
+<section class="panel">
+  <div class="panel-head">
+    <div><p class="eyebrow">Momentum</p><h2>Completed actions, last six weeks</h2></div>
+    <a class="quiet-link" href="/insights">Insights →</a>
+  </div>
+  <div class="bars" role="img" aria-label="Completed actions per week">
+    {% set peak = series.done|max if series.done else 1 %}
+    {% for label in series.labels %}
+    <div class="bar-col">
+      <span class="bar-value">{{ series.done[loop.index0] }}</span>
+      <span class="bar" style="height: {{ ((series.done[loop.index0] / (peak or 1)) * 100)|round|int }}%"></span>
+      <span class="bar-label">{{ label }}</span>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

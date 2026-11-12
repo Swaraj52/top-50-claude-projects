@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Goals{% endblock %}
+{% block header %}
+<div>
+  <p class="eyebrow">Portfolio</p>
+  <h1>Your goals</h1>
+  <p class="lede">Every goal should have a finish line you can measure and a next step you can take.</p>
+</div>
+<a class="btn primary" href="#new">New goal</a>
+{% endblock %}
+{% block content %}
+
+<div class="toolbar">
+  <nav class="pills" aria-label="Filter by status">
+    {% for key, label in [('active','Active'),('achieved','Achieved'),('paused','Paused'),('archived','Archived'),('all','All')] %}
+    <a href="/goals?status={{ key }}{% if category %}&category={{ category }}{% endif %}" {% if current_status == key %}aria-current="page"{% endif %}>{{ label }} <span>{{ counts[key] if key != 'all' else counts.values()|sum }}</span></a>
+    {% endfor %}
+  </nav>
+  <form method="get" action="/goals" class="inline-select">
+    <input type="hidden" name="status" value="{{ current_status }}">
+    <label class="sr-only" for="category">Category</label>
+    <select id="category" name="category" data-autosubmit>
+      <option value="">All categories</option>
+      {% for key, label in categories.items() %}
+      <option value="{{ key }}" {% if category == key %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button class="btn small" type="submit">Filter</button>
+  </form>
+</div>
+
+{% if rows %}
+<div class="goal-grid">
+  {% for row in rows %}
+  {% set goal = row.goal %}
+  <article class="goal-card">
+    <div class="goal-card-top">
+      <span class="chip cat-{{ goal.category }}">{{ categories[goal.category] }}</span>
+      <span class="badge {{ row.pace.state }}">{{ row.pace.state.replace('-', ' ') }}</span>
+    </div>
+    <h2><a href="/goals/{{ goal.id }}">{{ goal.title }}</a></h2>
+    {% if goal.why %}<p class="goal-why">“{{ goal.why|truncate(140) }}”</p>{% endif %}
+    <div class="progress-row">
+      <div class="progress"><span style="width: {{ row.progress }}%"></span></div>
+      <strong>{{ row.progress }}%</strong>
+    </div>
+    <dl class="mini-facts">
+      <div><dt>Next milestone</dt><dd>{{ row.next.title if row.next else 'None — add one' }}</dd></div>
+      <div><dt>Target</dt><dd>{{ goal.target_date|datefmt('long') if goal.target_date else 'No date' }}</dd></div>
+      <div><dt>Milestones</dt><dd>{{ goal.milestones|selectattr('status','eq','done')|list|length }}/{{ goal.milestones|length }} done</dd></div>
+    </dl>
+    <div class="goal-card-actions">
+      <a class="btn small" href="/goals/{{ goal.id }}">Open goal</a>
+      <a class="quiet-link" href="/weekly?week={{ week_start.isoformat() }}">This week →</a>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty panel">
+  <h3>No goals in this view</h3>
+  <p>{% if current_status == 'active' %}Set one goal you can make measurable this month.{% else %}Nothing has this status yet.{% endif %}</p>
+  <a class="btn primary" href="#new">Create a goal</a>
+</div>
+{% endif %}
+
+<section class="panel form-panel" id="new">
+  <div class="panel-head"><div><p class="eyebrow">New</p><h2>Set a goal</h2></div></div>
+  <form method="post" action="/goals" class="form-grid">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label class="span-2">Goal title
+      <input type="text" name="title" maxlength="160" minlength="3" required placeholder="e.g. Run a half marathon">
+    </label>
+    <label>Category
+      <select name="category">
+        {% for key, label in categories.items() %}<option value="{{ key }}">{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>Target date <span class="hint">optional</span>
+      <input type="date" name="target_date">
+    </label>
+    <label class="span-2">Why this matters
+      <textarea name="why" rows="2" maxlength="1200" placeholder="The reason you will still care about this in six weeks."></textarea>
+    </label>
+    <label class="span-2">Description <span class="hint">optional</span>
+      <textarea name="description" rows="2" maxlength="4000" placeholder="Scope, constraints, first ideas."></textarea>
+    </label>
+    <div class="span-2 form-actions">
+      <button class="btn primary" type="submit">Create goal</button>
+      <span class="muted">You can add milestones on the next screen.</span>
+    </div>
+  </form>
+</section>
+{% endblock %}

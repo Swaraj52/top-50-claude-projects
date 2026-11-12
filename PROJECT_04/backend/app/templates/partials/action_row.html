@@ -1,0 +1,28 @@
+<div class="action {{ 'done' if action.status == 'done' }}" id="action-{{ action.id }}">
+  <form method="post" action="/weekly/actions/{{ action.id }}/toggle"
+        hx-post="/weekly/actions/{{ action.id }}/toggle" hx-target="closest .action" hx-swap="outerHTML">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="next" value="{{ next_url|default('/weekly') }}">
+    <button class="tick" type="submit" aria-pressed="{{ 'true' if action.status == 'done' else 'false' }}"
+            aria-label="{{ 'Mark open' if action.status == 'done' else 'Mark done' }}: {{ action.title }}">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m4 10 4 4 8-9"/></svg>
+    </button>
+  </form>
+  <div class="action-main">
+    <span class="action-title">{{ action.title }}</span>
+    <span class="action-meta">
+      <a href="/goals/{{ action.goal_id }}">{{ action.goal.title }}</a>
+      · {{ action.estimate_min|mins }}
+      {% if action.milestone %}· {{ action.milestone.title }}{% endif %}
+      {% if action.source == 'coach' %}<span class="chip mini">coach</span>{% endif %}
+    </span>
+  </div>
+  {% if show_delete|default(false) %}
+  <form method="post" action="/weekly/actions/{{ action.id }}/delete" class="row-del">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button class="icon-btn" type="submit" data-confirm="Remove this action?" aria-label="Delete {{ action.title }}">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5h10M8 5V3h4v2M7 8v8M13 8v8M6 5l1 13h6l1-13"/></svg>
+    </button>
+  </form>
+  {% endif %}
+</div>

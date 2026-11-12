@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}{{ status_code }} · {{ message }}{% endblock %}
+{% block header %}<div><p class="eyebrow">Error {{ status_code }}</p><h1>{{ message }}</h1></div>{% endblock %}
+{% block content %}
+<section class="panel narrow">
+  <p>Nothing was lost. Head back to your <a href="/">overview</a> and try again.</p>
+  <a class="btn primary" href="/">Back to Summit</a>
+</section>
+{% endblock %}
+{% block auth_content %}
+<div class="auth-card single">
+  <p class="eyebrow">Error {{ status_code }}</p>
+  <h2>{{ message }}</h2>
+  <p>Head back to <a href="/login">sign in</a> and try again.</p>
+</div>
+{% endblock %}
