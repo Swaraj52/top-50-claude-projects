@@ -1,45 +1,45 @@
 # Next Actions
 
-_Last updated: 2026-11-09_
+_Last updated: 2026-11-12_
 
-## Waiting on the owner
+## Continue now
 
-1. **Command to start the next project.** Nothing starts until the owner says `Start Project 4`
-   (Personal Goal Tracker) or names another project.
-2. **The owner's data for Projects 01–03.** Asked for after Project 03's release. Non-secret data
-   given in chat is loaded with each project's import script; secrets go only into the app's forms
-   or the project `.env`.
-3. **Go-ahead for the Project 01/02 follow-ups** below.
-4. *(Optional)* Verifying Claude features live in Projects 01–03 needs the owner's own
-   `ANTHROPIC_API_KEY` in each project's `.env` and approval of the (small) spend.
+1. **Project 05: Habit & Routine Coach.** Category 1, port 8005. Features from the PDF: habit
+   calendar, streaks, reflection prompts, weekly report. Use the established FastAPI + Jinja2 +
+   HTMX + SQLite stack, a fresh design, real tests, docs, screenshots and a tag. Then continue to
+   Project 06 without waiting.
+2. Reuse the shared tooling: `shared-resources/.venv` (project `.venv` is a junction), the headless
+   Playwright screenshot pattern, and `render_docs.py` after each release.
 
-## When `Start Project N` is received
+## Owner input (collect after completion, do not block the build)
 
-1. Set **Authorized project** in `CURRENT_STATE.md`.
-2. Follow `MASTER_README.md` §3, including the live preview (preview script + `launch.json`), the
-   Swayam credit, `docs/YOUR_DATA.md` with an import script, and asking for the data at the end.
-3. Tooling notes:
-   - `preview_start` with the launch.json name opens a preview in the Browser pane.
-   - Playwright screenshots can be saved straight to `PROJECT_NN/docs/screenshots/`.
-     `.playwright-mcp/` is git-ignored; delete it after a run.
-   - Take screenshots with `reducedMotion: reduce` to avoid half-animated frames.
+1. **Owner's data for Projects 01–04.** Each project's `docs/YOUR_DATA.md` says what is safe to
+   share and how its `scripts/import_data.py` loads it. Secrets go only into the app's forms or the
+   project `.env`.
+2. *(Optional)* Live Claude verification for Projects 01–04 needs the owner's own
+   `ANTHROPIC_API_KEY` and approval of the small per-call spend.
+
+## Pending follow-ups for Projects 01 and 02 (owner request, 2026-11-09)
+
+1. Retake the screenshots that show the demo user's name or the credit (P01: most pages; P02:
+   inbox, mobile, sign-in) so they show "Swayam".
+2. Add `docs/YOUR_DATA.md` and `scripts/import_data.py` to Projects 01 and 02. These need an
+   explicit owner request that names them, per the standing rule about closed projects.
 
 ## Useful commands
 
 ```bash
 python shared-resources/scripts/render_docs.py --check
 gh auth status
-cd PROJECT_02/backend && .venv/Scripts/python -m pytest   # 60 passed
-cd PROJECT_02/frontend && npm test                        # 12 passed
-cd PROJECT_03/backend && .venv/Scripts/python -m pytest   # 33 passed
+cd PROJECT_04/backend && .venv/Scripts/python.exe -m pytest   # 41 passed
+cd PROJECT_04/backend && .venv/Scripts/python.exe scripts/preview.py  # :8004
 ```
 
-## Pending follow-ups for Projects 01 and 02 (owner request, 2026-11-09)
+## Tooling notes
 
-The "credit Swayam" change is done and pushed (READMEs, in-app credit, API metadata, demo name).
-Still to do (Project 03 is finished; ask the owner before starting):
-1. Retake the screenshots that show the demo user's name or the credit
-   (P01: most pages; P02: inbox, mobile, sign-in) so they show "Swayam".
-2. Add `docs/YOUR_DATA.md` and `scripts/import_data.py` to Projects 01 and 02. The importer
-   creates a temporary session for the owner's account and calls the app's own API, so no password
-   is needed. Then ask the owner for each project's data.
+- `preview_start` with the launch.json name opens a preview in the Browser pane. The built-in
+  screenshot tool needs a visible tab; headless Playwright works without one and is already
+  installed in `shared-resources/.venv` (`playwright install chromium`).
+- Take screenshots at 1440 px, 390 px and with `color_scheme="dark"`; wait for `networkidle` and a
+  short settle before capturing.
+- `data/*.db`, `.venv/` and browser artefacts are git-ignored; never commit them.

@@ -1,12 +1,18 @@
 # Blockers
 
-_Last updated: 2026-11-09_
+_Last updated: 2026-11-12_
 
 ## Open
 
 _None._
 
 ## Resolved
+
+### B-003: Built-in browser screenshots need a visible tab (resolved 2026-11-12)
+
+- `browser.screenshot` failed with "Screenshot needs a visible tab" in the headless session.
+- Installed Playwright + Chromium into `shared-resources/.venv` (free) and captured screenshots
+  headlessly with an explicit login flow. This is now the standard screenshot path.
 
 ### B-001: GitHub CLI not installed or authenticated (resolved 2026-11-07)
 

@@ -12,6 +12,32 @@ Only items that were actually checked are listed here.
 | Root docs and recovery system | Written and generated; `CLAUDE.md` enforces the start-command rule |
 | Public GitHub repo `Swaraj52/top-50-claude-projects` | `gh api`: public, owner Swaraj52; remote `main` matched local after each push |
 
+## Project 04: Personal Goal Tracker ("Summit"), v1.0
+
+| Feature | Verification |
+|---|---|
+| Accounts, CSRF (forms and HTMX), rate limits, per-user isolation, security headers | pytest; browser |
+| Goals: CRUD, six categories, pause/achieve/archive, target date, "why" | pytest; browser |
+| Weighted milestones (1–5), next-milestone ordering, cascade deletes | pytest; browser |
+| Pace (ahead/on track/behind/overdue/setup/no date) and at-risk detection | pytest unit cases; browser |
+| Dashboard: stats, focus list, this week, risk signals, six-week momentum | pytest; browser at 1440 px and 390 px |
+| Weekly plan: add/toggle/delete, capacity, previous/next week | pytest (HTMX fragment and plain POST); browser |
+| Carry unfinished actions without duplicating titles | pytest; browser |
+| Check-ins: confidence 1–5, note, daily upsert, streak | pytest; browser |
+| Coach: deterministic local plan, 3–5 actions, rate limit | pytest; browser (generated actions appeared on the goal page) |
+| Coach: Claude path and fallback | pytest with a fake HTTP response (validation rejects invented milestone ids; failures labelled). **Not called live (no API key)** |
+| Insights: eight-week volume, completion rate, confidence line, category portfolio, goal health | pytest; browser; chart bugs found and fixed during the browser pass |
+| Printable goal review | pytest; browser |
+| Settings: name, timezone, weekly capacity, password change, JSON export, account deletion | pytest; browser |
+| Import accepts a real export shape (top-level actions/check-ins) and nested JSON | pytest; manual round trip: 4 goals, 15 milestones, 41 actions, 54 check-ins |
+| Light/dark colour schemes, mobile layout, visible sign-out control | Playwright screenshots at 1440 px (light/dark) and 390 px |
+| Migrations | pytest: migrated schema matches the models |
+| Live preview: `scripts/preview.py` | Started on :8004; demo account signed in; all pages returned 200 |
+
+- **Tests:** backend 41 passed.
+- **Docs:** README (15 sections), PRD, ARCHITECTURE, YOUR_DATA, `.env.example`, 10 screenshots.
+- **Release:** commit `425e717`, tag `project-04-v1.0`. Pushed and verified on GitHub.
+
 ## Project 03: Daily Review Agent ("Shutdown"), v1.0
 
 | Feature | Verification |

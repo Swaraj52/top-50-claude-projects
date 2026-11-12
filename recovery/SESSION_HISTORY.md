@@ -72,3 +72,22 @@
 - **Recovery instructions:** authorized project is NONE. Wait for `Start Project N`. The Project 01/02
   follow-ups in `NEXT_ACTIONS.md` need the owner's go-ahead.
 
+## Session 5: 2026-11-12, Project 04 (standing authorization)
+
+- **Authorized by:** the owner's new instruction to build Projects 04–50 sequentially, recorded in
+  `CLAUDE.md` and `CURRENT_STATE.md`.
+- **Built:** Summit. A server-rendered FastAPI + Jinja2 + HTMX goal tracker: weighted milestones,
+  straight-line pace and at-risk signals, a weekly plan with carry-over, confidence check-ins and
+  streaks, an optional Claude coach with a labelled deterministic planner, eight-week insights,
+  a printable goal review, JSON export/import and account deletion. Demo seed has eight weeks of
+  actions and check-ins; one-command preview on :8004.
+- **Verified:** 41 backend tests; browser run of every page at desktop, mobile, light and dark;
+  the screenshot pass found and fixed three real UI bugs (HTML `.bar` colliding with SVG bars,
+  stretched SVG chart text, invisible sidebar sign-out). Export → import round trip checked against
+  a scratch database (4 goals, 15 milestones, 41 actions, 54 check-ins).
+- **Commits:** `c4583ed` standing authorization, `9d7b0b8` backend + UI, `813eb45` preview/seed/import,
+  `4acb1ee` docs and screenshots, `425e717` release + tag `project-04-v1.0`.
+- **Not verified live:** the Claude coach (no API key); the local planner is what the screenshots
+  show and the UI labels it as such.
+- **Recovery instructions:** continue with Project 05 (Habit & Routine Coach) without waiting.
+
