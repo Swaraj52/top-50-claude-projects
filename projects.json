@@ -717,6 +717,18 @@
       "github": "Done",
       "stack": "FastAPI · Jinja2 + HTMX · SQLite · Claude API",
       "notes": "Shutdown v1.0: 33 backend tests; triage, review and commit verified end-to-end in a browser with the database checked afterwards. Claude review not verified live (no key)."
+    },
+    "4": {
+      "status": "Completed",
+      "planning": "Done",
+      "frontend": "Done",
+      "backend": "Done",
+      "database": "Done",
+      "testing": "Done",
+      "docs": "Done",
+      "github": "Done",
+      "stack": "FastAPI · Jinja2 + HTMX · SQLite · Claude API",
+      "notes": "Summit v1.0: 41 backend tests; weighted milestones, pace, weekly actions, check-ins, coach fallback and charts verified in a browser. Claude coach not verified live (no key)."
     }
   }
 }

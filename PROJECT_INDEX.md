@@ -54,11 +54,12 @@ Generated from `projects.json`; descriptions and features come from the source P
 ### 04. Personal Goal Tracker
 
 - **Folder:** [`PROJECT_04/`](PROJECT_04/)
-- **Status:** Pending
+- **Status:** Completed
 - **What it does:** Breaks long-term goals down into milestones and weekly actions.
 - **Core features:** Goal dashboard, Progress tracking, Habit check-ins
-- **Tech stack:** Chosen when the project starts
+- **Tech stack:** FastAPI · Jinja2 + HTMX · SQLite · Claude API
 - **Reserved local ports:** backend `8004`, frontend `5104`
+- **Notes:** Summit v1.0: 41 backend tests; weighted milestones, pace, weekly actions, check-ins, coach fallback and charts verified in a browser. Claude coach not verified live (no key).
 
 > Original brief: Long-term goals ko milestones aur weekly actions mein todta hai.
 

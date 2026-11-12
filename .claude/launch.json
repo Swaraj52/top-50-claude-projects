@@ -24,6 +24,14 @@
         "PROJECT_03/backend/scripts/preview.py"
       ],
       "port": 8003
+    },
+    {
+      "name": "project-04-summit",
+      "runtimeExecutable": "PROJECT_04/backend/.venv/Scripts/python.exe",
+      "runtimeArgs": [
+        "PROJECT_04/backend/scripts/preview.py"
+      ],
+      "port": 8004
     }
   ]
 }
