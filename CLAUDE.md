@@ -2,12 +2,12 @@
 
 ## Execution control (highest priority)
 
-- **Never start a project without the owner's explicit command**, in the form `Start Project N`.
-- Build only the authorized project. Changes to an existing project need an explicit request that names it.
-- When the authorized project is complete, verified and published, **stop and report**. Do not start the next one.
-- Questions, discussion and progress updates are not authorization.
-- After a context reset or a new session, recover state (below), report it, and **wait**. Resume
-  the current project only when the owner says to continue.
+- **Standing authorization (owner, 2026-11-12):** build Projects 04–50 sequentially, without
+  stopping for routine approval. This supersedes the earlier one-project-at-a-time rule.
+- After a context reset or new session, recover state (below), report it, and continue from the
+  first project that is not verified and published. Do not restart completed projects.
+- Changes to completed Projects 01–03 need an explicit request that names them; do not rewrite
+  their history while working on new projects.
 
 The current authorization lives in `recovery/CURRENT_STATE.md` → **Authorized project**.
 
