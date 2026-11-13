@@ -1,12 +1,20 @@
 # Blockers
 
-_Last updated: 2026-11-12_
+_Last updated: 2026-11-13_
 
 ## Open
 
 _None._
 
 ## Resolved
+
+### B-004: Report logic treated open and paused habits as failures (resolved 2026-11-13)
+
+- Screenshot review showed today's unlogged habits counted as missed, and a paused habit lowering
+  the Week/Insights completion rate.
+- Fixed in `habitmath.py` (`pending` today, decided-day rates), filtered paused habits from the
+  Week/Reflect/Insights queries, added dashed pending states, and covered both rules with tests.
+  The week now shows 16/16 decided days with today still open.
 
 ### B-003: Built-in browser screenshots need a visible tab (resolved 2026-11-12)
 

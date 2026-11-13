@@ -12,6 +12,33 @@ Only items that were actually checked are listed here.
 | Root docs and recovery system | Written and generated; `CLAUDE.md` enforces the start-command rule |
 | Public GitHub repo `Swaraj52/top-50-claude-projects` | `gh api`: public, owner Swaraj52; remote `main` matched local after each push |
 
+## Project 05: Habit & Routine Coach ("Cadence"), v1.0
+
+| Feature | Verification |
+|---|---|
+| Accounts, scrypt hashing, hashed session tokens, CSRF (forms and HTMX), login/coach rate limits, per-user isolation, security headers | pytest; browser |
+| Habits: create with intention/cue/schedule, edit, pause/resume/archive/delete, status filters | pytest; browser |
+| Daily logs: done, planned rest, clear; one per habit/day; future days refused | pytest; browser; database checked after toggles |
+| Streaks over scheduled days, planned rest neutral, today open | pytest unit cases; browser (27-day Read streak) |
+| Decided-day rates; today excluded while pending | pytest (including an explicit pending test); browser |
+| Paused habits excluded from Week, Reflect and Insights | pytest; browser (paused habit disappeared, rate rose to 100%) |
+| Week grid: seven days × active habits, done/undo, rest, pending today, future disabled, prev/next | pytest; browser; mobile screenshot |
+| Weekly report: rate, strongest routine, best day | pytest; browser |
+| Reflections: one per ISO week, mood 1–5, three prompts, upsert, history, seven-week streak | pytest; browser |
+| Insights: eight-week volume, weekday pattern, per-habit health, honest read, next step | pytest; browser at 1440 px and 390 px |
+| Coach: deterministic local suggestions, visible LOCAL label, rate limit | pytest; browser (three notes on the dashboard and two on habit detail) |
+| Coach: Claude path and validation/fallback | pytest with a fake response and a forced network failure. **Not called live (no API key)** |
+| Settings: name, IANA timezone, password change, JSON export, account deletion | pytest; browser |
+| Export contains habits/logs/reflections and no password material | pytest |
+| Import accepts the export shape; duplicate habits/logs/reflections skipped | Manual round trip described in `docs/YOUR_DATA.md`; importer run against demo data |
+| Light/dark schemes, mobile header, scrollable week grid with sticky habit column | Playwright screenshots at 1440 px (light/dark) and 390 px; two mobile issues found and fixed |
+| Migrations | pytest: migrated schema matches the models |
+| Live preview: `scripts/preview.py` | Started on :8005; demo account signed in; all pages returned 200 |
+
+- **Tests:** backend 76 passed.
+- **Docs:** README (15 sections), PRD, ARCHITECTURE, YOUR_DATA, `.env.example`, 12 screenshots.
+- **Release:** commit `481e54f`, tag `project-05-v1.0`. Pushed and verified on GitHub.
+
 ## Project 04: Personal Goal Tracker ("Summit"), v1.0
 
 | Feature | Verification |

@@ -91,3 +91,20 @@
   show and the UI labels it as such.
 - **Recovery instructions:** continue with Project 05 (Habit & Routine Coach) without waiting.
 
+## Session 6: 2026-11-13, Project 05 (standing authorization)
+
+- **Authorized by:** the standing instruction to build Projects 04–50 sequentially, reconfirmed by
+  the owner's `/continue`.
+- **Built:** Cadence. A server-rendered FastAPI + Jinja2 + HTMX habit coach: per-user habits with
+  schedules and cues, daily done/rest logs, pending-today semantics, streaks, week grid and report,
+  weekly reflections, eight-week insights, optional Claude coach with a labelled local fallback,
+  JSON export/import and account deletion. One-command preview on :8005 with an eight-week seed.
+- **Verified:** 76 backend tests. Browser and screenshot pass at desktop, mobile, light and dark
+  found and fixed three real issues: paused habits dragging down reports, today counted as missed,
+  and a clipped mobile nav; the week grid also gained a sticky habit column and a swipe hint.
+- **Commits:** `86d704b` app, `04ba203` tests/tooling, `bfe2630` docs and screenshots, `481e54f`
+  release + tag `project-05-v1.0`.
+- **Not verified live:** the Claude coach (no API key); the UI shows locally generated notes.
+- **Recovery instructions:** continue with Project 06 without waiting. Read `CURRENT_STATE.md`.
+
+
