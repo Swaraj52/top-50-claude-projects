@@ -66,11 +66,12 @@ Generated from `projects.json`; descriptions and features come from the source P
 ### 05. Habit & Routine Coach
 
 - **Folder:** [`PROJECT_05/`](PROJECT_05/)
-- **Status:** Pending
+- **Status:** Completed
 - **What it does:** Tracks the user's routines and gives realistic habit suggestions.
 - **Core features:** Habit calendar, Streaks, Reflection prompts, Weekly report
-- **Tech stack:** Chosen when the project starts
+- **Tech stack:** FastAPI · Jinja2 + HTMX · SQLite · Claude API
 - **Reserved local ports:** backend `8005`, frontend `5105`
+- **Notes:** Cadence v1.0: 76 backend tests; pending-today semantics, planned rest, paused-habit exclusion, week grid, reflections, insights and the labelled local coach verified against seeded data in a browser. Claude coach not verified live (no key).
 
 > Original brief: User ke routines ko track karke realistic habit suggestions deta hai.
 

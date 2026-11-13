@@ -63,7 +63,7 @@ top-50-claude-projects/
 | 02 | [Second Brain / Life Library](PROJECT_02/) | Saves articles, newsletters, YouTube videos and web pages so you can ask questions about them later. | FastAPI · SQLite FTS5 · React + TypeScript · Claude API | Completed |
 | 03 | [Daily Review Agent](PROJECT_03/) | At the end of the day, builds a review of completed work, pending tasks and tomorrow's priorities. | FastAPI · Jinja2 + HTMX · SQLite · Claude API | Completed |
 | 04 | [Personal Goal Tracker](PROJECT_04/) | Breaks long-term goals down into milestones and weekly actions. | FastAPI · Jinja2 + HTMX · SQLite · Claude API | Completed |
-| 05 | [Habit & Routine Coach](PROJECT_05/) | Tracks the user's routines and gives realistic habit suggestions. | — | Pending |
+| 05 | [Habit & Routine Coach](PROJECT_05/) | Tracks the user's routines and gives realistic habit suggestions. | FastAPI · Jinja2 + HTMX · SQLite · Claude API | Completed |
 | 06 | [Meeting Memory Assistant](PROJECT_06/) | Converts meeting notes into decisions, owners and follow-ups. | — | Pending |
 | 07 | [Email Command Center](PROJECT_07/) | Organizes the inbox into categories and drafts replies and follow-ups. | — | Pending |
 | 08 | [Personal Knowledge Search](PROJECT_08/) | Provides natural-language search across notes, documents and saved resources. | — | Pending |

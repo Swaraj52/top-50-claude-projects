@@ -32,6 +32,14 @@
         "PROJECT_04/backend/scripts/preview.py"
       ],
       "port": 8004
+    },
+    {
+      "name": "project-05-cadence",
+      "runtimeExecutable": "PROJECT_05/backend/.venv/Scripts/python.exe",
+      "runtimeArgs": [
+        "PROJECT_05/backend/scripts/preview.py"
+      ],
+      "port": 8005
     }
   ]
 }
