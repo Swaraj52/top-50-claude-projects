@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Insights{% endblock %}
+{% block content %}
+<section class="hero compact">
+  <div>
+    <p class="eyebrow">Eight-week view</p>
+    <h1>Patterns, not perfection.</h1>
+    <p class="lede">Every number here comes from your own logs. Look for the day that keeps slipping and the routine that keeps holding.</p>
+  </div>
+</section>
+
+<section class="stat-grid four">
+  <article class="stat">
+    <p class="stat-label">Habit days done</p>
+    <p class="stat-value">{{ total_done }}</p>
+    <p class="stat-note">in the last eight weeks</p>
+  </article>
+  <article class="stat">
+    <p class="stat-label">Completion</p>
+    <p class="stat-value">{{ rate if rate is not none else "—" }}{% if rate is not none %}<span class="stat-unit">%</span>{% endif %}</p>
+    <p class="stat-note">of {{ total_scheduled }} decided days</p>
+  </article>
+  <article class="stat">
+    <p class="stat-label">Active habits</p>
+    <p class="stat-value">{{ active_count }}</p>
+    <p class="stat-note">routines in the current plan</p>
+  </article>
+  <article class="stat">
+    <p class="stat-label">Reflections</p>
+    <p class="stat-value">{{ reflection_count }}</p>
+    <p class="stat-note">{{ reflection_streak }}-week current streak</p>
+  </article>
+</section>
+
+<div class="chart-grid">
+  <section class="panel">
+    <div class="panel-head"><div><p class="eyebrow">Volume</p><h2>Completed habit days</h2></div></div>
+    {{ volume_chart }}
+    <p class="panel-foot muted">Taller bars mean more routines completed, not more routines scheduled.</p>
+  </section>
+  <section class="panel">
+    <div class="panel-head"><div><p class="eyebrow">Rhythm</p><h2>Completion by weekday</h2></div></div>
+    {{ pattern_chart }}
+    <p class="panel-foot muted">The weekly shape is often more useful than the weekly total.</p>
+  </section>
+</div>
+
+{% set rated = pattern|rejectattr("rate", "none")|list %}
+{% set strongest = rated|sort(attribute="rate")|last if rated else None %}
+{% set weakest = rated|sort(attribute="rate")|first if rated else None %}
+
+<div class="split">
+  <section class="panel">
+    <div class="panel-head"><div><p class="eyebrow">Diagnosis</p><h2>How each habit is holding</h2></div></div>
+    {% if consistency %}
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Habit</th><th>Done</th><th>Rate</th><th>Streak</th><th>Read</th></tr></thead>
+        <tbody>
+          {% for row in consistency %}
+          <tr>
+            <td><a href="/habits/{{ row.habit.id }}">{{ row.habit.title }}</a><small class="muted block">{{ row.habit|schedule }}</small></td>
+            <td>{{ row.stats.done }}/{{ row.stats.done + row.stats.missed }}</td>
+            <td><strong>{{ row.stats.rate if row.stats.rate is not none else "—" }}{% if row.stats.rate is not none %}%{% endif %}</strong></td>
+            <td>{{ row.streak }}</td>
+            <td>
+              {% if row.stats.rate is none %}<span class="badge">new</span>
+              {% elif row.stats.rate >= 80 %}<span class="badge done">steady</span>
+              {% elif row.stats.rate >= 60 %}<span class="badge">workable</span>
+              {% else %}<span class="badge warn">shrink it</span>{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="muted">No habits to measure yet. Add one and log a week.</p>
+    {% endif %}
+  </section>
+
+  <aside class="stack-lg">
+    <section class="panel">
+      <div class="panel-head"><div><p class="eyebrow">What to change</p><h2>The honest read</h2></div></div>
+      {% if strongest and weakest %}
+      <p class="report-line">{{ strongest.rate }}% on {{ strongest.weekday|dayname }} is your strongest day. {{ weakest.rate }}% on {{ weakest.weekday|dayname }} is the one to protect.</p>
+      <p class="muted small">Move the hardest habit away from {{ weakest.weekday|dayname }}, or schedule the smallest version of it there. Change one variable before adding effort.</p>
+      {% elif strongest %}
+      <p class="report-line">{{ strongest.rate }}% on {{ strongest.weekday|dayname }} is the only weekday with enough data. Keep logging for a clearer shape.</p>
+      {% else %}
+      <p class="muted">Not enough logged days yet. Two weeks of honest check-ins is enough to see a pattern.</p>
+      {% endif %}
+      <div class="prompt-card">
+        <p class="eyebrow">Next step</p>
+        <p>Open the week grid and look at the misses before the wins.</p>
+        <a class="btn small" href="/week">Open week grid</a>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><div><p class="eyebrow">Weekday detail</p><h2>Done / scheduled</h2></div></div>
+      <ul class="weekday-list">
+        {% for row in pattern %}
+        <li>
+          <span class="weekday-name">{{ row.weekday|dayname }}</span>
+          <div class="progress"><span style="width: {{ row.rate or 0 }}%"></span></div>
+          <span class="weekday-value">{{ row.rate if row.rate is not none else "—" }}{% if row.rate is not none %}%{% endif %}</span>
+          <small class="muted">{{ row.done }}/{{ row.scheduled }}</small>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+  </aside>
+</div>
+{% endblock %}

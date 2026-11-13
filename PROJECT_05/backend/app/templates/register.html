@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Create account{% endblock %}
+{% block auth_content %}
+<div class="auth-split">
+  <section class="auth-art" aria-hidden="true">
+    <div class="orbit orbit-one"></div>
+    <div class="orbit orbit-two"></div>
+    <div class="auth-art-copy">
+      <p class="eyebrow">Start with one routine</p>
+      <h1>Not more effort.<br>Better design.</h1>
+      <p>Pick a cue, choose realistic days, and let the weekly reflection do the adjusting. Streaks are a signal, not a punishment.</p>
+      <div class="art-week">
+        {% for d in ["M","T","W","T","F","S","S"] %}<span>{{ d }}</span>{% endfor %}
+      </div>
+    </div>
+  </section>
+  <section class="auth-panel">
+    <div class="auth-card">
+      <p class="eyebrow">First time here</p>
+      <h2>Create your account</h2>
+      {% if error %}<div class="notice error" role="alert">{{ error }}</div>{% endif %}
+      <form method="post" action="/register" class="stack">
+        <input type="hidden" name="csrf_token" value="{{ form_csrf }}">
+        <input type="hidden" name="timezone" value="UTC" data-browser-timezone>
+        <label>Name
+          <input type="text" name="name" value="{{ values.name or '' }}" autocomplete="name" maxlength="80" required autofocus>
+        </label>
+        <label>Email
+          <input type="email" name="email" value="{{ values.email or '' }}" autocomplete="email" required>
+        </label>
+        <label>Password
+          <input type="password" name="password" autocomplete="new-password" minlength="8" required>
+          <span class="hint">At least 8 characters. Stored as a scrypt hash.</span>
+        </label>
+        <button class="btn primary wide" type="submit">Create account</button>
+      </form>
+      <p class="auth-alt">Already have an account? <a href="/login">Sign in</a></p>
+    </div>
+  </section>
+</div>
+{% endblock %}

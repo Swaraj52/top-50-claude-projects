@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Today{% endblock %}
+{% block content %}
+<section class="hero">
+  <div>
+    <p class="eyebrow">{{ today|datefmt("weekday") }} · week of {{ week_label }}</p>
+    <h1>Keep the rhythm you chose.</h1>
+    <p class="lede">A small, honest check-in is more useful than a perfect plan. Mark what happened; adjust the rest on Sunday.</p>
+  </div>
+  <a class="btn primary" href="/habits#new-habit">New habit</a>
+</section>
+
+<section class="stat-grid four">
+  <article class="stat">
+    <p class="stat-label">Today</p>
+    <p class="stat-value">{{ today_done }}<span class="stat-of">/{{ today_total }}</span></p>
+    <p class="stat-note">scheduled routines marked done</p>
+  </article>
+  <article class="stat">
+    <p class="stat-label">This week</p>
+    <p class="stat-value">{{ week_rate if week_rate is not none else "—" }}{% if week_rate is not none %}<span class="stat-unit">%</span>{% endif %}</p>
+    <p class="stat-note">{{ totals.done }} done · {{ totals.missed }} missed · {{ totals.skipped }} rest</p>
+  </article>
+  <article class="stat">
+    <p class="stat-label">Active habits</p>
+    <p class="stat-value">{{ habits|length }}</p>
+    <p class="stat-note">{{ at_risk|length }} need a smaller ask</p>
+  </article>
+  <article class="stat">
+    <p class="stat-label">Reflection streak</p>
+    <p class="stat-value">{{ reflection_streak }}</p>
+    <p class="stat-note">consecutive weeks reflected</p>
+  </article>
+</section>
+
+<div class="split">
+  <section class="panel">
+    <div class="panel-head">
+      <div><p class="eyebrow">Today's routines</p><h2>{{ today_rows|length }} scheduled</h2></div>
+      <a class="quiet-link" href="/week">Week view →</a>
+    </div>
+    {% if today_rows %}
+    <div class="routine-list">
+      {% for row in today_rows %}
+      <div class="routine-row">
+        <div class="routine-main">
+          <span class="ring {{ 'done' if row.log and row.log.status == 'done' else ('rest' if row.log and row.log.status == 'skipped' else '') }}"></span>
+          <div>
+            <h3>{{ row.habit.title }}</h3>
+            <p class="muted small">{{ row.habit.cue or row.habit|schedule }} · {{ row.streak }}-day streak</p>
+          </div>
+        </div>
+        <div class="routine-actions">
+          {% if row.log and row.log.status == "done" %}
+          <span class="badge done">Done</span>
+          <form method="post" action="/habits/{{ row.habit.id }}/log">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="day" value="{{ today.isoformat() }}">
+            <input type="hidden" name="status" value="clear">
+            <input type="hidden" name="next" value="/">
+            <button class="icon-btn" type="submit" aria-label="Clear today's log">Undo</button>
+          </form>
+          {% elif row.log and row.log.status == "skipped" %}
+          <span class="badge rest">Rest</span>
+          <form method="post" action="/habits/{{ row.habit.id }}/log">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="day" value="{{ today.isoformat() }}">
+            <input type="hidden" name="status" value="done">
+            <input type="hidden" name="next" value="/">
+            <button class="btn small" type="submit">Did it</button>
+          </form>
+          {% else %}
+          <form method="post" action="/habits/{{ row.habit.id }}/log">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="day" value="{{ today.isoformat() }}">
+            <input type="hidden" name="status" value="done">
+            <input type="hidden" name="next" value="/">
+            <button class="btn primary small" type="submit">Done</button>
+          </form>
+          <form method="post" action="/habits/{{ row.habit.id }}/log">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="day" value="{{ today.isoformat() }}">
+            <input type="hidden" name="status" value="skipped">
+            <input type="hidden" name="next" value="/">
+            <button class="btn ghost small" type="submit">Rest</button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty">
+      <p>Nothing is scheduled today.</p>
+      <a class="btn" href="/habits">Review your habits</a>
+    </div>
+    {% endif %}
+  </section>
+
+  <aside class="stack-lg">
+    <section class="panel">
+      <div class="panel-head"><div><p class="eyebrow">Weekly report</p><h2>How the week is going</h2></div><a class="quiet-link" href="/reflect">Reflect →</a></div>
+      <p class="report-line">{{ week_rate if week_rate is not none else 0 }}% of decided days completed.</p>
+      <p class="muted small">{{ totals.done }} done, {{ totals.missed }} missed, {{ totals.skipped }} planned rest. Best day and habit detail live in the weekly report.</p>
+      <div class="prompt-card">
+        <p class="eyebrow">Reflection prompt</p>
+        <p>{{ reflection_prompts.worked }}</p>
+        {% if reflection %}<p class="muted small">Saved for this week. <a href="/reflect">Edit it</a>.</p>{% else %}<a class="btn small" href="/reflect">Write five minutes</a>{% endif %}
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><div><p class="eyebrow">Needs attention</p><h2>A smaller ask</h2></div></div>
+      {% if at_risk %}
+      {% for habit in at_risk %}
+      <div class="attention-row">
+        <a href="/habits/{{ habit.id }}">{{ habit.title }}</a>
+        <span class="badge warn">{{ stats[habit.id]["month"]["rate"] }}%</span>
+      </div>
+      {% endfor %}
+      <p class="muted small">Under 60% over four weeks. Shrink the habit or cut a scheduled day before adding effort.</p>
+      {% else %}
+      <p class="muted">Nothing is under 60% over the last four weeks. Keep the rhythm boring.</p>
+      {% endif %}
+    </section>
+  </aside>
+</div>
+
+{% if suggestions %}
+<section class="panel">
+  <div class="panel-head"><div><p class="eyebrow">Latest coach notes</p><h2>Realistic changes</h2></div></div>
+  <div class="suggestion-grid">
+    {% for s in suggestions %}
+    <article class="suggestion">
+      <p class="eyebrow">{{ s.habit.title }} · {{ s.source }}</p>
+      <h3>{{ s.title }}</h3>
+      <p>{{ s.rationale }}</p>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="panel">
+  <div class="panel-head"><div><p class="eyebrow">Momentum</p><h2>Completed habit days, last six weeks</h2></div><a class="quiet-link" href="/insights">Insights →</a></div>
+  {{ chart }}
+</section>
+{% endblock %}

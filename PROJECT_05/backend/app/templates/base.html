@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="Swayam">
+  <meta name="description" content="Cadence tracks routines, protects streaks and turns weekly reflection into a realistic next step.">
+  <title>{% block title %}Cadence{% endblock %} · Habit & Routine Coach</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/app.css?v={{ version }}">
+  <script src="/static/htmx.min.js" defer></script>
+  <script src="/static/app.js?v={{ version }}" defer></script>
+</head>
+<body hx-headers='{"X-CSRF-Token": "{{ csrf_token }}"}'>
+  {% if user %}
+  <header class="masthead">
+    <a class="brand" href="/">
+      <svg class="brand-mark" viewBox="0 0 44 44" aria-hidden="true">
+        <circle cx="22" cy="22" r="16" fill="none" stroke="currentColor" stroke-width="2.2"/>
+        <path d="M22 6v5M22 33v5M6 22h5M33 22h5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M14 27c3-10 11-10 16-13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-text">Cadence<small>habits into rhythm</small></span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="/" {% if path == "/" %}aria-current="page"{% endif %}>Today</a>
+      <a href="/habits" {% if path.startswith("/habits") %}aria-current="page"{% endif %}>Habits</a>
+      <a href="/week" {% if path.startswith("/week") %}aria-current="page"{% endif %}>Week</a>
+      <a href="/reflect" {% if path.startswith("/reflect") %}aria-current="page"{% endif %}>Reflect</a>
+      <a href="/insights" {% if path.startswith("/insights") %}aria-current="page"{% endif %}>Insights</a>
+      <a href="/settings" {% if path.startswith("/settings") %}aria-current="page"{% endif %}>Settings</a>
+    </nav>
+    <div class="who">
+      <span class="avatar" aria-hidden="true">{{ user.name[0]|upper }}</span>
+      <span class="who-text"><strong>{{ user.name }}</strong><small>{{ today|datefmt("weekday") if today else "" }}</small></span>
+      <form method="post" action="/logout">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn ghost small" type="submit">Sign out</button>
+      </form>
+    </div>
+  </header>
+  <main id="main" class="page">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="foot">Cadence · designed and built by Swayam</footer>
+  {% else %}
+  <main id="main" class="auth-main">
+    {% block auth_content %}{% endblock %}
+  </main>
+  <footer class="foot auth-foot">Cadence · designed and built by Swayam</footer>
+  {% endif %}
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+</body>
+</html>

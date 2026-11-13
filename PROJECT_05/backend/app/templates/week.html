@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Week{% endblock %}
+{% block content %}
+<section class="hero compact">
+  <div>
+    <p class="eyebrow">Weekly plan</p>
+    <h1>{{ week_label }}</h1>
+    <p class="lede">The grid is the honest version of the week. Click any scheduled day to mark it done; click again to undo.</p>
+  </div>
+  <div class="month-nav">
+    <a class="btn ghost small" href="/week?week={{ prev_week }}">← Previous</a>
+    {% if not is_current %}<a class="btn ghost small" href="/week">This week</a>{% endif %}
+    <a class="btn ghost small" href="/week?week={{ next_week }}">Next →</a>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel-head"><div><p class="eyebrow">Habit grid</p><h2>What actually happened</h2></div><a class="quiet-link" href="/reflect?week={{ week_start.isoformat() }}">Reflect on this week →</a></div>
+  <div class="table-wrap">
+    <table class="week-table">
+      <thead>
+        <tr>
+          <th class="habit-col">Habit</th>
+          {% for day in days %}<th class="{{ 'today' if day == today }}"><span>{{ day|datefmt("weekday") }}</span><small>{{ day.day }}</small></th>{% endfor %}
+          <th>Done</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td class="habit-col"><a href="/habits/{{ row.habit.id }}">{{ row.habit.title }}</a><small class="muted">{{ row.habit|schedule }}</small></td>
+          {% for cell in row.cells %}
+          <td class="cell {{ cell.status }} {{ 'today' if cell.today }}">
+            {% if cell.status == "future" or cell.status == "off" %}
+            <span class="cell-mark">·</span>
+            {% else %}
+            <form method="post" action="/habits/{{ row.habit.id }}/log">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <input type="hidden" name="day" value="{{ cell.day.isoformat() }}">
+              <input type="hidden" name="status" value="{{ 'clear' if cell.status == 'done' else ('done' if cell.status in ('missed', 'pending') else 'clear') }}">
+              <input type="hidden" name="next" value="/week?week={{ week_start.isoformat() }}">
+              <button class="cell-btn {{ cell.status }}" type="submit" aria-label="{{ cell.day|datefmt('weekday') }}: {{ cell.status }}" title="{{ cell.status }}">
+                {% if cell.status == "done" %}✓{% elif cell.status == "skipped" %}–{% elif cell.status == "pending" %}◌{% elif cell.status == "missed" %}○{% endif %}
+              </button>
+            </form>
+            {% endif %}
+          </td>
+          {% endfor %}
+          <td class="week-total">{{ stats[row.habit.id].done }}/{{ stats[row.habit.id].done + stats[row.habit.id].missed }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="swipe-hint">Swipe the grid sideways to reach the rest of the week.</p>
+  {% if not rows %}<div class="empty"><p>No habits yet.</p><a class="btn" href="/habits">Add one</a></div>{% endif %}
+  <p class="muted small">✓ done · ○ missed · ◌ open today · – planned rest · · not scheduled. Future days can't be logged.</p>
+</section>
+
+<section class="panel report-panel">
+  <div class="panel-head"><div><p class="eyebrow">Weekly report</p><h2>The short version</h2></div><span class="badge">{{ report.rate if report.rate is not none else 0 }}%</span></div>
+  <ul class="report-list">
+    {% for line in report.lines %}<li>{{ line }}</li>{% endfor %}
+  </ul>
+</section>
+{% endblock %}

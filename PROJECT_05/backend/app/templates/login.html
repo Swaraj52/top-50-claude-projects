@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block auth_content %}
+<div class="auth-split">
+  <section class="auth-art" aria-hidden="true">
+    <div class="orbit orbit-one"></div>
+    <div class="orbit orbit-two"></div>
+    <div class="auth-art-copy">
+      <p class="eyebrow">Habit & Routine Coach</p>
+      <h1>Small repeats.<br>Real rhythm.</h1>
+      <p>Track the routines you chose, see the streak honestly, and turn one weekly reflection into a smaller, more realistic next step.</p>
+      <div class="art-week">
+        {% for d in ["M","T","W","T","F","S","S"] %}<span>{{ d }}</span>{% endfor %}
+      </div>
+    </div>
+  </section>
+  <section class="auth-panel">
+    <div class="auth-card">
+      <p class="eyebrow">Welcome back</p>
+      <h2>Sign in to Cadence</h2>
+      {% if error %}<div class="notice error" role="alert">{{ error }}</div>{% endif %}
+      <form method="post" action="/login" class="stack">
+        <input type="hidden" name="csrf_token" value="{{ form_csrf }}">
+        <label>Email
+          <input type="email" name="email" value="{{ values.email or '' }}" autocomplete="email" required autofocus>
+        </label>
+        <label>Password
+          <input type="password" name="password" autocomplete="current-password" required>
+        </label>
+        <button class="btn primary wide" type="submit">Sign in</button>
+      </form>
+      <p class="auth-alt">New here? <a href="/register">Create an account</a></p>
+    </div>
+  </section>
+</div>
+{% endblock %}

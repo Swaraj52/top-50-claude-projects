@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Habits{% endblock %}
+{% block content %}
+<section class="hero compact">
+  <div>
+    <p class="eyebrow">Your routines</p>
+    <h1>Habits, not wishes.</h1>
+    <p class="lede">A habit is a cue, a schedule and a small enough first step. Edit the design, not just the intention.</p>
+  </div>
+</section>
+
+<div class="filter-row" role="tablist" aria-label="Habit status">
+  {% for value in ["active", "paused", "archived", "all"] %}
+  <a class="filter {{ 'active' if current_status == value }}" href="/habits?status={{ value }}">{{ value|capitalize }} <span class="count">{{ counts[value] if value != "all" else counts.active + counts.paused + counts.archived }}</span></a>
+  {% endfor %}
+</div>
+
+{% if rows %}
+<div class="habit-grid">
+  {% for row in rows %}
+  <article class="habit-card">
+    <div class="habit-card-top">
+      <div>
+        <p class="eyebrow">{{ row.habit|schedule }}</p>
+        <h2><a href="/habits/{{ row.habit.id }}">{{ row.habit.title }}</a></h2>
+      </div>
+      {% if row.habit.status != "active" %}<span class="badge">{{ row.habit.status }}</span>{% endif %}
+    </div>
+    <p class="muted small">{{ row.habit.cue or "No cue yet — attach it to something you already do." }}</p>
+    <div class="strip" aria-label="Last fourteen days">
+      {% for cell in row.strip %}
+      <span class="strip-dot {{ cell.status }}" title="{{ cell.day|datefmt('weekday') }} · {{ cell.status }}"></span>
+      {% endfor %}
+    </div>
+    <div class="habit-metrics">
+      <span><strong>{{ row.stats.streak }}</strong><small>streak</small></span>
+      <span><strong>{{ row.stats["month"]["rate"] if row.stats["month"]["rate"] is not none else "—" }}{% if row.stats["month"]["rate"] is not none %}%{% endif %}</strong><small>4 weeks</small></span>
+      <span><strong>{{ row.stats.longest }}</strong><small>best</small></span>
+    </div>
+    {% if row.stats.at_risk %}<p class="badge warn inline">Needs a smaller ask</p>{% endif %}
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty panel"><p>No {{ current_status }} habits yet.</p></div>
+{% endif %}
+
+<section class="panel form-panel" id="new-habit">
+  <div class="panel-head"><div><p class="eyebrow">New routine</p><h2>Start with one</h2></div></div>
+  <form method="post" action="/habits" class="form-grid">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label class="span-2">Habit
+      <input type="text" name="title" maxlength="120" placeholder="Read for 20 minutes" required>
+    </label>
+    <label class="span-2">Why it matters
+      <textarea name="intention" rows="2" maxlength="1000" placeholder="I want to think in longer sentences than a feed allows."></textarea>
+    </label>
+    <label class="span-2">Cue
+      <input type="text" name="cue" maxlength="160" placeholder="After I put the kettle on">
+      <span class="hint">Name something you already do right before this habit.</span>
+    </label>
+    <fieldset class="span-2 days-field">
+      <legend>Days</legend>
+      <div class="day-picks">
+        {% for name, num in weekdays %}
+        <label class="day-pick"><input type="checkbox" name="days" value="{{ num }}" {% if num < 5 %}checked{% endif %}> {{ name }}</label>
+        {% endfor %}
+      </div>
+    </fieldset>
+    <div class="span-2 form-actions">
+      <button class="btn primary" type="submit">Add habit</button>
+      <span class="hint">You can pause or archive it any time.</span>
+    </div>
+  </form>
+</section>
+{% endblock %}

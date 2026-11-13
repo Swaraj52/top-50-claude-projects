@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Reflect{% endblock %}
+{% block content %}
+<section class="hero compact">
+  <div>
+    <p class="eyebrow">Weekly reflection · {{ week_label }}</p>
+    <h1>Five minutes, honestly.</h1>
+    <p class="lede">The report is computed from your logs. The reflection is yours: what worked, what got in the way, and one adjustment.</p>
+  </div>
+  <div class="month-nav">
+    <a class="btn ghost small" href="/reflect?week={{ prev_week }}">← Previous</a>
+    {% if not is_current %}<a class="btn ghost small" href="/reflect">This week</a>{% endif %}
+    <a class="btn ghost small" href="/reflect?week={{ next_week }}">Next →</a>
+  </div>
+</section>
+
+{% if saved %}<div class="notice info" role="status">Reflection saved. The adjustment is now the plan for next week.</div>{% endif %}
+
+<div class="split reflect-split">
+  <section class="panel">
+    <div class="panel-head"><div><p class="eyebrow">Report</p><h2>What the logs say</h2></div><span class="badge">{{ report.rate if report.rate is not none else 0 }}%</span></div>
+    <ul class="report-list">
+      {% for line in report.lines %}<li>{{ line }}</li>{% endfor %}
+    </ul>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Habit</th><th>Done</th><th>Missed</th><th>Rest</th><th>Rate</th></tr></thead>
+        <tbody>
+          {% for row in report.per_habit %}
+          <tr>
+            <td><a href="/habits/{{ row.habit.id }}">{{ row.habit.title }}</a></td>
+            <td>{{ row.stats.done }}</td>
+            <td>{{ row.stats.missed }}</td>
+            <td>{{ row.stats.skipped }}</td>
+            <td>{{ row.stats.rate if row.stats.rate is not none else "—" }}{% if row.stats.rate is not none %}%{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="muted small">Reflection streak: {{ reflection_streak }} week{{ '' if reflection_streak == 1 else 's' }}.</p>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><div><p class="eyebrow">{{ "Edit reflection" if reflection else "New reflection" }}</p><h2>Your turn</h2></div></div>
+    <form method="post" action="/reflect" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="week" value="{{ week_start.isoformat() }}">
+      <label>{{ prompts.worked }}
+        <textarea name="worked" rows="3" maxlength="2000">{{ reflection.worked if reflection else '' }}</textarea>
+      </label>
+      <label>{{ prompts.friction }}
+        <textarea name="friction" rows="3" maxlength="2000">{{ reflection.friction if reflection else '' }}</textarea>
+      </label>
+      <label>{{ prompts.change }}
+        <textarea name="change" rows="3" maxlength="2000">{{ reflection.change if reflection else '' }}</textarea>
+      </label>
+      <fieldset class="mood-field">
+        <legend>How did the week feel?</legend>
+        <div class="mood-picks">
+          {% for n in [1, 2, 3, 4, 5] %}
+          <label class="mood-pick"><input type="radio" name="mood" value="{{ n }}" {% if (reflection and reflection.mood == n) or (not reflection and n == 3) %}checked{% endif %}> <span>{{ n }}</span></label>
+          {% endfor %}
+        </div>
+        <span class="hint">1 = draining · 5 = energising</span>
+      </fieldset>
+      <button class="btn primary" type="submit">Save reflection</button>
+    </form>
+  </section>
+</div>
+
+<section class="panel">
+  <div class="panel-head"><div><p class="eyebrow">History</p><h2>Past reflections</h2></div></div>
+  {% if history %}
+  <div class="reflection-list">
+    {% for item in history %}
+    <article class="reflection">
+      <div class="reflection-head">
+        <a href="/reflect?week={{ item.week_start.isoformat() }}">{{ item.week_start|datefmt("long") }} week</a>
+        <span class="badge">mood {{ item.mood }}/5</span>
+      </div>
+      {% if item.change %}<p><strong>Adjustment:</strong> {{ item.change }}</p>{% endif %}
+      {% if item.worked %}<p class="muted small">Worked: {{ item.worked }}</p>{% endif %}
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="muted">No reflections yet. The first one can be short.</p>
+  {% endif %}
+</section>
+{% endblock %}

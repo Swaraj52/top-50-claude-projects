@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}{{ habit.title }}{% endblock %}
+{% block content %}
+<section class="hero compact">
+  <div>
+    <p class="eyebrow"><a href="/habits">← All habits</a> · {{ habit|schedule }}</p>
+    <h1>{{ habit.title }}</h1>
+    <p class="lede">{{ habit.intention or "No reason written yet. Add one so a hard week has context." }}</p>
+    <p class="muted small">{{ habit.cue and ("Cue: " ~ habit.cue) or "No cue yet." }} · {{ habit.status|capitalize }}</p>
+  </div>
+  <button class="btn" type="button" data-print>Print</button>
+</section>
+
+<section class="stat-grid four">
+  <article class="stat"><p class="stat-label">Current streak</p><p class="stat-value">{{ stats.streak }}</p><p class="stat-note">scheduled days completed</p></article>
+  <article class="stat"><p class="stat-label">Best streak</p><p class="stat-value">{{ stats.longest }}</p><p class="stat-note">since this habit began</p></article>
+  <article class="stat"><p class="stat-label">Last 7 days</p><p class="stat-value">{{ stats.week.done }}<span class="stat-of">/{{ stats.week.done + stats.week.missed }}</span></p><p class="stat-note">{{ stats.week.skipped }} planned rest</p></article>
+  <article class="stat"><p class="stat-label">Last 4 weeks</p><p class="stat-value">{{ stats.month.rate if stats.month.rate is not none else "—" }}{% if stats.month.rate is not none %}<span class="stat-unit">%</span>{% endif %}</p><p class="stat-note">{{ stats.month.done }} done · {{ stats.month.missed }} missed</p></article>
+</section>
+
+<div class="split detail-split">
+  <section class="panel">
+    <div class="panel-head">
+      <div><p class="eyebrow">Calendar</p><h2>{{ month_label }}</h2></div>
+      <div class="month-nav">
+        <a class="icon-btn" href="/habits/{{ habit.id }}?month={{ prev_month }}" aria-label="Previous month">←</a>
+        <a class="icon-btn" href="/habits/{{ habit.id }}?month={{ next_month }}" aria-label="Next month">→</a>
+      </div>
+    </div>
+    <table class="calendar">
+      <thead><tr>{% for name, num in weekdays %}<th>{{ name[0] }}</th>{% endfor %}</tr></thead>
+      <tbody>
+        {% for week in weeks %}
+        <tr>
+          {% for cell in week %}
+          {% if cell %}
+          <td class="{{ cell.status }} {{ 'today' if cell.today }}" title="{{ cell.day|datefmt('weekday') }} · {{ cell.status }}">
+            <span>{{ cell.day.day }}</span>
+            {% if cell.status == "done" %}<b class="cal-dot done"></b>{% elif cell.status == "missed" %}<b class="cal-dot missed"></b>{% elif cell.status == "skipped" %}<b class="cal-dot rest"></b>{% elif cell.status == "pending" %}<b class="cal-dot pending"></b>{% endif %}
+          </td>
+          {% else %}<td class="outside"></td>{% endif %}
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p class="muted small">Filled dot = done · hollow = missed · dotted = open today · dash = planned rest · empty = not scheduled.</p>
+
+    <div class="today-log">
+      <p class="eyebrow">Today</p>
+      {% if today_scheduled %}
+      <div class="inline-actions">
+        {% if checked_today and checked_today.status == "done" %}
+        <span class="badge done">Done today</span>
+        <form method="post" action="/habits/{{ habit.id }}/log">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="day" value="{{ today.isoformat() }}"><input type="hidden" name="status" value="clear"><input type="hidden" name="next" value="/habits/{{ habit.id }}">
+          <button class="btn ghost small" type="submit">Undo</button>
+        </form>
+        {% elif checked_today and checked_today.status == "skipped" %}
+        <span class="badge rest">Rest today</span>
+        <form method="post" action="/habits/{{ habit.id }}/log">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="day" value="{{ today.isoformat() }}"><input type="hidden" name="status" value="done"><input type="hidden" name="next" value="/habits/{{ habit.id }}">
+          <button class="btn primary small" type="submit">Did it</button>
+        </form>
+        {% else %}
+        <form method="post" action="/habits/{{ habit.id }}/log">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="day" value="{{ today.isoformat() }}"><input type="hidden" name="status" value="done"><input type="hidden" name="next" value="/habits/{{ habit.id }}">
+          <button class="btn primary small" type="submit">Mark done</button>
+        </form>
+        <form method="post" action="/habits/{{ habit.id }}/log">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="day" value="{{ today.isoformat() }}"><input type="hidden" name="status" value="skipped"><input type="hidden" name="next" value="/habits/{{ habit.id }}">
+          <button class="btn ghost small" type="submit">Planned rest</button>
+        </form>
+        {% endif %}
+      </div>
+      {% else %}
+      <p class="muted">Not scheduled today. Rest is part of the design.</p>
+      {% endif %}
+    </div>
+  </section>
+
+  <aside class="stack-lg">
+    <section class="panel">
+      <div class="panel-head"><div><p class="eyebrow">Coach</p><h2>Make it easier to repeat</h2></div></div>
+      <p class="muted small">Pattern-based suggestions from your own logs{% if ai_enabled %}; Claude rewrites them when available{% else %}. Add an API key on the server to use Claude instead{% endif %}.</p>
+      {% if coached %}<div class="notice {{ 'info' if coached == 'claude' else 'quiet' }}">{% if coached == "claude" %}Claude wrote this set and it was validated.{% else %}Local coach: no API key, so the plan comes from your logs.{% endif %}</div>{% endif %}
+      <form method="post" action="/habits/{{ habit.id }}/coach">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn primary wide" type="submit">Suggest a smaller ask</button>
+      </form>
+      {% if suggestions %}
+      <div class="suggestion-list">
+        {% for s in suggestions %}
+        <article class="suggestion">
+          <p class="eyebrow">{{ s.source }}{% if s.model %} · {{ s.model }}{% endif %}</p>
+          <h3>{{ s.title }}</h3>
+          <p>{{ s.rationale }}</p>
+        </article>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="muted small">No suggestions yet. Ask the coach after a week of logs for a useful pattern.</p>
+      {% endif %}
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><div><p class="eyebrow">Manage</p><h2>Habit design</h2></div></div>
+      <div class="inline-actions wrap">
+        {% for status in ["active", "paused", "archived"] %}
+        {% if habit.status != status %}
+        <form method="post" action="/habits/{{ habit.id }}/status">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="status" value="{{ status }}">
+          <button class="btn ghost small" type="submit">{{ "Resume" if status == "active" else status|capitalize }}</button>
+        </form>
+        {% endif %}
+        {% endfor %}
+        <form method="post" action="/habits/{{ habit.id }}/delete" data-confirm-form="Delete this habit and all its logs?">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="btn danger small" type="submit" data-confirm="Delete this habit and all its logs?">Delete</button>
+        </form>
+      </div>
+      <details class="edit-details">
+        <summary>Edit habit details</summary>
+        <form method="post" action="/habits/{{ habit.id }}/update" class="stack">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <label>Habit <input type="text" name="title" value="{{ habit.title }}" maxlength="120" required></label>
+          <label>Why it matters <textarea name="intention" rows="3" maxlength="1000">{{ habit.intention }}</textarea></label>
+          <label>Cue <input type="text" name="cue" value="{{ habit.cue }}" maxlength="160"></label>
+          <fieldset class="days-field"><legend>Days</legend>
+            <div class="day-picks">
+              {% set active_days = parse_days(habit.days) %}
+              {% for name, num in weekdays %}
+              <label class="day-pick"><input type="checkbox" name="days" value="{{ num }}" {% if num in active_days %}checked{% endif %}> {{ name }}</label>
+              {% endfor %}
+            </div>
+          </fieldset>
+          <button class="btn primary" type="submit">Save changes</button>
+        </form>
+      </details>
+    </section>
+  </aside>
+</div>
+
+<section class="panel">
+  <div class="panel-head"><div><p class="eyebrow">History</p><h2>Recent logs</h2></div><a class="quiet-link" href="/week?week={{ week_start.isoformat() }}">Week grid →</a></div>
+  {% if logs %}
+  <div class="log-list">
+    {% for log in logs %}
+    <div class="log-row">
+      <span class="badge {{ 'done' if log.status == 'done' else 'rest' }}">{{ log.status }}</span>
+      <span class="log-day">{{ log.day|datefmt("weekday") }}</span>
+      <span class="muted small">{{ log.note or "" }}</span>
+      <form method="post" action="/habits/{{ habit.id }}/log">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="day" value="{{ log.day.isoformat() }}"><input type="hidden" name="status" value="clear"><input type="hidden" name="next" value="/habits/{{ habit.id }}">
+        <button class="icon-btn" type="submit" aria-label="Remove this log">×</button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}<p class="muted">No logs yet. Today is a fine place to start.</p>{% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<section class="hero compact">
+  <div>
+    <p class="eyebrow">Your account</p>
+    <h1>Settings</h1>
+    <p class="lede">Time zone, security and a portable copy of your data. Nothing here is shared with anyone.</p>
+  </div>
+</section>
+
+{% if saved %}<div class="notice success" role="status">Changes saved.</div>{% endif %}
+{% if error %}<div class="notice error" role="alert">{{ error }}</div>{% endif %}
+
+<div class="split">
+  <section class="panel">
+    <div class="panel-head"><div><p class="eyebrow">Profile</p><h2>How Cadence works for you</h2></div></div>
+    <form method="post" action="/settings" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label>Name
+        <input type="text" name="name" value="{{ user.name }}" maxlength="80" required>
+      </label>
+      <label>Email
+        <input type="email" value="{{ user.email }}" disabled>
+        <span class="hint">Email changes are not supported in v1.</span>
+      </label>
+      <label>Time zone
+        <input type="text" name="timezone" value="{{ user.timezone }}" list="timezones" autocomplete="off" required>
+        <datalist id="timezones" data-fill-timezones></datalist>
+        <span class="hint">Today, streaks and weekly reports follow this time zone.</span>
+      </label>
+      <button class="btn primary" type="submit">Save settings</button>
+    </form>
+
+    <div class="coach-status">
+      <p class="eyebrow">Coach</p>
+      {% if ai_enabled %}
+      <p class="muted small">Claude is configured ({{ ai_model }}). Suggestions are validated before they are saved; if the call fails, the local coach writes them instead.</p>
+      {% else %}
+      <p class="muted small">No API key on this server, so the local coach writes every suggestion from your logs and labels itself honestly. Add <code>ANTHROPIC_API_KEY</code> to the server environment to let Claude rewrite them.</p>
+      {% endif %}
+    </div>
+  </section>
+
+  <div class="column">
+    <section class="panel">
+      <div class="panel-head"><div><p class="eyebrow">Security</p><h2>Change password</h2></div></div>
+      <form method="post" action="/settings/password" class="stack">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label>Current password
+          <input type="password" name="current_password" autocomplete="current-password" required>
+        </label>
+        <label>New password
+          <input type="password" name="new_password" minlength="8" maxlength="128" autocomplete="new-password" required>
+          <span class="hint">At least 8 characters. Other devices are signed out.</span>
+        </label>
+        <button class="btn" type="submit">Update password</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><div><p class="eyebrow">Portability</p><h2>Export your data</h2></div></div>
+      <p class="muted">Habits, every log and every weekly reflection as JSON. No passwords or session data.</p>
+      <a class="btn" href="/settings/export" download>Download JSON</a>
+    </section>
+
+    <section class="panel danger-zone">
+      <div class="panel-head"><div><p class="eyebrow">Danger zone</p><h2>Delete account</h2></div></div>
+      <details>
+        <summary class="btn danger small">Delete everything</summary>
+        <p class="muted small">This removes your account, habits, logs and reflections immediately. Export first if you may want the data.</p>
+        <form method="post" action="/settings/delete" class="stack" data-confirm-form="Permanently delete your account and all habit data?">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <label>Password
+            <input type="password" name="password" autocomplete="current-password" required>
+          </label>
+          <label>Type DELETE to confirm
+            <input type="text" name="confirm" required pattern="DELETE" autocomplete="off">
+          </label>
+          <button class="btn danger" type="submit">Delete my account</button>
+        </form>
+      </details>
+    </section>
+  </div>
+</div>
+{% endblock %}
