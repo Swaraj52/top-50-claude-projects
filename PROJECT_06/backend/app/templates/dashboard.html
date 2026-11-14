@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Today{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">{{ today|datefmt("weekday") }} · THE WORKING RECORD</p>
+    <h1>Your meetings, still working.</h1>
+    <p class="lede">Decisions that stayed decided. Follow-ups that did not disappear. Pick up where the last conversation left off.</p>
+  </div>
+  <div class="head-actions">
+    <a class="btn ghost" href="/memory">Search memory</a>
+    <a class="btn primary" href="/meetings/new">+ New meeting</a>
+  </div>
+</section>
+
+<section class="stat-grid four" aria-label="Overview">
+  <a class="stat accent-cobalt" href="/meetings">
+    <span class="stat-label">Meetings recorded</span>
+    <strong class="stat-value">{{ meeting_total }}</strong>
+    <span class="stat-meta">{{ this_month }} this month</span>
+  </a>
+  <a class="stat accent-amber" href="/actions">
+    <span class="stat-label">Open follow-ups</span>
+    <strong class="stat-value">{{ open_actions }}</strong>
+    <span class="stat-meta">{{ due_soon }} due in the next 7 days</span>
+  </a>
+  <a class="stat accent-coral" href="/actions">
+    <span class="stat-label">Overdue</span>
+    <strong class="stat-value">{{ overdue }}</strong>
+    <span class="stat-meta">{{ "Nothing is late." if overdue == 0 else "Needs a decision, not a reminder." }}</span>
+  </a>
+  <a class="stat accent-mint" href="/decisions">
+    <span class="stat-label">Decisions kept</span>
+    <strong class="stat-value">{{ decision_total }}</strong>
+    <span class="stat-meta">Searchable across every meeting</span>
+  </a>
+</section>
+
+<div class="dashboard-grid">
+  <section class="panel followup-panel">
+    <div class="panel-head">
+      <div><p class="eyebrow">FOLLOW-UPS</p><h2>What you owe someone</h2></div>
+      <a class="quiet-link" href="/actions">All follow-ups →</a>
+    </div>
+
+    {% if followups or undated %}
+    <ul class="followup-list">
+      {% for action in followups %}
+      <li class="followup-row {{ 'late' if action.due_date < today }}">
+        <form method="post" action="/actions/{{ action.id }}/toggle">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <input type="hidden" name="next" value="/">
+          <button class="check" type="submit" aria-label="Mark {{ action.title }} done" title="Mark done"></button>
+        </form>
+        <div class="followup-main">
+          <a href="/meetings/{{ action.meeting_id }}#actions">{{ action.title }}</a>
+          <span class="meta-line">
+            <a class="meeting-ref" href="/meetings/{{ action.meeting_id }}">{{ action.meeting.title }}</a>
+            {% if action.owner %}<span class="owner-pill">{{ action.owner }}</span>{% endif %}
+          </span>
+        </div>
+        <span class="due {{ 'late' if action.due_date < today }}">
+          {% if action.due_date < today %}Overdue{% elif action.due_date == today %}Today{% else %}{{ action.due_date|datefmt }}{% endif %}
+        </span>
+      </li>
+      {% endfor %}
+      {% for action in undated %}
+      <li class="followup-row">
+        <form method="post" action="/actions/{{ action.id }}/toggle">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <input type="hidden" name="next" value="/">
+          <button class="check" type="submit" aria-label="Mark {{ action.title }} done" title="Mark done"></button>
+        </form>
+        <div class="followup-main">
+          <a href="/meetings/{{ action.meeting_id }}#actions">{{ action.title }}</a>
+          <span class="meta-line">
+            <a class="meeting-ref" href="/meetings/{{ action.meeting_id }}">{{ action.meeting.title }}</a>
+            {% if action.owner %}<span class="owner-pill">{{ action.owner }}</span>{% endif %}
+          </span>
+        </div>
+        <span class="due">No date</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty">
+      <p>Nothing open. Every follow-up from your meetings is closed.</p>
+      <a class="btn ghost small" href="/meetings/new">Record a meeting</a>
+    </div>
+    {% endif %}
+  </section>
+
+  <aside class="panel recent-panel">
+    <div class="panel-head"><div><p class="eyebrow">RECENT</p><h2>Latest meetings</h2></div><a class="quiet-link" href="/meetings">All →</a></div>
+    {% if meetings %}
+    <ul class="mini-meetings">
+      {% for meeting in meetings %}
+      <li>
+        <a href="/meetings/{{ meeting.id }}">
+          <span class="mini-date">{{ meeting.occurred_on|datefmt }}</span>
+          <span class="mini-title">{{ meeting.title }}</span>
+          <span class="mini-meta">{{ meeting.decisions|length }} decision{{ "" if meeting.decisions|length == 1 else "s" }} · {{ meeting.actions|length }} follow-up{{ "" if meeting.actions|length == 1 else "s" }}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty"><p>No meetings yet.</p><a class="btn ghost small" href="/meetings/new">Add the first one</a></div>
+    {% endif %}
+    <div class="recent-footer"><a class="btn primary small" href="/meetings/new">+ Capture a meeting</a></div>
+  </aside>
+</div>
+
+<section class="panel">
+  <div class="panel-head"><div><p class="eyebrow">DECISION LOG</p><h2>What the team settled</h2></div><a class="quiet-link" href="/decisions">Full log →</a></div>
+  {% if recent_decisions %}
+  <ul class="decision-list compact">
+    {% for decision in recent_decisions %}
+    <li>
+      <span class="decision-mark" aria-hidden="true"></span>
+      <div>
+        <p class="decision-text">{{ decision.text }}</p>
+        <p class="meta-line">{{ decision.decided_on|datefmt }} · <a class="meeting-ref" href="/meetings/{{ decision.meeting_id }}">{{ decision.meeting.title }}</a></p>
+      </div>
+      <span class="tag {{ 'revisit' if decision.status == 'revisit' else 'decision' }}">{{ decision.status }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <div class="empty"><p>No decisions recorded yet. Paste your next set of notes and Quorum will pull them out.</p></div>
+  {% endif %}
+</section>
+{% endblock %}

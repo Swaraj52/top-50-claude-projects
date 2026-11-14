@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Follow-ups{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">THE OPEN LOOP</p>
+    <h1>Follow-ups</h1>
+    <p class="lede">Every commitment made in a meeting, with the person who owns it. Close the loop or move the date.</p>
+  </div>
+  <div class="head-actions"><a class="btn ghost" href="/meetings/new">+ Capture a meeting</a></div>
+</section>
+
+<section class="toolbar">
+  <div class="filter-row">
+    <a class="chip {{ 'active' if status == 'open' }}" href="/actions?status=open{{ '&owner=' ~ owner if owner }}">Open <span>{{ open_count }}</span></a>
+    <a class="chip {{ 'active' if status == 'done' }}" href="/actions?status=done{{ '&owner=' ~ owner if owner }}">Done <span>{{ done_count }}</span></a>
+    <a class="chip {{ 'active' if status == 'all' }}" href="/actions?status=all{{ '&owner=' ~ owner if owner }}">All</a>
+  </div>
+  {% if owners %}
+  <form class="owner-filter" method="get" action="/actions">
+    <input type="hidden" name="status" value="{{ status }}">
+    <label for="owner">Owner</label>
+    <select id="owner" name="owner" onchange="this.form.submit()">
+      <option value="">Everyone</option>
+      {% for name in owners %}<option value="{{ name }}" {{ 'selected' if owner == name }}>{{ name }}</option>{% endfor %}
+    </select>
+    <noscript><button class="btn ghost small" type="submit">Apply</button></noscript>
+  </form>
+  {% endif %}
+</section>
+
+{% if groups %}
+<div class="action-groups">
+  {% for label, rows in groups.items() %}
+  {% if rows %}
+  <section class="panel action-group {{ label|lower|replace(' ', '-') }}">
+    <div class="panel-head"><div><p class="eyebrow">{{ label|upper }}</p><h2>{{ rows|length }} {{ "item" if rows|length == 1 else "items" }}</h2></div></div>
+    <ul class="action-list">
+      {% for action in rows %}
+      <li class="action-row {{ 'done' if action.status == 'done' }} {{ 'late' if action.status == 'open' and action.due_date and action.due_date < today }}">
+        <form method="post" action="/actions/{{ action.id }}/toggle">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <input type="hidden" name="next" value="/actions?status={{ status }}{{ '&owner=' ~ owner if owner }}">
+          <button class="check {{ 'checked' if action.status == 'done' }}" type="submit" aria-label="{{ 'Reopen' if action.status == 'done' else 'Complete' }} {{ action.title }}" title="{{ 'Reopen' if action.status == 'done' else 'Mark done' }}"></button>
+        </form>
+        <div class="action-body">
+          <p class="action-title">{{ action.title }}</p>
+          <p class="meta-line">
+            {% if action.owner %}<span class="owner-pill">{{ action.owner }}</span>{% else %}<span class="owner-pill unassigned">Unassigned</span>{% endif %}
+            <a class="meeting-ref" href="/meetings/{{ action.meeting_id }}#actions">{{ action.meeting.title }}</a>
+            <span>{{ action.meeting.occurred_on|datefmt }}</span>
+            {% if action.due_date %}<span class="due {{ 'late' if action.status == 'open' and action.due_date < today }}">{{ 'Overdue · ' if action.status == 'open' and action.due_date < today else 'Due ' }}{{ action.due_date|datefmt("long") }}</span>{% endif %}
+          </p>
+        </div>
+        <div class="row-actions">
+          <details class="edit-pop">
+            <summary class="btn ghost tiny" role="button">Edit</summary>
+            <form method="post" action="/actions/{{ action.id }}/update" class="pop-form">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <input type="hidden" name="next" value="/actions?status={{ status }}{{ '&owner=' ~ owner if owner }}">
+              <label class="field"><span>Task</span><input type="text" name="title" value="{{ action.title }}" maxlength="280" required></label>
+              <label class="field"><span>Owner</span><input type="text" name="owner" value="{{ action.owner }}" maxlength="80"></label>
+              <label class="field"><span>Due</span><input type="date" name="due_date" value="{{ action.due_date.isoformat() if action.due_date else '' }}"></label>
+              <button class="btn primary small" type="submit">Save</button>
+            </form>
+          </details>
+          <form method="post" action="/actions/{{ action.id }}/delete" data-confirm="Delete this follow-up?">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="next" value="/actions?status={{ status }}{{ '&owner=' ~ owner if owner }}">
+            <button class="icon-btn" type="submit" aria-label="Delete follow-up" title="Delete">×</button>
+          </form>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+  {% endfor %}
+</div>
+{% else %}
+<section class="empty large">
+  <p class="eyebrow">CLEAR</p>
+  <h2>{{ "Nothing completed yet." if status == "done" else "No open follow-ups." }}</h2>
+  <p>{{ "When you close a follow-up it will live here." if status == "done" else "Every commitment from your meetings is closed. Enjoy the quiet." }}</p>
+  <a class="btn ghost" href="/meetings">Browse meetings</a>
+</section>
+{% endif %}
+{% endblock %}

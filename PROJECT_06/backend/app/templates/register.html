@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Create account{% endblock %}
+{% block content %}
+<section class="auth-shell">
+  <div class="auth-art">
+    <a class="auth-brand" href="/login">
+      <svg viewBox="0 0 36 36" aria-hidden="true">
+        <circle cx="8" cy="18" r="4" fill="currentColor"/>
+        <circle cx="28" cy="8" r="4" fill="currentColor"/>
+        <circle cx="28" cy="28" r="4" fill="currentColor"/>
+        <path d="M12 16.5 24 9.5M12 19.5l12 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+      </svg>
+      <span>Quorum</span>
+    </a>
+    <div class="auth-copy">
+      <p class="eyebrow">START THE RECORD</p>
+      <h1>The meeting ends.<br>The memory doesn't.</h1>
+      <p>One place for what was decided, who owns what, and when it is due. No integrations, no bots, no meeting recording.</p>
+    </div>
+    <ul class="auth-list" aria-hidden="true">
+      <li>Paste any notes or transcript</li>
+      <li>Decisions separated from discussion</li>
+      <li>Follow-ups with owners and dates</li>
+      <li>Search across every meeting</li>
+    </ul>
+  </div>
+
+  <div class="auth-form">
+    <div class="auth-form-card">
+      <p class="eyebrow">CREATE AN ACCOUNT</p>
+      <h2>Start your memory</h2>
+      <p class="muted">Local by default. Nothing is sent anywhere unless you add an API key.</p>
+
+      {% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+
+      <form method="post" action="/register" class="form">
+        <input type="hidden" name="csrf_token" value="{{ form_csrf }}">
+        <label class="field">
+          <span>Name</span>
+          <input type="text" name="name" value="{{ values.name or '' }}" maxlength="80" autocomplete="name" required autofocus>
+        </label>
+        <label class="field">
+          <span>Email</span>
+          <input type="email" name="email" value="{{ values.email or '' }}" autocomplete="email" required>
+        </label>
+        <label class="field">
+          <span>Password</span>
+          <input type="password" name="password" minlength="8" autocomplete="new-password" required>
+          <small>At least 8 characters.</small>
+        </label>
+        <label class="field">
+          <span>Timezone</span>
+          <input type="text" name="timezone" value="Asia/Kolkata" list="timezones" autocomplete="off">
+          <small>Used to decide what "today" means.</small>
+        </label>
+        <datalist id="timezones">
+          <option value="Asia/Kolkata"></option>
+          <option value="UTC"></option>
+          <option value="Europe/London"></option>
+          <option value="Europe/Berlin"></option>
+          <option value="America/New_York"></option>
+          <option value="America/Los_Angeles"></option>
+          <option value="Asia/Singapore"></option>
+          <option value="Australia/Sydney"></option>
+        </datalist>
+        <button class="btn primary wide" type="submit">Create account</button>
+      </form>
+
+      <p class="auth-switch">Already have an account? <a href="/login">Sign in</a></p>
+    </div>
+  </div>
+</section>
+{% endblock %}

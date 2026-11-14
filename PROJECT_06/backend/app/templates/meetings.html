@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Meetings{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">THE ARCHIVE</p>
+    <h1>Meetings</h1>
+    <p class="lede">Every conversation you filed, newest first. Open one to see what was decided and who left with a job.</p>
+  </div>
+  <div class="head-actions"><a class="btn primary" href="/meetings/new">+ New meeting</a></div>
+</section>
+
+<section class="toolbar">
+  <form class="search" method="get" action="/meetings" role="search">
+    <label class="sr-only" for="q">Search meetings</label>
+    <input id="q" type="search" name="q" value="{{ q }}" placeholder="Search titles, notes, people…">
+    <button class="btn ghost small" type="submit">Search</button>
+    {% if q %}<a class="quiet-link" href="/meetings">Clear</a>{% endif %}
+  </form>
+  <div class="filter-row" aria-label="Filter by source">
+    <a class="chip {{ 'active' if not source }}" href="/meetings{{ '?q=' ~ q if q }}">All</a>
+    <a class="chip {{ 'active' if source == 'claude' }}" href="/meetings?source=claude{{ '&q=' ~ q if q }}">Claude</a>
+    <a class="chip {{ 'active' if source == 'local' }}" href="/meetings?source=local{{ '&q=' ~ q if q }}">Local</a>
+  </div>
+</section>
+
+{% if meetings %}
+<section class="meeting-stack" aria-label="Meetings">
+  {% for meeting in meetings %}
+  <a class="meeting-row" href="/meetings/{{ meeting.id }}">
+    <div class="date-block">
+      <span>{{ meeting.occurred_on|datefmt("month") }}</span>
+      <strong>{{ meeting.occurred_on.day }}</strong>
+      <em>{{ meeting.occurred_on|datefmt("day") }}</em>
+    </div>
+    <div class="meeting-body">
+      <div class="meeting-title-line">
+        <h2>{{ meeting.title }}</h2>
+        <span class="tag {{ 'claude' if meeting.source == 'claude' else 'local' }}">{{ 'Claude' if meeting.source == 'claude' else 'Local' }}</span>
+      </div>
+      <p class="meeting-summary">{{ meeting.summary or "No summary yet." }}</p>
+      <div class="meeting-meta">
+        <span>{{ meeting.decisions|length }} decision{{ "" if meeting.decisions|length == 1 else "s" }}</span>
+        <span>{{ counts.get(meeting.id, (0, 0))[0] }}/{{ meeting.actions|length }} follow-ups done</span>
+        {% if meeting.attendees %}<span class="attendee-line">{{ meeting.attendees|attendees|join(" · ") }}</span>{% endif %}
+      </div>
+    </div>
+    <span class="row-arrow" aria-hidden="true">→</span>
+  </a>
+  {% endfor %}
+</section>
+{% else %}
+<section class="empty large">
+  <p class="eyebrow">NOTHING FILED</p>
+  <h2>{{ "No meeting matches that search." if q else "The archive is empty." }}</h2>
+  <p>{{ "Try a broader word, or clear the filter." if q else "Paste your first set of notes and Quorum will turn them into decisions and follow-ups." }}</p>
+  {% if q %}<a class="btn ghost" href="/meetings">Clear search</a>{% else %}<a class="btn primary" href="/meetings/new">Record the first meeting</a>{% endif %}
+</section>
+{% endif %}
+{% endblock %}

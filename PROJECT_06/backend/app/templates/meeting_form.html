@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}{{ "Edit meeting" if meeting.id else "New meeting" }}{% endblock %}
+{% block content %}
+<section class="page-head compact">
+  <div>
+    <p class="eyebrow">{{ "EDIT RECORD" if meeting.id else "CAPTURE" }}</p>
+    <h1>{{ "Edit the record" if meeting.id else "Paste the notes." }}</h1>
+    <p class="lede">{{ "Update the details, then re-read the notes if you want the decisions and follow-ups rebuilt." if meeting.id else "Quorum reads the notes, separates decisions from discussion, and pulls out owners and dates." }}</p>
+  </div>
+  {% if meeting.id %}<div class="head-actions"><a class="btn ghost" href="/meetings/{{ meeting.id }}">Cancel</a></div>{% endif %}
+</section>
+
+{% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+
+<form method="post" action="{{ '/meetings/' ~ meeting.id ~ '/edit' if meeting.id else '/meetings' }}" class="meeting-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <div class="capture-grid">
+    <div class="panel">
+      <div class="form-grid">
+        <label class="field span-2">
+          <span>Meeting title</span>
+          <input type="text" name="title" value="{{ meeting.title }}" maxlength="160" required autofocus placeholder="Weekly product review">
+        </label>
+        <label class="field">
+          <span>Date</span>
+          <input type="date" name="occurred_on" value="{{ meeting.occurred_on.isoformat() }}" required>
+        </label>
+        <label class="field">
+          <span>Attendees</span>
+          <input type="text" name="attendees" value="{{ meeting.attendees }}" placeholder="Priya, Arjun, Meera" autocomplete="off">
+          <small>Comma-separated. @mentions in the notes are added automatically.</small>
+        </label>
+        <label class="field span-2">
+          <span>Notes or transcript</span>
+          <textarea name="notes" rows="18" maxlength="60000" required placeholder="Paste anything: a rough bullet list, a transcript, or notes someone else wrote.
+
+Decisions:
+- Ship the beta on 1 December
+- Keep pricing on one page
+
+Action items:
+- @Priya send the onboarding deck by Friday
+- Arjun will draft the migration note by 2026-11-20">{{ meeting.notes }}</textarea>
+          <small>Clear section headings help, but Quorum also reads ordinary sentences.</small>
+        </label>
+      </div>
+      {% if meeting.id %}
+      <label class="checkline">
+        <input type="checkbox" name="reextract" value="1">
+        <span>Re-read the notes and rebuild decisions and follow-ups. <b>This replaces the current extracted items.</b></span>
+      </label>
+      {% endif %}
+    </div>
+
+    <aside class="capture-side">
+      <section class="panel note-panel">
+        <p class="eyebrow">HOW IT READS</p>
+        <h2>What Quorum looks for</h2>
+        <ul class="tip-list">
+          <li><b>Decisions</b><span>“We agreed…”, “Decision:”, “Approved”, or a “Decisions” section.</span></li>
+          <li><b>Follow-ups</b><span>“Action:”, “TODO”, “@Name”, or “Priya will…” lines.</span></li>
+          <li><b>Owners</b><span>@mentions, “Owner:”, or the name before “will”.</span></li>
+          <li><b>Dates</b><span>“by Friday”, “by 2026-11-20”, “tomorrow”, “next week”.</span></li>
+        </ul>
+        <p class="muted small">No notes leave this machine unless you add an Anthropic key. Every result says whether it came from Claude or the local extractor.</p>
+      </section>
+
+      <button class="btn primary wide" type="submit">{{ "Save changes" if meeting.id else "Remember this meeting" }}</button>
+      <p class="muted small center">Nothing is recorded until you submit.</p>
+    </aside>
+  </div>
+</form>
+{% endblock %}

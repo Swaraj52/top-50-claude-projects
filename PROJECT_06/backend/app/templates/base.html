@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="Swayam">
+  <meta name="description" content="Quorum turns meeting notes into decisions, owners and follow-ups you can actually find later.">
+  <title>{% block title %}Quorum{% endblock %} · Meeting Memory</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/app.css?v={{ version }}">
+  <script src="/static/htmx.min.js" defer></script>
+  <script src="/static/app.js?v={{ version }}" defer></script>
+</head>
+<body hx-headers='{"X-CSRF-Token": "{{ csrf_token }}"}'>
+  {% if user %}
+  <header class="masthead">
+    <a class="brand" href="/">
+      <svg class="brand-mark" viewBox="0 0 36 36" aria-hidden="true">
+        <circle cx="8" cy="18" r="4" fill="currentColor"/>
+        <circle cx="28" cy="8" r="4" fill="currentColor"/>
+        <circle cx="28" cy="28" r="4" fill="currentColor"/>
+        <path d="M12 16.5 24 9.5M12 19.5l12 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-text">Quorum<small>meetings that remember</small></span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="/" {% if path == "/" %}aria-current="page"{% endif %}>Today</a>
+      <a href="/meetings" {% if path.startswith("/meetings") %}aria-current="page"{% endif %}>Meetings</a>
+      <a href="/actions" {% if path.startswith("/actions") %}aria-current="page"{% endif %}>Follow-ups</a>
+      <a href="/decisions" {% if path.startswith("/decisions") %}aria-current="page"{% endif %}>Decisions</a>
+      <a href="/memory" {% if path.startswith("/memory") %}aria-current="page"{% endif %}>Memory</a>
+      <a href="/settings" {% if path.startswith("/settings") %}aria-current="page"{% endif %}>Settings</a>
+    </nav>
+    <div class="who">
+      <span class="avatar" aria-hidden="true">{{ user.name|initial }}</span>
+      <span class="who-text"><strong>{{ user.name }}</strong><small>{{ today|datefmt("weekday") if today else "" }}</small></span>
+      <form method="post" action="/logout">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn ghost small" type="submit">Sign out</button>
+      </form>
+    </div>
+  </header>
+  {% endif %}
+
+  <main class="page">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% if user %}
+  <footer class="foot">Quorum · designed and built by Swayam</footer>
+  {% endif %}
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+</body>
+</html>

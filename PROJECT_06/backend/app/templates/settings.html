@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<section class="page-head compact">
+  <div>
+    <p class="eyebrow">ACCOUNT</p>
+    <h1>Settings</h1>
+    <p class="lede">Your name, your timezone, and the exit door. Quorum has no integrations and no analytics.</p>
+  </div>
+</section>
+
+{% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+{% if saved %}<div class="alert success" role="status">Changes saved.</div>{% endif %}
+
+<div class="settings-grid">
+  <div>
+    <section class="panel">
+      <div class="panel-head"><div><p class="eyebrow">PROFILE</p><h2>How you appear</h2></div></div>
+      <form method="post" action="/settings" class="form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label class="field">
+          <span>Display name</span>
+          <input type="text" name="name" value="{{ user.name }}" maxlength="80" required>
+        </label>
+        <label class="field">
+          <span>Email</span>
+          <input type="email" value="{{ user.email }}" disabled>
+          <small>Email changes are not supported in this local build.</small>
+        </label>
+        <label class="field">
+          <span>Timezone</span>
+          <input type="text" name="timezone" value="{{ user.timezone }}" list="timezones" required>
+          <small>Decides what "today" means for follow-up due dates.</small>
+        </label>
+        <datalist id="timezones">
+          <option value="Asia/Kolkata"></option><option value="UTC"></option><option value="Europe/London"></option>
+          <option value="Europe/Berlin"></option><option value="America/New_York"></option><option value="America/Los_Angeles"></option>
+          <option value="Asia/Singapore"></option><option value="Australia/Sydney"></option>
+        </datalist>
+        <button class="btn primary" type="submit">Save profile</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><div><p class="eyebrow">SECURITY</p><h2>Change password</h2></div></div>
+      <form method="post" action="/settings/password" class="form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label class="field"><span>Current password</span><input type="password" name="current_password" autocomplete="current-password" required></label>
+        <label class="field"><span>New password</span><input type="password" name="new_password" minlength="8" autocomplete="new-password" required><small>At least 8 characters. Other devices are signed out.</small></label>
+        <button class="btn ghost" type="submit">Update password</button>
+      </form>
+    </section>
+  </div>
+
+  <aside>
+    <section class="panel">
+      <p class="eyebrow">THE ARCHIVE</p>
+      <h2>{{ counts.meetings or 0 }} meetings</h2>
+      <p class="muted">{{ counts.decisions or 0 }} decisions and {{ counts.actions or 0 }} follow-ups are stored in the local SQLite database.</p>
+      <a class="btn ghost wide" href="/settings/export">Download JSON</a>
+      <p class="muted small">Includes meetings, notes, decisions and follow-ups. No password material.</p>
+    </section>
+
+    <section class="panel">
+      <p class="eyebrow">EXTRACTION</p>
+      <h2>{{ "Claude enabled" if ai_enabled else "Local extractor" }}</h2>
+      <p class="muted small">
+        {% if ai_enabled %}Notes are sent to {{ ai_model }} when a meeting is read. The local extractor remains the fallback and every result is labelled.
+        {% else %}Everything runs on this machine. Add <code>ANTHROPIC_API_KEY</code> to <code>PROJECT_06/.env</code> to use Claude as well.{% endif %}
+      </p>
+    </section>
+
+    <section class="panel danger-zone">
+      <p class="eyebrow">DANGER</p>
+      <h2>Delete account</h2>
+      <p class="muted small">Removes every meeting, decision, follow-up and session. This cannot be undone.</p>
+      <form method="post" action="/settings/delete" data-confirm="Delete your account and all meeting memory? This cannot be undone." class="form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label class="field"><span>Password</span><input type="password" name="password" autocomplete="current-password" required></label>
+        <label class="field"><span>Type DELETE</span><input type="text" name="confirm" placeholder="DELETE" autocomplete="off" required></label>
+        <button class="btn danger" type="submit">Delete everything</button>
+      </form>
+    </section>
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Memory{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">ASK THE ARCHIVE</p>
+    <h1>Memory</h1>
+    <p class="lede">One search across meeting summaries, decisions and follow-ups. Find the conversation, the call, or the person who owns it.</p>
+  </div>
+</section>
+
+<form class="memory-search" method="get" action="/memory" role="search">
+  <label class="sr-only" for="q">Search everything</label>
+  <input id="q" type="search" name="q" value="{{ q }}" placeholder="Try “pricing”, “Priya”, “beta”…" autofocus>
+  <button class="btn primary" type="submit">Search memory</button>
+</form>
+
+{% if q %}
+<p class="result-line">{{ total }} result{{ "" if total == 1 else "s" }} for <b>“{{ q }}”</b></p>
+
+{% if meetings %}
+<section class="panel memory-group">
+  <div class="panel-head"><div><p class="eyebrow">MEETINGS</p><h2>{{ meetings|length }} match{{ "" if meetings|length == 1 else "es" }}</h2></div></div>
+  <ul class="mini-meetings">
+    {% for meeting in meetings %}
+    <li><a href="/meetings/{{ meeting.id }}">
+      <span class="mini-date">{{ meeting.occurred_on|datefmt }}</span>
+      <span class="mini-title">{{ meeting.title }}</span>
+      <span class="mini-meta">{{ meeting.summary[:130] }}{{ "…" if meeting.summary|length > 130 }}</span>
+    </a></li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if decisions %}
+<section class="panel memory-group">
+  <div class="panel-head"><div><p class="eyebrow">DECISIONS</p><h2>{{ decisions|length }} match{{ "" if decisions|length == 1 else "es" }}</h2></div></div>
+  <ul class="decision-list compact">
+    {% for decision in decisions %}
+    <li>
+      <span class="decision-mark" aria-hidden="true"></span>
+      <div><p class="decision-text">{{ decision.text }}</p>
+      <p class="meta-line">{{ decision.decided_on|datefmt }} · <a class="meeting-ref" href="/meetings/{{ decision.meeting_id }}#decisions">{{ decision.meeting.title }}</a></p></div>
+      <span class="tag {{ 'revisit' if decision.status == 'revisit' else 'decision' }}">{{ decision.status }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if actions %}
+<section class="panel memory-group">
+  <div class="panel-head"><div><p class="eyebrow">FOLLOW-UPS</p><h2>{{ actions|length }} match{{ "" if actions|length == 1 else "es" }}</h2></div></div>
+  <ul class="action-list">
+    {% for action in actions %}
+    <li class="action-row {{ 'done' if action.status == 'done' }}">
+      <span class="check static {{ 'checked' if action.status == 'done' }}" aria-hidden="true"></span>
+      <div class="action-body">
+        <p class="action-title">{{ action.title }}</p>
+        <p class="meta-line">
+          {% if action.owner %}<span class="owner-pill">{{ action.owner }}</span>{% endif %}
+          <a class="meeting-ref" href="/meetings/{{ action.meeting_id }}#actions">{{ action.meeting.title }}</a>
+          <span>{{ action.status|capitalize }}</span>
+          {% if action.due_date %}<span>{{ action.due_date|datefmt }}</span>{% endif %}
+        </p>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if total == 0 %}
+<section class="empty large">
+  <p class="eyebrow">NO MATCH</p>
+  <h2>Nothing in the archive says “{{ q }}”.</h2>
+  <p>Search a shorter phrase, a person's first name, or a word from the decision itself.</p>
+  <a class="btn ghost" href="/memory">Clear search</a>
+</section>
+{% endif %}
+
+{% else %}
+<section class="memory-prompts">
+  <div class="prompt-card"><p class="eyebrow">PEOPLE</p><h2>What does Priya own?</h2><p>Search a name to find every follow-up and the meeting it came from.</p></div>
+  <div class="prompt-card"><p class="eyebrow">TOPICS</p><h2>What did we decide about pricing?</h2><p>Decisions and summaries are indexed together, not buried in attachments.</p></div>
+  <div class="prompt-card"><p class="eyebrow">TIME</p><h2>When did we last discuss the beta?</h2><p>Results are ordered by meeting date, so the newest context is first.</p></div>
+</section>
+{% endif %}
+{% endblock %}

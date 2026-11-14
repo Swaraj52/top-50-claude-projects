@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block title %}{{ meeting.title }}{% endblock %}
+{% block content %}
+<section class="detail-head">
+  <div>
+    <p class="eyebrow"><a href="/meetings">MEETINGS</a> / {{ meeting.occurred_on|datefmt("long") }}</p>
+    <h1>{{ meeting.title }}</h1>
+    <div class="detail-meta">
+      <span class="tag {{ 'claude' if meeting.source == 'claude' else 'local' }}">{{ 'Claude read' if meeting.source == 'claude' else 'Local read' }}</span>
+      {% if meeting.attendees %}<span class="attendee-line">{{ meeting.attendees|attendees|join(" · ") }}</span>{% endif %}
+      <span class="muted">{{ meeting.decisions|length }} decisions · {{ meeting.actions|length }} follow-ups</span>
+    </div>
+  </div>
+  <div class="head-actions">
+    <a class="btn ghost small" href="/meetings/{{ meeting.id }}/edit">Edit</a>
+    <button class="btn ghost small" type="button" onclick="window.print()">Print</button>
+    <form method="post" action="/meetings/{{ meeting.id }}/delete" data-confirm="Delete this meeting, its decisions and its follow-ups?">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button class="btn danger small" type="submit">Delete</button>
+    </form>
+  </div>
+</section>
+
+{% if created %}<div class="alert success" role="status">Meeting recorded. Here is what Quorum found.</div>{% endif %}
+{% if saved %}<div class="alert success" role="status">Changes saved.</div>{% endif %}
+{% if extracted %}<div class="alert success" role="status">The notes were read again and the record rebuilt.</div>{% endif %}
+{% if error %}<div class="alert" role="alert">That item was too short or too long. Check it and try again.</div>{% endif %}
+{% if meeting.extract_note %}<div class="alert info" role="status">{{ meeting.extract_note }}</div>{% endif %}
+
+<div class="detail-grid">
+  <div class="detail-main">
+    <section class="panel">
+      <div class="panel-head"><div><p class="eyebrow">SUMMARY</p><h2>The short version</h2></div></div>
+      <p class="summary-text">{{ meeting.summary or "No summary was captured." }}</p>
+    </section>
+
+    <section class="panel" id="decisions">
+      <div class="panel-head">
+        <div><p class="eyebrow">DECISION LOG</p><h2>What was settled</h2></div>
+        <span class="badge">{{ meeting.decisions|length }}</span>
+      </div>
+      {% if meeting.decisions %}
+      <ul class="decision-list">
+        {% for decision in meeting.decisions|sort(attribute="id") %}
+        <li class="{{ 'revisit' if decision.status == 'revisit' }}">
+          <span class="decision-mark" aria-hidden="true"></span>
+          <div class="decision-body">
+            <p class="decision-text">{{ decision.text }}</p>
+            <p class="meta-line">{{ decision.decided_on|datefmt }} · {{ "Agreed" if decision.status == "agreed" else "Needs another look" }}</p>
+          </div>
+          <div class="row-actions">
+            <form method="post" action="/decisions/{{ decision.id }}/status">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <button class="btn ghost tiny" type="submit">{{ "Revisit" if decision.status == "agreed" else "Settle" }}</button>
+            </form>
+            <form method="post" action="/decisions/{{ decision.id }}/delete" data-confirm="Remove this decision from the log?">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <button class="icon-btn" type="submit" aria-label="Delete decision" title="Delete">×</button>
+            </form>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="muted">No decisions were found. Add one below if the notes missed it.</p>
+      {% endif %}
+      <form method="post" action="/meetings/{{ meeting.id }}/decisions" class="inline-add">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label class="sr-only" for="decision-text">Add a decision</label>
+        <input id="decision-text" type="text" name="text" maxlength="500" placeholder="Add a decision that was missed…" required>
+        <select name="status" aria-label="Decision status">
+          <option value="agreed">Agreed</option>
+          <option value="revisit">Revisit</option>
+        </select>
+        <button class="btn primary small" type="submit">Add</button>
+      </form>
+    </section>
+
+    <section class="panel" id="actions">
+      <div class="panel-head">
+        <div><p class="eyebrow">FOLLOW-UPS</p><h2>Who owns what</h2></div>
+        <span class="badge">{{ actions|selectattr("status", "equalto", "open")|list|length }} open</span>
+      </div>
+      {% if actions %}
+      <ul class="action-list">
+        {% for action in actions %}
+        <li class="action-row {{ 'done' if action.status == 'done' }} {{ 'late' if action.status == 'open' and action.due_date and action.due_date < today }}">
+          <form method="post" action="/actions/{{ action.id }}/toggle">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="next" value="/meetings/{{ meeting.id }}#actions">
+            <button class="check {{ 'checked' if action.status == 'done' }}" type="submit" aria-label="{{ 'Reopen' if action.status == 'done' else 'Complete' }} {{ action.title }}" title="{{ 'Reopen' if action.status == 'done' else 'Mark done' }}"></button>
+          </form>
+          <div class="action-body">
+            <p class="action-title">{{ action.title }}</p>
+            <p class="meta-line">
+              {% if action.owner %}<span class="owner-pill">{{ action.owner }}</span>{% else %}<span class="owner-pill unassigned">Unassigned</span>{% endif %}
+              {% if action.due_date %}<span class="due {{ 'late' if action.status == 'open' and action.due_date < today }}">{{ 'Overdue · ' if action.status == 'open' and action.due_date < today else 'Due ' }}{{ action.due_date|datefmt("long") }}</span>{% else %}<span class="due">No date</span>{% endif %}
+            </p>
+          </div>
+          <div class="row-actions">
+            <details class="edit-pop">
+              <summary class="btn ghost tiny" role="button">Edit</summary>
+              <form method="post" action="/actions/{{ action.id }}/update" class="pop-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="next" value="/meetings/{{ meeting.id }}#actions">
+                <label class="field"><span>Task</span><input type="text" name="title" value="{{ action.title }}" maxlength="280" required></label>
+                <label class="field"><span>Owner</span><input type="text" name="owner" value="{{ action.owner }}" maxlength="80"></label>
+                <label class="field"><span>Due</span><input type="date" name="due_date" value="{{ action.due_date.isoformat() if action.due_date else '' }}"></label>
+                <button class="btn primary small" type="submit">Save</button>
+              </form>
+            </details>
+            <form method="post" action="/actions/{{ action.id }}/delete" data-confirm="Delete this follow-up?">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <input type="hidden" name="next" value="/meetings/{{ meeting.id }}#actions">
+              <button class="icon-btn" type="submit" aria-label="Delete follow-up" title="Delete">×</button>
+            </form>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="muted">No follow-ups were found. Add one below.</p>
+      {% endif %}
+      <form method="post" action="/meetings/{{ meeting.id }}/actions" class="inline-add">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label class="sr-only" for="action-title">Add a follow-up</label>
+        <input id="action-title" type="text" name="title" maxlength="280" placeholder="Add a follow-up…" required>
+        <input type="text" name="owner" maxlength="80" placeholder="Owner" aria-label="Owner">
+        <input type="date" name="due_date" aria-label="Due date">
+        <button class="btn primary small" type="submit">Add</button>
+      </form>
+    </section>
+
+    <details class="panel notes-panel">
+      <summary><span class="eyebrow">SOURCE NOTES</span><h2>The original notes</h2><span class="summary-hint">Show</span></summary>
+      <pre class="notes-body">{{ meeting.notes }}</pre>
+    </details>
+  </div>
+
+  <aside class="detail-side">
+    <section class="panel">
+      <p class="eyebrow">RECORD</p>
+      <dl class="facts">
+        <dt>Date</dt><dd>{{ meeting.occurred_on|datefmt("long") }}</dd>
+        <dt>Source</dt><dd>{{ "Claude" if meeting.source == "claude" else "Local extractor" }}{% if meeting.model %}<br><span class="muted small">{{ meeting.model }}</span>{% endif %}</dd>
+        <dt>Attendees</dt><dd>{{ meeting.attendees|attendees|join(", ") if meeting.attendees else "None recorded" }}</dd>
+        <dt>Last updated</dt><dd>{{ meeting.updated_at|datefmt("long") }}</dd>
+      </dl>
+    </section>
+
+    <section class="panel">
+      <p class="eyebrow">MAINTAIN</p>
+      <h2>Read it again</h2>
+      <p class="muted small">Use this after editing the notes. It replaces the extracted decisions and follow-ups, including manual additions.</p>
+      <form method="post" action="/meetings/{{ meeting.id }}/extract">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn ghost wide" type="submit">Re-read the notes</button>
+      </form>
+    </section>
+
+    <section class="panel side-tip">
+      <p class="eyebrow">MEMORY TIP</p>
+      <p>Every decision and follow-up here is searchable from <a href="/memory">Memory</a>. Search a person's name to see everything they own.</p>
+    </section>
+  </aside>
+</div>
+{% endblock %}

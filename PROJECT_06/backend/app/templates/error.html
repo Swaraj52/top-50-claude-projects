@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ status_code }} · {{ message }}{% endblock %}
+{% block content %}
+<section class="error-shell">
+  <p class="eyebrow">ERROR {{ status_code }}</p>
+  <h1>{{ message }}</h1>
+  <p class="lede">The record is intact. Head back to something useful.</p>
+  <div class="button-row">
+    {% if user %}<a class="btn primary" href="/">Back to today</a>
+    <a class="btn ghost" href="/meetings">All meetings</a>{% else %}
+    <a class="btn primary" href="/login">Sign in</a>{% endif %}
+  </div>
+</section>
+{% endblock %}

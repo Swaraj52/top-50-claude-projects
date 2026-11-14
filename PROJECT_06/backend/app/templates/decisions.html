@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Decisions{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">THE LOG</p>
+    <h1>Decisions</h1>
+    <p class="lede">The record of what was actually settled — not what was discussed. Mark one "revisit" when reality changes.</p>
+  </div>
+  <div class="head-actions"><a class="btn ghost" href="/memory">Search memory</a></div>
+</section>
+
+<section class="toolbar">
+  <form class="search" method="get" action="/decisions" role="search">
+    <label class="sr-only" for="q">Search decisions</label>
+    <input id="q" type="search" name="q" value="{{ q }}" placeholder="Search the decision log…">
+    <button class="btn ghost small" type="submit">Search</button>
+    {% if q %}<a class="quiet-link" href="/decisions">Clear</a>{% endif %}
+  </form>
+  <div class="filter-row">
+    <a class="chip {{ 'active' if not status }}" href="/decisions{{ '?q=' ~ q if q }}">All</a>
+    <a class="chip {{ 'active' if status == 'agreed' }}" href="/decisions?status=agreed{{ '&q=' ~ q if q }}">Agreed</a>
+    <a class="chip {{ 'active' if status == 'revisit' }}" href="/decisions?status=revisit{{ '&q=' ~ q if q }}">Revisit</a>
+  </div>
+</section>
+
+{% if decisions %}
+<section class="panel">
+  <div class="panel-head"><div><p class="eyebrow">{{ decisions|length }} RECORDED</p><h2>What the team settled</h2></div></div>
+  <ul class="decision-list roomy">
+    {% for decision in decisions %}
+    <li class="{{ 'revisit' if decision.status == 'revisit' }}">
+      <span class="decision-mark" aria-hidden="true"></span>
+      <div class="decision-body">
+        <p class="decision-text">{{ decision.text }}</p>
+        <p class="meta-line">
+          {{ decision.decided_on|datefmt("long") }} ·
+          <a class="meeting-ref" href="/meetings/{{ decision.meeting_id }}#decisions">{{ decision.meeting.title }}</a>
+        </p>
+      </div>
+      <div class="row-actions">
+        <span class="tag {{ 'revisit' if decision.status == 'revisit' else 'decision' }}">{{ decision.status }}</span>
+        <form method="post" action="/decisions/{{ decision.id }}/status">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="btn ghost tiny" type="submit">{{ "Settle" if decision.status == "revisit" else "Revisit" }}</button>
+        </form>
+        <form method="post" action="/decisions/{{ decision.id }}/delete" data-confirm="Remove this decision from the log?">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="icon-btn" type="submit" aria-label="Delete decision" title="Delete">×</button>
+        </form>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% else %}
+<section class="empty large">
+  <p class="eyebrow">EMPTY LOG</p>
+  <h2>{{ "No decision matches that search." if q else "No decisions recorded yet." }}</h2>
+  <p>{{ "Try a different word or clear the filter." if q else "Record a meeting and Quorum will separate the decisions from the discussion." }}</p>
+  {% if q %}<a class="btn ghost" href="/decisions">Clear search</a>{% else %}<a class="btn primary" href="/meetings/new">Record a meeting</a>{% endif %}
+</section>
+{% endif %}
+{% endblock %}
