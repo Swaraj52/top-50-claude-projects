@@ -3,7 +3,7 @@
 Generated from `projects.json` by `shared-resources/scripts/render_docs.py`.
 Edit `projects.json`, then re-run the script. Do not edit this table by hand.
 
-**Summary:** Pending: 45 · Planning: 0 · In Development: 0 · Testing: 0 · Blocked: 0 · Completed: 5 · Published to GitHub: 5/50
+**Summary:** Pending: 44 · Planning: 0 · In Development: 0 · Testing: 0 · Blocked: 0 · Completed: 6 · Published to GitHub: 6/50
 
 Phase values: `—` not started · `In progress` · `Done` · `N/A` (not needed) · `Blocked`.
 GitHub publication is tracked separately from local completion.
@@ -17,7 +17,7 @@ GitHub publication is tracked separately from local completion.
 | [Project 03](PROJECT_03/) | Daily Review Agent | Done | Done | Done | Done | Done | Done | Done | **Completed** |
 | [Project 04](PROJECT_04/) | Personal Goal Tracker | Done | Done | Done | Done | Done | Done | Done | **Completed** |
 | [Project 05](PROJECT_05/) | Habit & Routine Coach | Done | Done | Done | Done | Done | Done | Done | **Completed** |
-| [Project 06](PROJECT_06/) | Meeting Memory Assistant | — | — | — | — | — | — | — | **Pending** |
+| [Project 06](PROJECT_06/) | Meeting Memory Assistant | Done | Done | Done | Done | Done | Done | Done | **Completed** |
 | [Project 07](PROJECT_07/) | Email Command Center | — | — | — | — | — | — | — | **Pending** |
 | [Project 08](PROJECT_08/) | Personal Knowledge Search | — | — | — | — | — | — | — | **Pending** |
 

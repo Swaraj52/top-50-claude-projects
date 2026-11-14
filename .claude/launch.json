@@ -40,6 +40,14 @@
         "PROJECT_05/backend/scripts/preview.py"
       ],
       "port": 8005
+    },
+    {
+      "name": "project-06-quorum",
+      "runtimeExecutable": "PROJECT_06/backend/.venv/Scripts/python.exe",
+      "runtimeArgs": [
+        "PROJECT_06/backend/scripts/preview.py"
+      ],
+      "port": 8006
     }
   ]
 }

@@ -78,11 +78,12 @@ Generated from `projects.json`; descriptions and features come from the source P
 ### 06. Meeting Memory Assistant
 
 - **Folder:** [`PROJECT_06/`](PROJECT_06/)
-- **Status:** Pending
+- **Status:** Completed
 - **What it does:** Converts meeting notes into decisions, owners and follow-ups.
 - **Core features:** Transcript/notes intake, Action items, Decision log
-- **Tech stack:** Chosen when the project starts
+- **Tech stack:** FastAPI · Jinja2 + HTMX · SQLite · Claude API
 - **Reserved local ports:** backend `8006`, frontend `5106`
+- **Notes:** Quorum v1.0: 144 backend tests; capture, decisions, owners, due-date grouping, memory search, export/import and deletion verified against seeded data in a browser at desktop, dark and phone widths. Claude extraction validated with a fake transport only (no key).
 
 > Original brief: Meeting notes ko decisions, owners aur follow-ups mein convert karta hai.
 

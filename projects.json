@@ -741,6 +741,18 @@
       "github": "Done",
       "stack": "FastAPI · Jinja2 + HTMX · SQLite · Claude API",
       "notes": "Cadence v1.0: 76 backend tests; pending-today semantics, planned rest, paused-habit exclusion, week grid, reflections, insights and the labelled local coach verified against seeded data in a browser. Claude coach not verified live (no key)."
+    },
+    "6": {
+      "status": "Completed",
+      "planning": "Done",
+      "frontend": "Done",
+      "backend": "Done",
+      "database": "Done",
+      "testing": "Done",
+      "docs": "Done",
+      "github": "Done",
+      "stack": "FastAPI · Jinja2 + HTMX · SQLite · Claude API",
+      "notes": "Quorum v1.0: 144 backend tests; capture, decisions, owners, due-date grouping, memory search, export/import and deletion verified against seeded data in a browser at desktop, dark and phone widths. Claude extraction validated with a fake transport only (no key)."
     }
   }
 }
