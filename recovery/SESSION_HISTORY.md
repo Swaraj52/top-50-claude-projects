@@ -107,4 +107,29 @@
 - **Not verified live:** the Claude coach (no API key); the UI shows locally generated notes.
 - **Recovery instructions:** continue with Project 06 without waiting. Read `CURRENT_STATE.md`.
 
+## Session 7: 2026-11-14, Project 06 (standing authorization, resumed after restart)
+
+- **Authorized by:** the standing instruction to build Projects 04–50 sequentially, continued with the
+  owner's `/continue`.
+- **Built:** Quorum. A server-rendered FastAPI + Jinja2 + HTMX meeting memory: paste notes, get a
+  summary, a decision log and follow-ups with owners and due dates, then search the whole archive.
+  A deterministic local extractor is the default; Claude is optional, validated and labelled.
+  Includes Agreed/Revisit decisions, timezone-aware follow-up groups, JSON export/import, account
+  deletion and a one-command preview on :8006 with a six-meeting seed built by the real extractor.
+- **Verified:** 144 backend tests across 7 files; browser pass at desktop, phone, light and dark;
+  13 Playwright screenshots. Export → import round trip against a scratch database wrote 6 meetings,
+  13 decisions and 17 actions, and a second run skipped all 6 meetings.
+- **Fixed in the pass:** a truncated "Follow up with…" action title (over-eager prefix), an
+  unassigned owner pill colliding with the `.empty` page style, a missing `Due` label, a duplicated
+  month in the archive date block, lowercase action status, a wrapped memory search button, and a
+  clipped phone nav (now a 3×2 grid; measured `scrollWidth == innerWidth == 390`).
+- **Encoding repair:** PowerShell `Set-Content` had double-encoded punctuation in three files and
+  added BOMs to five Python files; all repaired with Python and re-scanned clean.
+- **Commits:** `357ec06` app, `200fcf7` tests/tooling, `6833a90` docs and screenshots, `8c2f569`
+  release + tag `project-06-v1.0`.
+- **Not verified live:** Claude extraction (no API key); the local extractor is what the screenshots
+  show and the UI labels it `Local`.
+- **Recovery instructions:** continue with Project 07 (Email Command Center, port 8007) without
+  waiting. Read `CURRENT_STATE.md` and `NEXT_ACTIONS.md`.
+
 

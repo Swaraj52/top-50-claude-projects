@@ -1,12 +1,21 @@
 # Blockers
 
-_Last updated: 2026-11-13_
+_Last updated: 2026-11-14_
 
 ## Open
 
 _None._
 
 ## Resolved
+
+### B-005: PowerShell text replacement corrupted UTF-8 templates (resolved 2026-11-14)
+
+- `Get-Content`/`Set-Content -Encoding utf8` double-encoded `·`, `×` and `…` into sequences such as
+  `Â·` and `â€¦` across `actions.html`, `meeting_detail.html` and `app.css`, and added BOMs to five
+  Python files.
+- Repaired with Python (`encoding="utf-8-sig"` in, `encoding="utf-8", newline="\n"` out), then
+  scanned every Project 06 text file for BOMs and double-encoded sequences: zero remaining.
+- Rule added to `NEXT_ACTIONS.md`: never edit non-ASCII files with PowerShell text cmdlets.
 
 ### B-004: Report logic treated open and paused habits as failures (resolved 2026-11-13)
 

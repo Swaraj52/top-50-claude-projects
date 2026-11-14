@@ -12,6 +12,35 @@ Only items that were actually checked are listed here.
 | Root docs and recovery system | Written and generated; `CLAUDE.md` enforces the start-command rule |
 | Public GitHub repo `Swaraj52/top-50-claude-projects` | `gh api`: public, owner Swaraj52; remote `main` matched local after each push |
 
+## Project 06: Meeting Memory Assistant ("Quorum"), v1.0
+
+| Feature | Verification |
+|---|---|
+| Accounts, scrypt hashing, hashed session tokens, CSRF (forms and HTMX), login/extraction rate limits, per-user isolation, security headers | pytest; browser |
+| Capture: title, date, attendees, notes; stores summary, decisions, follow-ups and the extraction source | pytest; browser (13-capture screenshot) |
+| Local extractor: inline/block headers, bullets, decision/action prefixes, `@mentions`, `Owner:`, "Name will…", attendee-led actions | pytest (26 extractor tests); browser on seeded notes |
+| Local extractor: due dates (`by Friday`, `tomorrow`, `next week`, ISO), dedupe, clamps, odd input | pytest |
+| Fix: "Follow up with their security questionnaire" is no longer truncated to a fragment | pytest regression test; extractor re-run over the demo seed |
+| Claude extraction: request shape, strict JSON, clamping, code fences, no-key path, HTTP/network/timeout/invalid-JSON fallbacks | pytest with a fake transport. **Not called live (no API key)** |
+| Meetings: searchable newest-first archive, Claude/Local filter, detail with original notes, edit, optional re-read, delete | pytest; browser |
+| Moving a meeting's date moves every decision's date with it | pytest |
+| Decisions: add, delete, Agreed/Revisit flip, searchable log and status filter | pytest; browser |
+| Follow-ups: add, complete, reopen, inline edit, delete, owner filter, Overdue/Today/This week/Later/No date groups | pytest; browser; database checked after toggles |
+| Follow-up redirect target accepts same-site paths only | pytest |
+| Memory search across meeting summaries/notes, decisions and follow-ups, scoped per account | pytest; browser |
+| Settings: name, IANA timezone, password change (other sessions ended), JSON export, account deletion with password + `DELETE` | pytest; browser |
+| Export contains meetings, decisions and follow-ups and no password material | pytest |
+| Import accepts a real export: 6 meetings, 13 decisions, 17 actions; a second run skips all 6 meetings | Manual round trip against a scratch database |
+| Fixes from the visual pass: unassigned owner pill, missing `Due` label, repeated month in the date block, capitalised status, memory search button wrap | pytest assertions plus re-captured screenshots |
+| Mobile: 3×2 nav grid under 640 px; `scrollWidth == innerWidth == 390`; masthead no longer sticky | Playwright; measured in the browser |
+| Light/dark schemes, desktop and phone layouts | 13 Playwright screenshots at 1440 px (light/dark) and 390 px |
+| Migrations | pytest: migrated schema matches the models |
+| Live preview: `scripts/preview.py` | Started on :8006; demo account signed in; all pages returned 200 |
+
+- **Tests:** backend 144 passed across 7 files.
+- **Docs:** README (15 sections), PRD, ARCHITECTURE, YOUR_DATA, `.env.example`, 13 screenshots.
+- **Release:** commit `8c2f569`, tag `project-06-v1.0`. Pushed and verified on GitHub.
+
 ## Project 05: Habit & Routine Coach ("Cadence"), v1.0
 
 | Feature | Verification |
