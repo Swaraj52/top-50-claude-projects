@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="Swayam">
+  <meta name="description" content="Switchboard triages your inbox into categories, drafts replies and keeps follow-ups on one desk.">
+  <title>{% block title %}Switchboard{% endblock %} · Email Command Center</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/app.css?v={{ version }}">
+  <script src="/static/htmx.min.js" defer></script>
+  <script src="/static/app.js?v={{ version }}" defer></script>
+</head>
+<body hx-headers='{"X-CSRF-Token": "{{ csrf_token }}"}'>
+{% if user %}
+<div class="shell">
+  <aside class="rail">
+    <a class="brand" href="/">
+      <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+        <rect x="4" y="7" width="32" height="26" rx="3" fill="none" stroke="currentColor" stroke-width="2.2"/>
+        <circle cx="13" cy="16" r="2.4" fill="currentColor"/>
+        <circle cx="20" cy="16" r="2.4" fill="currentColor"/>
+        <circle cx="27" cy="16" r="2.4" fill="currentColor"/>
+        <path d="M13 23h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-text">Switchboard<small>email command center</small></span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="/" {% if path == "/" %}aria-current="page"{% endif %}><span class="nav-num">01</span>Desk</a>
+      <a href="/inbox" {% if path.startswith("/inbox") or path.startswith("/threads") %}aria-current="page"{% endif %}><span class="nav-num">02</span>Inbox</a>
+      <a href="/drafts" {% if path.startswith("/drafts") %}aria-current="page"{% endif %}><span class="nav-num">03</span>Drafts</a>
+      <a href="/followups" {% if path.startswith("/followups") %}aria-current="page"{% endif %}><span class="nav-num">04</span>Follow-ups</a>
+      <a href="/settings" {% if path.startswith("/settings") %}aria-current="page"{% endif %}><span class="nav-num">05</span>Settings</a>
+    </nav>
+    <div class="rail-foot">
+      <div class="operator">
+        <span class="avatar" aria-hidden="true">{{ user.name|initial }}</span>
+        <span class="operator-text"><strong>{{ user.name }}</strong><small>{{ now|dt(tz, "time") }} · {{ tz.key }}</small></span>
+      </div>
+      <form method="post" action="/logout">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn ghost small" type="submit">Sign out</button>
+      </form>
+    </div>
+  </aside>
+  <div class="work">
+    <header class="topbar">
+      <span class="topbar-item"><span class="lamp {{ 'green' if ai_enabled else 'amber' }}"></span>{{ "Claude available" if ai_enabled else "Local rules only" }}</span>
+      <span class="topbar-item mono">{{ today|datefmt("weekday") if today else "" }}</span>
+      <a class="btn primary small" href="/compose">Log an email</a>
+    </header>
+    <main class="page">
+      {% block content %}{% endblock %}
+    </main>
+    <footer class="foot">Switchboard · designed and built by Swayam · drafts stay on this machine</footer>
+  </div>
+</div>
+{% else %}
+<main class="auth">
+  {% block auth_content %}{% endblock %}
+</main>
+{% endif %}
+<div id="toasts" class="toasts" aria-live="polite"></div>
+</body>
+</html>

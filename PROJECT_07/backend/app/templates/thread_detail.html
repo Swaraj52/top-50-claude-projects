@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% block title %}{{ thread.subject|truncate(60, true, '…') }}{% endblock %}
+{% block content %}
+<a class="back" href="/inbox">← Back to inbox</a>
+
+{% if imported %}<div class="alert success">Logged. The rules routed it and wrote a local summary — both are shown below and can be overridden.</div>{% endif %}
+
+<section class="page-head compact" style="margin-bottom:1rem">
+  <div class="thread-title" style="flex:1">
+    <div style="min-width:0">
+      <p class="eyebrow">{{ labels.get(thread.category, thread.category) }} · {{ thread.mailbox.name }}</p>
+      <h1 style="overflow-wrap:anywhere">{{ thread.subject }}</h1>
+      <div class="meta-chips">
+        <span class="stamp {{ thread.category }}">{{ labels.get(thread.category, thread.category) }}</span>
+        {% if thread.status == 'waiting' %}<span class="badge amber">Waiting on them</span>
+        {% elif thread.status == 'closed' %}<span class="badge">Closed</span>
+        {% else %}<span class="badge">Open</span>{% endif %}
+        {% if thread.starred %}<span class="badge amber">★ Starred</span>{% endif %}
+        <span class="badge">{{ thread.messages|length }} message{{ '' if thread.messages|length == 1 else 's' }}</span>
+        <span class="badge mono">{{ thread.last_activity_at|dt(tz, "stamp") }}</span>
+      </div>
+      {% if thread.participants %}<p class="hint" style="margin-top:0.6rem">Participants: {{ thread.participants }}</p>{% endif %}
+    </div>
+  </div>
+</section>
+
+<div class="filter-bar" style="margin-bottom:1.2rem">
+  <div class="inline-fields">
+    <form method="post" action="/threads/{{ thread.id }}/category" class="inline-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="next" value="/threads/{{ thread.id }}">
+      <div class="inline-fields">
+        <div class="field">
+          <label for="route">Route</label>
+          <select id="route" name="category">
+            {% for key, label in labels.items() %}<option value="{{ key }}" {{ 'selected' if thread.category == key }}>{{ label }}</option>{% endfor %}
+          </select>
+        </div>
+        <button class="btn small" type="submit">Set route</button>
+      </div>
+    </form>
+
+    <form method="post" action="/threads/{{ thread.id }}/status" class="inline-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="next" value="/threads/{{ thread.id }}">
+      <div class="inline-fields">
+        <div class="field">
+          <label for="status">Status</label>
+          <select id="status" name="status">
+            <option value="open" {{ 'selected' if thread.status == 'open' }}>Open</option>
+            <option value="waiting" {{ 'selected' if thread.status == 'waiting' }}>Waiting on them</option>
+            <option value="closed" {{ 'selected' if thread.status == 'closed' }}>Closed</option>
+          </select>
+        </div>
+        <button class="btn small" type="submit">Save status</button>
+      </div>
+    </form>
+
+    <form method="post" action="/threads/{{ thread.id }}/star" class="inline-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="next" value="/threads/{{ thread.id }}">
+      <button class="btn small" type="submit">{{ '★ Unstar' if thread.starred else '☆ Star' }}</button>
+    </form>
+
+    <form method="post" action="/threads/{{ thread.id }}/unread" class="inline-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="next" value="/inbox">
+      <button class="btn small ghost" type="submit">Mark unread</button>
+    </form>
+
+    <form method="post" action="/threads/{{ thread.id }}/delete" class="inline-form" data-confirm="Delete this thread and every message, draft and follow-up in it?">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button class="btn small danger" type="submit">Delete thread</button>
+    </form>
+  </div>
+</div>
+
+<div class="detail-grid">
+  <div class="stack">
+    <section class="panel summary-panel" id="summary">
+      <div class="panel-head">
+        <h2>Thread summary</h2>
+        <span class="stamp {{ thread.summary_source }}">{{ 'Claude' if thread.summary_source == 'claude' else 'Local' }}</span>
+      </div>
+      <p class="summary-text">{{ thread.summary or "No summary yet." }}</p>
+      {% if thread.summary_note %}<p class="summary-note">{{ thread.summary_note }}</p>{% endif %}
+      <div class="form-actions">
+        <form method="post" action="/threads/{{ thread.id }}/summarize">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="btn small" type="submit">Re-summarise</button>
+        </form>
+        <span class="hint">
+          {% if ai_enabled %}Uses your Claude key when it answers, otherwise the labelled local writer.
+          {% else %}The local writer runs in-process. Add an Anthropic key to use Claude.{% endif %}
+        </span>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>Conversation</h2>
+        <span class="mono">{{ thread.messages|length }} message{{ '' if thread.messages|length == 1 else 's' }}</span>
+      </div>
+      <div class="message-stack">
+        {% for message in messages %}
+        <article class="message {{ 'out' if message.direction == 'out' }}">
+          <div class="message-head">
+            <div class="message-who">
+              {{ 'You' if message.direction == 'out' else message.sender|sender }}
+              {% if message.direction != 'out' and '<' in message.sender %}<span class="mono">{{ message.sender|emailaddr }}</span>{% endif %}
+            </div>
+            <span class="message-time">{{ message.received_at|dt(tz, "stamp") }} · {{ tz.key }}</span>
+          </div>
+          {% if message.recipients %}<p class="hint" style="margin-bottom:0.45rem">To: {{ message.recipients }}</p>{% endif %}
+          <div class="message-body">{{ message.body }}</div>
+          <div class="meta-chips">
+            <span class="stamp {{ 'local' if message.direction == 'in' else 'claude' }}">{{ 'received' if message.direction == 'in' else 'marked sent' }}</span>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+
+  <div class="side-stack">
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Why this rank</h2>
+        <span class="mono">score</span>
+      </div>
+      <p class="score-big">{{ score }}<small> / 100</small></p>
+      {% if reasons %}
+      <ul class="why-list">
+        {% for reason in reasons %}<li><span>{{ reason }}</span></li>{% endfor %}
+      </ul>
+      {% else %}<p class="hint">No live signals: the score comes from the route alone.</p>{% endif %}
+      <p class="hint" style="margin-top:0.7rem">Computed from the route, VIP list, unread/starred state, a question, a deadline and the age of the latest message.</p>
+    </section>
+
+    <section class="panel" id="drafts">
+      <div class="panel-head">
+        <h2>Reply drafts</h2>
+        <span class="mono">{{ drafts|length }} open</span>
+      </div>
+      <form method="post" action="/threads/{{ thread.id }}/draft" class="inline-fields" style="margin-bottom:1rem">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div class="field">
+          <label for="tone">Tone</label>
+          <select id="tone" name="tone">
+            {% for key, label in tones %}<option value="{{ key }}">{{ label }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label for="engine">Writer</label>
+          <select id="engine" name="engine">
+            <option value="local">Local scaffold</option>
+            <option value="claude" {{ 'disabled' if not ai_enabled }}>Claude{{ '' if ai_enabled else ' (needs a key)' }}</option>
+          </select>
+        </div>
+        <button class="btn small primary" type="submit">Draft a reply</button>
+      </form>
+
+      {% for draft in drafts %}
+      <div class="draft-card">
+        <div class="draft-head">
+          <strong style="font-size:0.9rem">{{ draft.subject|truncate(48, true, '…') }}</strong>
+          <span class="stamp {{ draft.source }}">{{ 'Claude' if draft.source == 'claude' else 'Local' }}</span>
+        </div>
+        <div class="draft-body">{{ draft.body }}</div>
+        {% if draft.note %}<p class="summary-note">{{ draft.note }}</p>{% endif %}
+        <div class="form-actions" style="margin-top:0.5rem">
+          <button class="btn tiny" type="button" data-copy="#draft-{{ draft.id }}-body">Copy text</button>
+          <form method="post" action="/drafts/{{ draft.id }}/send" data-confirm="Mark this draft sent? Switchboard records it locally and never sends email.">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="btn tiny primary" type="submit">Mark sent</button>
+          </form>
+          <form method="post" action="/drafts/{{ draft.id }}/delete" data-confirm="Delete this draft?">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="btn tiny danger" type="submit">Delete</button>
+          </form>
+        </div>
+        <textarea id="draft-{{ draft.id }}-body" class="sr-only" readonly>{{ draft.body }}</textarea>
+        <details class="edit-pop">
+          <summary class="summary-link">Edit draft</summary>
+          <form method="post" action="/drafts/{{ draft.id }}" class="draft-edit">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <div class="field">
+              <label for="ds-{{ draft.id }}">Subject</label>
+              <input id="ds-{{ draft.id }}" type="text" name="subject" value="{{ draft.subject }}" maxlength="200" required>
+            </div>
+            <div class="field">
+              <label for="db-{{ draft.id }}">Body</label>
+              <textarea id="db-{{ draft.id }}" name="body" maxlength="4000" required>{{ draft.body }}</textarea>
+            </div>
+            <button class="btn small" type="submit">Save draft</button>
+          </form>
+        </details>
+      </div>
+      {% else %}
+      <p class="hint" style="margin-bottom:0.8rem">No open drafts. A scaffold quotes the ask, keeps the greeting and leaves the commitment to you.</p>
+      {% endfor %}
+
+      {% if sent %}
+      <details class="edit-pop">
+        <summary class="summary-link">Sent from here ({{ sent|length }})</summary>
+        {% for draft in sent %}
+        <div class="draft-card" style="opacity:0.85">
+          <div class="draft-head">
+            <strong style="font-size:0.85rem">{{ draft.subject|truncate(42, true, '…') }}</strong>
+            <span class="stamp local">marked sent</span>
+          </div>
+          <p class="summary-note">{{ draft.note }}</p>
+        </div>
+        {% endfor %}
+      </details>
+      {% endif %}
+    </section>
+
+    <section class="panel" id="followups">
+      <div class="panel-head">
+        <h2>Follow-ups</h2>
+        <span class="mono">{{ followups|selectattr('status', 'equalto', 'open')|list|length }} open</span>
+      </div>
+      <form method="post" action="/threads/{{ thread.id }}/followups" class="inline-fields" style="margin-bottom:0.8rem">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div class="field" style="flex:1 1 160px">
+          <label for="new-followup">What are you waiting on?</label>
+          <input id="new-followup" type="text" name="title" maxlength="240" placeholder="The signed proposal" required>
+        </div>
+        <div class="field">
+          <label for="new-due">Due</label>
+          <input id="new-due" type="text" name="due_date" placeholder="friday or 2026-11-20">
+        </div>
+        <button class="btn small" type="submit">Add</button>
+      </form>
+      {% if followups %}
+      <div class="followup-list">
+        {% for followup in followups %}{% with next="/threads/" ~ thread.id %}{% include "_followup.html" %}{% endwith %}{% endfor %}
+      </div>
+      {% else %}
+      <p class="hint">No follow-ups on this thread yet.</p>
+      {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}

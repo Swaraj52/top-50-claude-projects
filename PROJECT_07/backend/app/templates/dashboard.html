@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}Desk{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">THE DESK · {{ today|datefmt("long") }}</p>
+    <h1>{{ greeting }}, {{ user.name|truncate(26, true, '…') }}.</h1>
+    <p class="lede">
+      {% if threads_total %}
+        {{ threads_total }} open thread{{ '' if threads_total == 1 else 's' }} on the board.
+        {% if stats.reply %}{{ stats.reply }} need{{ 's' if stats.reply == 1 else '' }} a reply{% else %}Nothing is asking for an answer{% endif %},
+        {% if stats.waiting %}{{ stats.waiting }} {{ 'is' if stats.waiting == 1 else 'are' }} waiting on someone else{% else %}nothing is waiting on someone else{% endif %}.
+      {% else %}
+        The desk is clear. Log an email or import a mail export to start routing.
+      {% endif %}
+    </p>
+  </div>
+  <div class="head-actions">
+    <a class="btn" href="/inbox?view=all">Open inbox</a>
+    <a class="btn primary" href="/compose">Log an email</a>
+  </div>
+</section>
+
+<div class="stat-strip">
+  <div class="stat accent">
+    <span class="stat-label">Unread</span>
+    <span class="stat-value">{{ stats.unread }}</span>
+    <span class="stat-meta">not yet opened</span>
+  </div>
+  <div class="stat accent">
+    <span class="stat-label">Needs reply</span>
+    <span class="stat-value">{{ stats.reply }}</span>
+    <span class="stat-meta">a question or request</span>
+  </div>
+  <div class="stat waiting">
+    <span class="stat-label">Waiting on them</span>
+    <span class="stat-value">{{ stats.waiting }}</span>
+    <span class="stat-meta">you have answered</span>
+  </div>
+  <div class="stat quiet">
+    <span class="stat-label">Drafts</span>
+    <span class="stat-value">{{ stats.drafts }}</span>
+    <span class="stat-meta">not marked sent</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">Follow-ups</span>
+    <span class="stat-value">{{ stats.followups }}</span>
+    <span class="stat-meta">{{ stats.overdue }} overdue</span>
+  </div>
+</div>
+
+<div class="dashboard-grid">
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Priority inbox</h2>
+      <span class="mono">highest score first</span>
+    </div>
+    {% if rows %}
+      <div class="thread-list" style="border-top:0">
+        {% for row in rows %}{% include "_row.html" %}{% endfor %}
+      </div>
+      <div class="form-actions">
+        <a class="btn small" href="/inbox">See every thread</a>
+      </div>
+    {% else %}
+      <div class="empty large">
+        <h2>No threads yet</h2>
+        <p>Switchboard does not connect to a mailbox. Paste a message, upload a <code>.eml</code> file or import a JSON export and the rules will sort it.</p>
+        <div class="form-actions" style="justify-content:center">
+          <a class="btn primary" href="/compose">Log the first email</a>
+        </div>
+      </div>
+    {% endif %}
+  </section>
+
+  <div class="side-stack">
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Follow-ups</h2>
+        <span class="mono"><a href="/followups">all</a></span>
+      </div>
+      {% if followups %}
+        <div class="followup-list">
+          {% for followup in followups %}{% include "_followup.html" %}{% endfor %}
+        </div>
+      {% else %}
+        <div class="empty">
+          <h3>Nothing to chase</h3>
+          <p>Open a thread and add a follow-up when you are waiting on a person, not just a mailbox.</p>
+        </div>
+      {% endif %}
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Drafts</h2>
+        <span class="mono"><a href="/drafts">all</a></span>
+      </div>
+      {% if drafts %}
+        <div class="followup-list">
+          {% for draft in drafts %}
+          <div class="followup-row">
+            <div class="followup-body">
+              <div class="followup-title"><a href="/threads/{{ draft.thread_id }}#drafts">{{ draft.subject|truncate(52, true, '…') }}</a></div>
+              <div class="followup-meta">
+                <span class="stamp {{ draft.source }}">{{ draft.source }}</span>
+                <span class="mono">{{ draft.updated_at|dt(tz) }}</span>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty">
+          <h3>No drafts</h3>
+          <p>Open a thread and generate a reply scaffold. It stays local until you copy it out.</p>
+        </div>
+      {% endif %}
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Routes</h2>
+        <span class="mono">open threads</span>
+      </div>
+      <div class="route-map">
+        {% for category, label in labels.items() %}
+        <span><span class="lamp {{ 'amber' if category == 'waiting' else ('green' if category == 'reply' else '') }}"></span>{{ label }}<strong style="margin-left:auto">{{ categories.get(category, 0) }}</strong></span>
+        {% endfor %}
+      </div>
+      <p class="hint" style="margin-top:0.8rem">Rules read the sender, subject and body. You can override any route from the thread.</p>
+    </section>
+  </div>
+</div>
+{% endblock %}

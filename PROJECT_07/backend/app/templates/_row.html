@@ -1,0 +1,34 @@
+{% set t = row.thread %}
+<a class="thread-row {{ 'unread' if t.unread else '' }}" href="/threads/{{ t.id }}">
+  <span class="score-box" title="Priority score: {{ row.score }} of 100">
+    <strong>{{ row.score }}</strong>
+    <small>score</small>
+  </span>
+  <span class="row-main">
+    <span class="row-top">
+      {% if t.unread %}<span class="unread-dot" aria-label="Unread"></span>{% endif %}
+      <span class="stamp {{ t.category }}">{{ labels.get(t.category, t.category) }}</span>
+      <h3 class="row-subject">{{ t.subject }}</h3>
+    </span>
+    <span class="row-from">
+      {% if row.latest %}{{ row.latest.sender|sender }}{% if '<' in row.latest.sender %} <span class="mono">{{ row.latest.sender|emailaddr }}</span>{% endif %}{% endif %}
+    </span>
+    {% if row.latest %}<span class="row-snippet">{{ row.latest.body|truncate(190, true, '…') }}</span>{% endif %}
+    <span class="row-meta">
+      <span class="mono">{{ t.mailbox.name }}</span>
+      <span>{{ t.messages|length }} message{{ '' if t.messages|length == 1 else 's' }}</span>
+      {% if t.drafts %} <span>{{ t.drafts|length }} draft{{ '' if t.drafts|length == 1 else 's' }}</span>{% endif %}
+      {% if t.followups %}<span>{{ t.followups|selectattr('status', 'equalto', 'open')|list|length }} open follow-up</span>{% endif %}
+    </span>
+    {% if row.reasons %}
+    <span class="reasons">
+      {% for reason in row.reasons %}<span class="reason">{{ reason }}</span>{% endfor %}
+    </span>
+    {% endif %}
+  </span>
+  <span class="row-side">
+    <span class="row-time">{{ t.last_activity_at|dt(tz) }}</span>
+    {% if t.starred %}<span class="star" title="Starred">★</span>{% endif %}
+    {% if t.status == 'waiting' %}<span class="badge amber">Waiting</span>{% elif t.status == 'closed' %}<span class="badge">Closed</span>{% endif %}
+  </span>
+</a>

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Follow-ups{% endblock %}
+{% block content %}
+<section class="page-head compact">
+  <div>
+    <p class="eyebrow">THE CHASE LIST</p>
+    <h1>Follow-ups</h1>
+    <p class="lede">
+      Things you are waiting on from a person. Grouped by your local date, with overdue first.
+      {% if followup_total %}{{ followup_total }} in this view.{% endif %}
+    </p>
+  </div>
+  <div class="head-actions">
+    <a class="btn ghost" href="/inbox">Back to inbox</a>
+    <a class="btn primary" href="/inbox">Open a thread to add one</a>
+  </div>
+</section>
+
+<nav class="tabs" aria-label="Follow-up views" style="margin-bottom:1.2rem">
+  <a class="tab {{ 'on' if status == 'open' }}" href="/followups?status=open">Open<span class="n">{{ counts.open }}</span></a>
+  <a class="tab {{ 'on' if status == 'done' }}" href="/followups?status=done">Done<span class="n">{{ counts.done }}</span></a>
+  <a class="tab {{ 'on' if status == 'all' }}" href="/followups?status=all">All</a>
+</nav>
+
+{% if groups %}
+<div class="stack">
+  {% for group in groups %}
+  <section class="panel">
+    <div class="panel-head">
+      <h2>{{ group.label }}</h2>
+      <span class="mono">{{ group.rows|length }}</span>
+    </div>
+    {% if group.key == 'overdue' %}<p class="hint" style="margin-bottom:0.6rem">Past the date you set. Complete it, move the date, or close the thread.</p>{% endif %}
+    <div class="followup-list">
+      {% for followup in group.rows %}{% include "_followup.html" %}{% endfor %}
+    </div>
+  </section>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty large">
+  <h2>{% if status == 'done' %}No completed follow-ups{% else %}Nothing to chase{% endif %}</h2>
+  <p>Open a thread, then add what you are waiting on and when you expect it. It will appear here on that date.</p>
+  <div class="form-actions" style="justify-content:center">
+    <a class="btn primary" href="/inbox">Find a thread</a>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

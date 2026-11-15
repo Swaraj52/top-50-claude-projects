@@ -1,0 +1,47 @@
+{% set f = followup %}
+<div class="followup-row {{ 'done' if f.status == 'done' else '' }}">
+  <form method="post" action="/followups/{{ f.id }}/toggle">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="next" value="{{ next|default('/followups') }}">
+    <button class="check {{ 'done' if f.status == 'done' else '' }}" type="submit"
+            aria-label="{{ 'Reopen' if f.status == 'done' else 'Complete' }}: {{ f.title }}"
+            title="{{ 'Reopen' if f.status == 'done' else 'Complete' }}">{{ '✓' if f.status == 'done' else '' }}</button>
+  </form>
+  <div class="followup-body">
+    <div class="followup-title">{{ f.title }}</div>
+    <div class="followup-meta">
+      <a href="/threads/{{ f.thread_id }}">{{ f.thread.subject|truncate(48, true, '…') }}</a>
+      {% if f.due_date %}
+        {% if f.due_date < today %}<span class="due late">{{ f.due_date|datefmt('weekday') }} · overdue</span>
+        {% elif f.due_date == today %}<span class="due today">due today</span>
+        {% else %}<span class="due">{{ f.due_date|datefmt('weekday') }}</span>{% endif %}
+      {% else %}
+        <span class="due">no date</span>
+      {% endif %}
+      {% if f.status == 'done' %}<span class="mono">done</span>{% endif %}
+    </div>
+  </div>
+  {% if allow_edit %}
+  <details class="edit-pop">
+    <summary class="summary-link">Edit</summary>
+    <form method="post" action="/followups/{{ f.id }}/update">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div class="inline-fields">
+        <div class="field" style="flex:1 1 180px">
+          <label for="ft-{{ f.id }}">Follow-up</label>
+          <input id="ft-{{ f.id }}" type="text" name="title" value="{{ f.title }}" maxlength="240" required>
+        </div>
+        <div class="field">
+          <label for="fd-{{ f.id }}">Due</label>
+          <input id="fd-{{ f.id }}" type="text" name="due_date" value="{{ f.due_date.isoformat() if f.due_date else '' }}" placeholder="2026-11-20 or friday">
+        </div>
+        <button class="btn small" type="submit">Save</button>
+      </div>
+    </form>
+    <form method="post" action="/followups/{{ f.id }}/delete" data-confirm="Delete this follow-up?">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button class="btn tiny danger" type="submit">Delete</button>
+    </form>
+  </details>
+  {% endif %}
+</div>

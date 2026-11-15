@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Log an email{% endblock %}
+{% block content %}
+<section class="page-head">
+  <div>
+    <p class="eyebrow">INTAKE · NOT A CONNECTION</p>
+    <h1>Log an email.</h1>
+    <p class="lede">
+      Paste a message you want on the desk, or upload a <code>.eml</code> file and the headers fill themselves in.
+      Nothing is fetched from a mail server and nothing is sent.
+    </p>
+  </div>
+  <div class="head-actions">
+    <a class="btn ghost" href="/inbox">Back to inbox</a>
+  </div>
+</section>
+
+{% if error %}<div class="alert error" role="alert">{{ error }}</div>{% endif %}
+
+<div class="capture-grid">
+  <section class="panel">
+    <form method="post" action="/compose" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+      <div class="field-row">
+        <div class="field">
+          <label for="mailbox_id">Mailbox</label>
+          <select id="mailbox_id" name="mailbox_id">
+            {% for box in mailboxes %}
+            <option value="{{ box.id }}">{{ box.name }} · {{ box.address }}</option>
+            {% endfor %}
+          </select>
+          <p class="hint">A label for where the message arrived. Add more in Settings.</p>
+        </div>
+        <div class="field">
+          <label for="received_at">Arrived ({{ tz.key }})</label>
+          <input id="received_at" type="datetime-local" name="received_at" value="{{ values.received_at or now_local }}">
+          <p class="hint">Leave as it is for “just now”. A pasted date is read in your time zone.</p>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="sender">From</label>
+          <input id="sender" type="text" name="sender" value="{{ values.sender or '' }}" placeholder="Priya Raman &lt;priya@lumen.example&gt;" maxlength="254">
+        </div>
+        <div class="field">
+          <label for="recipients">To</label>
+          <input id="recipients" type="text" name="recipients" value="{{ values.recipients or '' }}" placeholder="you@example.com" maxlength="400">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="subject">Subject</label>
+        <input id="subject" type="text" name="subject" value="{{ values.subject or '' }}" placeholder="Re: Q4 launch checklist" maxlength="200">
+      </div>
+
+      <div class="field">
+        <label for="body">Message</label>
+        <textarea id="body" name="body" rows="14" placeholder="Paste the message exactly as you received it. Quoted history is fine; the summary skips it.">{{ values.body or '' }}</textarea>
+      </div>
+
+      <div class="field">
+        <label for="file">Or upload a .eml file</label>
+        <input id="file" type="file" name="file" accept=".eml,message/rfc822">
+        <p class="hint">Headers, plain text and the Message-ID are read. The file is not stored; its text becomes the message.</p>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn primary" type="submit">Log and route</button>
+        <a class="btn ghost" href="/inbox">Cancel</a>
+      </div>
+    </form>
+  </section>
+
+  <div class="side-stack">
+    <section class="panel">
+      <div class="panel-head">
+        <h2>What happens next</h2>
+        <span class="mono">in order</span>
+      </div>
+      <ol class="note-list">
+        <li>The subject is trimmed of <code>Re:</code>, <code>Fwd:</code> and similar, then matched to an open thread in the same mailbox.</li>
+        <li>Rules read the text and pick one route: needs reply, waiting, FYI, newsletter or receipt.</li>
+        <li>A local two-sentence summary is written from the latest inbound message.</li>
+        <li>The priority score is computed and the reason is shown on the row.</li>
+      </ol>
+      <p class="hint">A VIP sender always lands in “Needs reply” unless the mail is clearly bulk or a receipt.</p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Threading</h2>
+        <span class="mono">safe by default</span>
+      </div>
+      <p style="font-size:0.88rem;color:var(--ink-2)">
+        A message joins an existing thread when the cleaned subject and mailbox match and the thread is not closed.
+        A <code>Message-ID</code> that was already imported is skipped, so importing the same file twice does not duplicate it.
+      </p>
+      <div class="route-map">
+        <span><span class="lamp green"></span>Conversation history stays in order</span>
+        <span><span class="lamp amber"></span>Closed threads start a new thread</span>
+        <span><span class="lamp"></span>Nothing leaves this machine</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>No credentials</h2>
+        <span class="mono">by design</span>
+      </div>
+      <p style="font-size:0.88rem;color:var(--ink-2)">
+        Switchboard has no IMAP, OAuth or SMTP code. There is no password field for a mailbox because there is no mailbox connection.
+        That keeps the desk useful without asking you to hand over an app password.
+      </p>
+    </section>
+  </div>
+</div>
+{% endblock %}

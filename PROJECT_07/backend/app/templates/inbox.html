@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Inbox{% endblock %}
+{% block content %}
+<section class="page-head compact">
+  <div>
+    <p class="eyebrow">THE MAIL ROOM</p>
+    <h1>Inbox</h1>
+    <p class="lede">
+      {% if total %}{{ total }} thread{{ '' if total == 1 else 's' }} in this view{% if q %} matching “{{ q }}”{% endif %}.
+      {% else %}Nothing in this view{% if q %} matches “{{ q }}”{% endif %}.{% endif %}
+      Scores are computed, not guessed — every row shows why.
+    </p>
+  </div>
+  <div class="head-actions">
+    <a class="btn" href="/followups">Follow-ups</a>
+    <a class="btn primary" href="/compose">Log an email</a>
+  </div>
+</section>
+
+<div class="filter-bar">
+  <nav class="tabs" aria-label="Inbox views">
+    <a class="tab {{ 'on' if view == 'priority' }}" href="/inbox?view=priority">Priority</a>
+    <a class="tab {{ 'on' if view == 'all' }}" href="/inbox?view=all">All</a>
+    {% for key, label in labels.items() %}
+    <a class="tab {{ 'on' if view == key }}" href="/inbox?view={{ key }}">{{ label }}<span class="n">{{ categories.get(key, 0) }}</span></a>
+    {% endfor %}
+    <a class="tab {{ 'on' if view == 'starred' }}" href="/inbox?view=starred">Starred</a>
+    <a class="tab {{ 'on' if view == 'closed' }}" href="/inbox?view=closed">Closed</a>
+  </nav>
+  <form class="search-row" method="get" action="/inbox" role="search">
+    <input type="hidden" name="view" value="{{ view }}">
+    <label class="sr-only" for="q">Search threads</label>
+    <input id="q" type="search" name="q" value="{{ q }}" placeholder="Search subject, people or message text">
+    <label class="sr-only" for="mailbox">Mailbox</label>
+    <select id="mailbox" name="mailbox">
+      <option value="0">All mailboxes</option>
+      {% for box in mailboxes %}
+      <option value="{{ box.id }}" {{ 'selected' if mailbox == box.id }}>{{ box.name }} · {{ box.address }}</option>
+      {% endfor %}
+    </select>
+    <button class="btn small" type="submit">Search</button>
+    {% if q or mailbox %}<a class="btn small ghost" href="/inbox?view={{ view }}">Clear</a>{% endif %}
+  </form>
+</div>
+
+{% if rows %}
+<div class="thread-list">
+  {% for row in rows %}{% include "_row.html" %}{% endfor %}
+</div>
+<p class="hint" style="margin-top:0.9rem">
+  Priority is a score out of 100: category, VIP sender, unread, starred, a question, a deadline and recency.
+  {% if view == 'priority' %}This view is sorted by that score.{% endif %}
+</p>
+{% else %}
+<div class="empty large">
+  <h2>{% if q %}No matches for “{{ q }}”{% else %}This view is empty{% endif %}</h2>
+  <p>
+    {% if q %}
+      Search covers subjects, participants and the full text of every message. Try a shorter term, or clear the filters.
+    {% elif view == 'closed' %}
+      Closing a thread files it here. Nothing is deleted unless you delete it.
+    {% elif view == 'starred' %}
+      Star a thread on its page and it will wait here.
+    {% else %}
+      Paste a message, upload a <code>.eml</code> file, or import a Switchboard JSON export to fill the desk.
+    {% endif %}
+  </p>
+  <div class="form-actions" style="justify-content:center">
+    <a class="btn primary" href="/compose">Log an email</a>
+    <a class="btn" href="/inbox?view=all">See all threads</a>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

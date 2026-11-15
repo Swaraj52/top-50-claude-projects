@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Drafts{% endblock %}
+{% block content %}
+<section class="page-head compact">
+  <div>
+    <p class="eyebrow">THE OUT TRAY</p>
+    <h1>Drafts</h1>
+    <p class="lede">
+      A draft is a scaffold, not a send. Edit it, copy it into your mail client, then mark it sent so the desk knows you answered.
+      Switchboard never sends email.
+    </p>
+  </div>
+  <div class="head-actions">
+    <a class="btn ghost" href="/inbox">Back to inbox</a>
+    <a class="btn primary" href="/compose">Log an email</a>
+  </div>
+</section>
+
+<nav class="tabs" aria-label="Draft views" style="margin-bottom:1.2rem">
+  <a class="tab {{ 'on' if status == 'draft' }}" href="/drafts?status=draft">Open<span class="n">{{ counts.draft }}</span></a>
+  <a class="tab {{ 'on' if status == 'sent' }}" href="/drafts?status=sent">Marked sent<span class="n">{{ counts.sent }}</span></a>
+  <a class="tab {{ 'on' if status == 'all' }}" href="/drafts?status=all">All</a>
+</nav>
+
+{% if drafts %}
+<div class="stack">
+  {% for draft in drafts %}
+  <section class="panel">
+    <div class="draft-head">
+      <div style="min-width:0">
+        <p class="eyebrow" style="margin-bottom:0.25rem"><a href="/threads/{{ draft.thread_id }}">{{ draft.thread.subject|truncate(70, true, '…') }}</a></p>
+        <h2 style="overflow-wrap:anywhere">{{ draft.subject|truncate(80, true, '…') }}</h2>
+      </div>
+      <div class="meta-chips">
+        <span class="stamp {{ draft.source }}">{{ 'Claude' if draft.source == 'claude' else 'Local' }}</span>
+        <span class="badge">{{ draft.tone|capitalize }} tone</span>
+        <span class="badge mono">{{ draft.updated_at|dt(tz, "stamp") }}</span>
+        {% if draft.status == 'sent' %}<span class="badge amber">Marked sent</span>{% endif %}
+      </div>
+    </div>
+    <div class="draft-body">{{ draft.body }}</div>
+    {% if draft.note %}<p class="summary-note">{{ draft.note }}</p>{% endif %}
+
+    {% if draft.status == 'draft' %}
+    <div class="form-actions">
+      <a class="btn small" href="/threads/{{ draft.thread_id }}#drafts">Open thread</a>
+      <form method="post" action="/drafts/{{ draft.id }}/send" data-confirm="Mark this draft sent? Switchboard records it locally and never sends email.">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn small primary" type="submit">Mark sent</button>
+      </form>
+      <form method="post" action="/drafts/{{ draft.id }}/delete" data-confirm="Delete this draft?">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn small danger" type="submit">Delete</button>
+      </form>
+      <button class="btn small ghost" type="button" data-copy="#draft-body-{{ draft.id }}">Copy text</button>
+    </div>
+    <textarea id="draft-body-{{ draft.id }}" class="sr-only" readonly>{{ draft.body }}</textarea>
+    <details class="edit-pop">
+      <summary class="summary-link">Edit this draft</summary>
+      <form method="post" action="/drafts/{{ draft.id }}" class="draft-edit">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div class="field">
+          <label for="s-{{ draft.id }}">Subject</label>
+          <input id="s-{{ draft.id }}" type="text" name="subject" value="{{ draft.subject }}" maxlength="200" required>
+        </div>
+        <div class="field">
+          <label for="b-{{ draft.id }}">Body</label>
+          <textarea id="b-{{ draft.id }}" name="body" maxlength="4000" required>{{ draft.body }}</textarea>
+        </div>
+        <button class="btn small" type="submit">Save changes</button>
+      </form>
+    </details>
+    {% else %}
+    <div class="form-actions">
+      <a class="btn small" href="/threads/{{ draft.thread_id }}#drafts">Open thread</a>
+      <form method="post" action="/drafts/{{ draft.id }}/delete" data-confirm="Delete this record?">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn small danger" type="submit">Delete record</button>
+      </form>
+    </div>
+    {% endif %}
+  </section>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty large">
+  <h2>{% if status == 'sent' %}Nothing marked sent yet{% else %}No drafts{% endif %}</h2>
+  <p>Open a thread and choose a tone. The local writer quotes the ask and leaves the commitment to you; Claude is optional.</p>
+  <div class="form-actions" style="justify-content:center">
+    <a class="btn primary" href="/inbox">Find a thread</a>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

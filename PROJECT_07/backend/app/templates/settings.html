@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<section class="page-head compact">
+  <div>
+    <p class="eyebrow">THE OPERATOR</p>
+    <h1>Settings</h1>
+    <p class="lede">Your name, your clock, the VIP list the rules read, and the export that gives you everything back.</p>
+  </div>
+  <div class="head-actions">
+    <a class="btn ghost" href="/inbox">Back to inbox</a>
+  </div>
+</section>
+
+{% if saved %}<div class="alert success">Saved.</div>{% endif %}
+{% if error %}<div class="alert error" role="alert">{{ error }}</div>{% endif %}
+
+<div class="settings-grid">
+  <div class="stack">
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Profile</h2>
+        <span class="mono">read by the rules and drafts</span>
+      </div>
+      <form method="post" action="/settings">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div class="field-row">
+          <div class="field">
+            <label for="name">Name</label>
+            <input id="name" type="text" name="name" value="{{ user.name }}" maxlength="80" required>
+            <p class="hint">Used in the greeting and in drafts.</p>
+          </div>
+          <div class="field">
+            <label for="timezone">Time zone</label>
+            <input id="timezone" type="text" name="timezone" value="{{ user.timezone }}" list="tz-list" required>
+            <datalist id="tz-list" data-fill-timezones></datalist>
+            <p class="hint">IANA name, for example Asia/Kolkata. Dates and follow-up groups use this.</p>
+          </div>
+        </div>
+        <div class="field">
+          <label for="signature">Signature</label>
+          <input id="signature" type="text" name="signature" value="{{ user.signature }}" maxlength="240" placeholder="Product lead, Lumen Labs">
+          <p class="hint">Optional. Appended under the local draft. Keep it to one line.</p>
+        </div>
+        <div class="field">
+          <label for="vips">VIP senders</label>
+          <textarea id="vips" name="vips" rows="4" style="min-height:6rem" placeholder="priya@lumen.example, arjun@acme.example">{{ user.vips }}</textarea>
+          <p class="hint">Comma, semicolon or newline separated. A VIP is scored higher and routed to “Needs reply”.</p>
+        </div>
+        <div class="form-actions">
+          <button class="btn primary" type="submit">Save profile</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Mailboxes</h2>
+        <span class="mono">{{ counts.mailboxes }} listed</span>
+      </div>
+      <p class="hint" style="margin-bottom:0.7rem">A mailbox is a label for where mail arrived. It is not a connection and has no password.</p>
+      <ul class="mailbox-list">
+        {% for box in mailboxes %}
+        <li>
+          <span><strong>{{ box.name }}</strong><br><span class="mono">{{ box.address }}</span></span>
+          <form method="post" action="/settings/mailboxes/{{ box.id }}/delete" data-confirm="Remove this mailbox label? Threads are not deleted.">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="btn tiny ghost" type="submit">Remove</button>
+          </form>
+        </li>
+        {% endfor %}
+      </ul>
+      <form method="post" action="/settings/mailboxes" class="inline-fields" style="margin-top:0.9rem">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div class="field">
+          <label for="box-name">Name</label>
+          <input id="box-name" type="text" name="name" maxlength="40" placeholder="Work" required>
+        </div>
+        <div class="field" style="flex:1 1 200px">
+          <label for="box-address">Address</label>
+          <input id="box-address" type="text" name="address" placeholder="you@work.example" required>
+        </div>
+        <button class="btn small" type="submit">Add mailbox</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Password</h2>
+        <span class="mono">other sessions end</span>
+      </div>
+      <form method="post" action="/settings/password">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div class="field-row">
+          <div class="field">
+            <label for="current_password">Current password</label>
+            <input id="current_password" type="password" name="current_password" autocomplete="current-password" required>
+          </div>
+          <div class="field">
+            <label for="new_password">New password</label>
+            <input id="new_password" type="password" name="new_password" minlength="8" autocomplete="new-password" required>
+            <p class="hint">At least eight characters.</p>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn" type="submit">Change password</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div class="stack">
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Your archive</h2>
+        <span class="mono">on this machine</span>
+      </div>
+      <div class="route-map">
+        <span>Threads<strong style="margin-left:auto">{{ counts.threads }}</strong></span>
+        <span>Drafts<strong style="margin-left:auto">{{ counts.drafts }}</strong></span>
+        <span>Follow-ups<strong style="margin-left:auto">{{ counts.followups }}</strong></span>
+        <span>Mailboxes<strong style="margin-left:auto">{{ counts.mailboxes }}</strong></span>
+      </div>
+      <p class="hint" style="margin-top:0.7rem">Export is a JSON file named <code>switchboard-export.json</code>. It contains no password, session token or API key.</p>
+      <div class="form-actions">
+        <a class="btn small" href="/settings/export">Download JSON</a>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>The writer</h2>
+        <span class="mono">optional</span>
+      </div>
+      {% if ai_enabled %}
+      <p style="font-size:0.88rem;color:var(--ink-2)">Claude is configured (<code>{{ ai_model }}</code>). Summaries and drafts fall back to the local writer if the call fails, and the label always says which was used.</p>
+      {% else %}
+      <p style="font-size:0.88rem;color:var(--ink-2)">No API key is set. Summaries and drafts come from the labelled local writer, in-process. Set <code>ANTHROPIC_API_KEY</code> in <code>PROJECT_07/.env</code> to enable Claude.</p>
+      {% endif %}
+      <div class="route-map">
+        <span><span class="lamp {{ 'green' if ai_enabled else 'amber' }}"></span>{{ 'Claude available' if ai_enabled else 'Local rules only' }}</span>
+        <span><span class="lamp"></span>No mailbox connection</span>
+        <span><span class="lamp"></span>No email is ever sent</span>
+      </div>
+    </section>
+
+    <section class="panel danger-zone">
+      <div class="panel-head">
+        <h2>Delete account</h2>
+        <span class="mono">permanent</span>
+      </div>
+      <p style="font-size:0.88rem;color:var(--ink-2)">This removes your account, threads, messages, drafts and follow-ups in one transaction. Download the export first if you want a copy.</p>
+      <form method="post" action="/settings/delete" data-confirm="Delete this account and every thread, draft and follow-up in it?">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div class="field">
+          <label for="delete-password">Password</label>
+          <input id="delete-password" type="password" name="password" autocomplete="current-password" required>
+        </div>
+        <div class="field">
+          <label for="confirm">Type DELETE</label>
+          <input id="confirm" type="text" name="confirm" placeholder="DELETE" autocomplete="off" required>
+        </div>
+        <div class="form-actions">
+          <button class="btn danger" type="submit">Delete everything</button>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>
+{% endblock %}
