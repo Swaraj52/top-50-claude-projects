@@ -90,11 +90,12 @@ Generated from `projects.json`; descriptions and features come from the source P
 ### 07. Email Command Center
 
 - **Folder:** [`PROJECT_07/`](PROJECT_07/)
-- **Status:** Pending
+- **Status:** Completed
 - **What it does:** Organizes the inbox into categories and drafts replies and follow-ups.
 - **Core features:** Priority inbox, Reply drafts, Follow-up list, Thread summaries
-- **Tech stack:** Chosen when the project starts
+- **Tech stack:** FastAPI · Jinja2 + HTMX · SQLite · Claude API
 - **Reserved local ports:** backend `8007`, frontend `5107`
+- **Notes:** Switchboard v1.0: 201 backend tests; paste, .eml upload, threading, five routes, explainable priority, local summaries and drafts, follow-ups, export and account deletion verified against seeded data in a browser at desktop, dark and phone widths. Claude summaries/drafts validated with a fake transport only (no key). No IMAP/OAuth/SMTP by design.
 
 > Original brief: Inbox ko categories mein organize karke replies aur follow-ups draft karta hai.
 

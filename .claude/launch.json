@@ -48,6 +48,14 @@
         "PROJECT_06/backend/scripts/preview.py"
       ],
       "port": 8006
+    },
+    {
+      "name": "project-07-switchboard",
+      "runtimeExecutable": "PROJECT_07/backend/.venv/Scripts/python.exe",
+      "runtimeArgs": [
+        "PROJECT_07/backend/scripts/preview.py"
+      ],
+      "port": 8007
     }
   ]
 }

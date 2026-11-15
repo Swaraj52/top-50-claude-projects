@@ -12,6 +12,35 @@ Only items that were actually checked are listed here.
 | Root docs and recovery system | Written and generated; `CLAUDE.md` enforces the start-command rule |
 | Public GitHub repo `Swaraj52/top-50-claude-projects` | `gh api`: public, owner Swaraj52; remote `main` matched local after each push |
 
+## Project 07: Email Command Center ("Switchboard"), v1.0
+
+| Feature | Verification |
+|---|---|
+| Accounts, scrypt hashing, hashed session tokens, CSRF (forms and HTMX), login/summary rate limits, per-user isolation, security headers | pytest; browser |
+| Intake: pasted fields and `.eml` upload (2 MB cap) with header parsing, `datetime-local` read in the user's zone, `Message-ID` dedupe | pytest; browser capture |
+| Threading: `Re:`/`Fwd:`/`Aw:`/`Sv:` and whitespace stripped, joins an open thread in the same mailbox, a closed thread starts a new one | pytest |
+| Five routes with visible reasons: newsletter and receipt wording first, then question/request/VIP to Needs reply, else FYI | pytest; browser |
+| A manual route is stored with `category_source="you"` and survives new inbound mail | pytest |
+| Explainable priority out of 100: route base, VIP, unread, starred, question, deadline, recency; every point has a reason | pytest; thread page in the browser |
+| Local summaries from the latest inbound message, with greeting, quoted history and signature removed | pytest; browser |
+| Local reply drafts in warm, brief and formal tone; quotes the ask, never invents an amount | pytest; browser |
+| Claude summary and draft: request shape, strict JSON, code fences, length clamps, no-key path, HTTP/network/timeout/invalid-JSON fallbacks | pytest with a fake transport. **Not called live (no API key)** |
+| Mark sent records one outbound message locally and moves the thread to Waiting; a second send is refused | pytest; browser |
+| Follow-ups: add with natural-language or ISO date, Overdue/Today/Next seven days/Later/No date groups, complete/reopen, edit, delete, safe redirects | pytest; browser |
+| Inbox views: Priority, All, the five routes, Starred, Closed; search across subject, participants and every message body; mailbox filter | pytest; browser |
+| Settings: name, IANA timezone, signature, VIP list, mailbox add/remove rules, password change ending other sessions, JSON export, account deletion with password + `DELETE` | pytest; browser |
+| Export contains threads, messages, drafts and follow-ups and no password or token material | pytest |
+| Import accepts a real export: 12 threads, 15 messages, 4 drafts, 7 follow-ups; a second and third run skip all 12 threads; `--dry-run` writes nothing | Manual round trip against scratch databases |
+| Sender rendering shows the display name and, only when the raw header contains one, the address | pytest; browser; re-captured screenshots |
+| Mobile: rail becomes a top bar under 900 px; `scrollWidth == innerWidth == 390` on inbox and thread | Playwright; measured in the browser |
+| Light/dark schemes, desktop and phone layouts | 12 Playwright screenshots at 1440 px (light/dark) and 390 px |
+| Migrations | pytest: migrated schema matches the models |
+| Live preview: `scripts/preview.py` | Started on :8007; demo account signed in; all pages returned 200 |
+
+- **Tests:** backend 201 passed across 8 files.
+- **Docs:** README (15 sections), PRD, ARCHITECTURE, YOUR_DATA, `.env.example`, 12 screenshots.
+- **Deliberate omission:** no IMAP, OAuth or SMTP; mail arrives by paste, `.eml` upload or import.
+
 ## Project 06: Meeting Memory Assistant ("Quorum"), v1.0
 
 | Feature | Verification |

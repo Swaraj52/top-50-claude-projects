@@ -132,4 +132,29 @@
 - **Recovery instructions:** continue with Project 07 (Email Command Center, port 8007) without
   waiting. Read `CURRENT_STATE.md` and `NEXT_ACTIONS.md`.
 
+## Session 8: 2026-11-15, Project 07 (standing authorization, resumed after restart)
+
+- **Authorized by:** the standing instruction to build Projects 04–50 sequentially, continued with the
+  owner's `/continue`.
+- **Built:** Switchboard. A server-rendered FastAPI + Jinja2 + HTMX email desk that never connects to
+  a mailbox: mail arrives by paste, `.eml` upload or JSON import, the rules route it to Needs reply,
+  Waiting, FYI, Newsletter or Receipt, a documented score explains its rank, and a local writer
+  produces summaries and drafts in three tones. Follow-ups, search, mailbox labels, VIPs, export,
+  importer, account deletion and a one-command preview on :8007 with a twelve-thread seed built by
+  the real classifier and scorer.
+- **Verified:** 201 backend tests across 8 files; browser pass at desktop, phone, light and dark;
+  12 Playwright screenshots; inbox and thread measured 390 px with no horizontal scroll. Export →
+  import round trip against scratch databases wrote 12 threads, 15 messages, 4 drafts and 7
+  follow-ups; the second and third runs skipped all 12 threads, and `--dry-run` wrote nothing.
+- **Fixed in the pass:** the sender line repeated the display name and the raw address, so both the
+  row and the thread now show the address only when the header contains one; the importer now keeps
+  mailbox names from the export instead of renaming every box "Imported"; unused imports removed.
+- **Deliberate omission:** no IMAP, OAuth or SMTP. "Mark sent" records the reply locally and moves
+  the thread to Waiting; the user sends from their own client.
+- **Not verified live:** Claude summaries and drafts (no API key); the local writer is what the
+  screenshots show and the UI labels it `Local`.
+- **Recovery instructions:** continue with Project 08 (Personal Knowledge Search, port 8008) without
+  waiting. Read `CURRENT_STATE.md` and `NEXT_ACTIONS.md`.
+
+
 

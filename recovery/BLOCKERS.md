@@ -1,12 +1,22 @@
 # Blockers
 
-_Last updated: 2026-11-14_
+_Last updated: 2026-11-15_
 
 ## Open
 
 _None._
 
 ## Resolved
+
+### B-006: Importer renamed imported mailboxes and the sender line repeated itself (resolved 2026-11-15)
+
+- Reviewing Project 07's round trip showed every imported mailbox was named `Imported`, losing the
+  export's `mailboxes[].name`; and rows and thread messages printed the display name followed by the
+  raw `Name <address>` string.
+- The importer now reads the top-level `mailboxes` list and reuses those names; an `emailaddr` Jinja
+  filter shows the address only when the stored header actually contains one.
+- Re-ran the round trip: the mailbox name `Personal` survives and the seeded export imports
+  losslessly and idempotently.
 
 ### B-005: PowerShell text replacement corrupted UTF-8 templates (resolved 2026-11-14)
 

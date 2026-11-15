@@ -753,6 +753,18 @@
       "github": "Done",
       "stack": "FastAPI · Jinja2 + HTMX · SQLite · Claude API",
       "notes": "Quorum v1.0: 144 backend tests; capture, decisions, owners, due-date grouping, memory search, export/import and deletion verified against seeded data in a browser at desktop, dark and phone widths. Claude extraction validated with a fake transport only (no key)."
+    },
+    "7": {
+      "status": "Completed",
+      "planning": "Done",
+      "frontend": "Done",
+      "backend": "Done",
+      "database": "Done",
+      "testing": "Done",
+      "docs": "Done",
+      "github": "Done",
+      "stack": "FastAPI · Jinja2 + HTMX · SQLite · Claude API",
+      "notes": "Switchboard v1.0: 201 backend tests; paste, .eml upload, threading, five routes, explainable priority, local summaries and drafts, follow-ups, export and account deletion verified against seeded data in a browser at desktop, dark and phone widths. Claude summaries/drafts validated with a fake transport only (no key). No IMAP/OAuth/SMTP by design."
     }
   }
 }
