@@ -102,11 +102,12 @@ Generated from `projects.json`; descriptions and features come from the source P
 ### 08. Personal Knowledge Search
 
 - **Folder:** [`PROJECT_08/`](PROJECT_08/)
-- **Status:** Pending
+- **Status:** Completed
 - **What it does:** Provides natural-language search across notes, documents and saved resources.
 - **Core features:** Semantic search, Source links, Topic clusters
-- **Tech stack:** Chosen when the project starts
+- **Tech stack:** FastAPI · Jinja2 + HTMX · SQLite · Claude API
 - **Reserved local ports:** backend `8008`, frontend `5108`
+- **Notes:** Loom v1.0: 181 backend tests; explainable lexical search with query understanding and filters, highlighted snippets, tag-first topic clusters, extractive Ask with citations, markdown/text/HTML uploads, collections, tags, export plus an idempotent import (14 items round-tripped, second run skipped all 14) and browser checks at desktop, dark and phone widths. Claude answer rewrite validated with a fake transport only (no key). No crawler or page fetching by design.
 
 > Original brief: Notes, documents aur saved resources mein natural-language search provide karta hai.
 

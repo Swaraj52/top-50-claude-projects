@@ -56,6 +56,14 @@
         "PROJECT_07/backend/scripts/preview.py"
       ],
       "port": 8007
+    },
+    {
+      "name": "project-08-loom",
+      "runtimeExecutable": "PROJECT_08/backend/.venv/Scripts/python.exe",
+      "runtimeArgs": [
+        "PROJECT_08/backend/scripts/preview.py"
+      ],
+      "port": 8008
     }
   ]
 }

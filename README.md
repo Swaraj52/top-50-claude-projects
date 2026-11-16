@@ -66,7 +66,7 @@ top-50-claude-projects/
 | 05 | [Habit & Routine Coach](PROJECT_05/) | Tracks the user's routines and gives realistic habit suggestions. | FastAPI · Jinja2 + HTMX · SQLite · Claude API | Completed |
 | 06 | [Meeting Memory Assistant](PROJECT_06/) | Converts meeting notes into decisions, owners and follow-ups. | FastAPI · Jinja2 + HTMX · SQLite · Claude API | Completed |
 | 07 | [Email Command Center](PROJECT_07/) | Organizes the inbox into categories and drafts replies and follow-ups. | FastAPI · Jinja2 + HTMX · SQLite · Claude API | Completed |
-| 08 | [Personal Knowledge Search](PROJECT_08/) | Provides natural-language search across notes, documents and saved resources. | — | Pending |
+| 08 | [Personal Knowledge Search](PROJECT_08/) | Provides natural-language search across notes, documents and saved resources. | FastAPI · Jinja2 + HTMX · SQLite · Claude API | Completed |
 
 ### 2. Business, Strategy & Operations
 

@@ -765,6 +765,18 @@
       "github": "Done",
       "stack": "FastAPI · Jinja2 + HTMX · SQLite · Claude API",
       "notes": "Switchboard v1.0: 201 backend tests; paste, .eml upload, threading, five routes, explainable priority, local summaries and drafts, follow-ups, export and account deletion verified against seeded data in a browser at desktop, dark and phone widths. Claude summaries/drafts validated with a fake transport only (no key). No IMAP/OAuth/SMTP by design."
+    },
+    "8": {
+      "status": "Completed",
+      "planning": "Done",
+      "frontend": "Done",
+      "backend": "Done",
+      "database": "Done",
+      "testing": "Done",
+      "docs": "Done",
+      "github": "Done",
+      "stack": "FastAPI · Jinja2 + HTMX · SQLite · Claude API",
+      "notes": "Loom v1.0: 181 backend tests; explainable lexical search with query understanding and filters, highlighted snippets, tag-first topic clusters, extractive Ask with citations, markdown/text/HTML uploads, collections, tags, export plus an idempotent import (14 items round-tripped, second run skipped all 14) and browser checks at desktop, dark and phone widths. Claude answer rewrite validated with a fake transport only (no key). No crawler or page fetching by design."
     }
   }
 }
