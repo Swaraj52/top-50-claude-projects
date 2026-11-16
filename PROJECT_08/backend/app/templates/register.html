@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Create an account{% endblock %}
+{% block mainclass %}auth-shell{% endblock %}
+{% block content %}
+<section class="auth">
+  <div class="auth-story">
+    <a class="brand brand-large" href="/">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M4 8h24M4 16h24M4 24h24" stroke="currentColor" stroke-width="2" fill="none"/>
+        <path d="M9 4v24M16 4v24M23 4v24" stroke="currentColor" stroke-width="1.4" fill="none" opacity=".55"/>
+      </svg>
+      <span class="brand-name">Loom</span>
+    </a>
+    <p class="eyebrow">A library with a memory</p>
+    <h1>Start with one page.</h1>
+    <p class="lede">
+      Paste a note, upload a Markdown or HTML file, or save a link with your own summary. Loom
+      indexes the text locally and shows you exactly which words brought a result back.
+    </p>
+    <ul class="story-list">
+      <li>Four kinds: note, article, reference, snippet.</li>
+      <li>Collections for projects; tags for everything that crosses them.</li>
+      <li>Export the whole library as JSON at any time.</li>
+    </ul>
+  </div>
+
+  <div class="auth-card">
+    <h2>Create an account</h2>
+    {% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+    <form method="post" action="/register" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ form_csrf }}">
+      <label for="name">Name</label>
+      <input id="name" type="text" name="name" value="{{ values.name or '' }}" maxlength="80" required autocomplete="name" autofocus>
+      <label for="email">Email</label>
+      <input id="email" type="email" name="email" value="{{ values.email or '' }}" required autocomplete="email">
+      <label for="password">Password <span class="hint">8 characters or more</span></label>
+      <input id="password" type="password" name="password" minlength="8" required autocomplete="new-password">
+      <label for="timezone">Timezone</label>
+      <input id="timezone" type="text" name="timezone" value="Asia/Kolkata" placeholder="Asia/Kolkata" autocomplete="off">
+      <button class="btn btn-ink btn-wide" type="submit">Create the library</button>
+    </form>
+    <p class="switch">Already have one? <a href="/login">Sign in</a></p>
+  </div>
+</section>
+{% endblock %}

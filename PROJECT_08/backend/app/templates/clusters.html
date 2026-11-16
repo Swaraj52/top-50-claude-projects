@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Topic clusters{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">A reading aid, not a folder tree</p>
+    <h1>Topic clusters</h1>
+  </div>
+  <div class="head-actions"><a class="btn btn-ink" href="/items/new">Add item</a></div>
+</header>
+
+<p class="lede narrow">
+  Clusters are recomputed from the words your items share. A term must appear in at least two
+  items, and once the library holds five items no single term may cover more than 60 percent of it.
+  Edit an item and its membership follows.
+</p>
+
+{% if clusters %}
+<div class="cluster-grid">
+  {% for cluster in clusters %}
+  <article class="cluster-card">
+    <div class="cluster-top">
+      <h2><a href="/clusters/{{ cluster.slug }}">{{ cluster.name }}</a></h2>
+      <span class="count">{{ cluster.count }} items</span>
+    </div>
+    <div class="chips">{% for term in cluster.terms %}<span class="chip">{{ term }}</span>{% endfor %}</div>
+    <ul class="cluster-items">
+      {% for item in cluster.items[:4] %}<li><a href="/items/{{ item.id }}">{{ item.title }}</a><span class="mini">{{ item.kind|kind }}</span></li>{% endfor %}
+    </ul>
+    {% if cluster.count > 4 %}<p class="fine">and {{ cluster.count - 4 }} more in this cluster</p>{% endif %}
+  </article>
+  {% endfor %}
+</div>
+{% if uncovered %}
+<p class="fine">{{ uncovered }} of {{ total }} items share no term with another item yet, so they stay out of every cluster.</p>
+{% endif %}
+{% else %}
+<div class="empty">
+  <h2>No clusters yet</h2>
+  <p>A cluster needs at least two items that talk about the same thing. Add a second note on a related topic and this page will fill in.</p>
+  <p><a class="btn btn-ink" href="/items/new">Add an item</a></p>
+</div>
+{% endif %}
+{% endblock %}

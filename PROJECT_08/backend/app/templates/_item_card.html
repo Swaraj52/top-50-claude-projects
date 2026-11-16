@@ -1,0 +1,16 @@
+{% set tags = item.tags|tags %}
+<article class="card card-{{ item.kind }}">
+  <div class="card-top">
+    <span class="kind kind-{{ item.kind }}">{{ item.kind|kind }}</span>
+    {% if item.collection %}<span class="collection">{{ item.collection.name }}</span>{% endif %}
+    <span class="card-age" title="Updated {{ item.updated_at|dt(tz, 'stamp') }}">{{ item.updated_at|relative }}</span>
+  </div>
+  <h3 class="card-title"><a href="/items/{{ item.id }}">{{ item.title }}</a></h3>
+  {% if item.body %}<p class="card-excerpt">{{ item.body|truncate(190, true, '…') }}</p>{% endif %}
+  <div class="card-foot">
+    {% if item.source_url %}<span class="host" title="{{ item.source_url }}">{{ item.source_url|host }}</span>{% endif %}
+    {% if item.author %}<span class="author">{{ item.author }}</span>{% endif %}
+    {% if tags %}<span class="mini-tags">{% for tag in tags %}<a href="/library?tag={{ tag|urlencode }}">{{ tag }}</a>{% endfor %}</span>{% endif %}
+    {% if item.starred %}<span class="star" title="Starred">★</span>{% endif %}
+  </div>
+</article>

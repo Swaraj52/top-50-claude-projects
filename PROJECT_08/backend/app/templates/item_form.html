@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% set v = values or {} %}
+{% set cur_title = v.title if v.title is defined else (item.title if item else '') %}
+{% set cur_body = v.body if v.body is defined else (item.body if item else '') %}
+{% set cur_kind = v.kind if v.kind is defined else (item.kind if item else (kind or 'note')) %}
+{% set cur_tags = v.tags if v.tags is defined else (item.tags if item else '') %}
+{% set cur_author = v.author if v.author is defined else (item.author if item else '') %}
+{% set cur_url = v.source_url if v.source_url is defined else (item.source_url if item else '') %}
+{% set cur_collection = v.collection_id if v.collection_id is defined else (item.collection_id|string if item and item.collection_id else '') %}
+{% set cur_starred = v.starred if v.starred is defined else (item.starred if item else false) %}
+{% block title %}{{ 'Edit' if item else 'New item' }}{% endblock %}
+{% block content %}
+<nav class="crumbs" aria-label="Breadcrumb">
+  <a href="/library">Library</a><span>/</span>
+  <span class="current">{{ 'Edit' if item else 'New item' }}</span>
+</nav>
+
+<header class="page-head">
+  <div>
+    <p class="eyebrow">{{ 'Change the text, tags or shelf' if item else 'Write it down once, find it later' }}</p>
+    <h1>{{ item.title if item else 'New item' }}</h1>
+  </div>
+</header>
+
+{% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+{% if upload_error %}<div class="alert" role="alert">{{ upload_error }}</div>{% endif %}
+
+<form class="item-form" method="post" action="{{ '/items/' ~ item.id ~ '/edit' if item else '/items/new' }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <div class="form-main">
+    <label for="title">Title</label>
+    <input id="title" type="text" name="title" value="{{ cur_title }}" maxlength="200" required placeholder="A name you will recognise in six months" autofocus>
+
+    <label for="body">Text</label>
+    <textarea id="body" name="body" rows="18" maxlength="100000" placeholder="Paste the note, article text or your own summary. Plain text is kept exactly; HTML files are reduced to text on upload.">{{ cur_body }}</textarea>
+    <p class="fine">Up to 100,000 characters. Search reads this text; nothing is sent anywhere unless you ask a Claude question.</p>
+  </div>
+
+  <aside class="form-side">
+    <label for="kind">Kind</label>
+    <select id="kind" name="kind">
+      {% for value in ['note', 'article', 'reference', 'snippet'] %}<option value="{{ value }}" {{ 'selected' if cur_kind == value else '' }}>{{ value|kind }}</option>{% endfor %}
+    </select>
+
+    <label for="collection">Collection</label>
+    <select id="collection" name="collection_id">
+      <option value="">No collection</option>
+      {% for entry in collections %}<option value="{{ entry.id }}" {{ 'selected' if cur_collection == entry.id|string else '' }}>{{ entry.name }}</option>{% endfor %}
+    </select>
+
+    <label for="tags">Tags <span class="hint">comma separated</span></label>
+    <input id="tags" type="text" name="tags" value="{{ cur_tags }}" maxlength="300" placeholder="pricing, client-work">
+
+    <label for="author">Author / origin</label>
+    <input id="author" type="text" name="author" value="{{ cur_author }}" maxlength="120" placeholder="Who wrote it?">
+
+    <label for="source_url">Source link <span class="hint">optional</span></label>
+    <input id="source_url" type="url" name="source_url" value="{{ cur_url }}" maxlength="500" placeholder="https://…">
+    <p class="fine">Stored as a link only. Loom does not fetch or archive the page.</p>
+
+    <label class="check"><input type="checkbox" name="starred" value="on" {{ 'checked' if cur_starred else '' }}> Star this item</label>
+
+    <div class="form-actions">
+      <button class="btn btn-ink btn-wide" type="submit">{{ 'Save changes' if item else 'Add to library' }}</button>
+      <a class="btn btn-wide" href="{{ '/items/' ~ item.id if item else '/library' }}">Cancel</a>
+    </div>
+  </aside>
+</form>
+
+{% if not item %}
+<section class="panel upload" id="upload">
+  <div class="panel-head">
+    <h2>Or upload a file</h2>
+    <span class="fine">Markdown, text or HTML · 512 KB</span>
+  </div>
+  <form method="post" action="/items/upload" enctype="multipart/form-data" class="upload-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label class="file-drop" for="file">
+      <input id="file" type="file" name="file" accept=".md,.markdown,.txt,.text,.html,.htm" required>
+      <span>Choose a file to turn into an item</span>
+    </label>
+    <button class="btn" type="submit">Upload</button>
+  </form>
+  <p class="fine">The file is read on this machine and kept as text. HTML is stripped to its words; the original file is not stored.</p>
+</section>
+{% endif %}
+{% endblock %}

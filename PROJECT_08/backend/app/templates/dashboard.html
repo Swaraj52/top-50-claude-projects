@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-copy">
+    <p class="eyebrow">{{ today|datefmt }} · {{ user.timezone }}</p>
+    <h1>What does your library know?</h1>
+    <p class="lede">
+      Search in plain words, or ask a question. Loom ranks your own notes, documents and saved
+      links, shows the words that matched, and quotes the passages behind an answer.
+    </p>
+    <form class="search-big" action="/search" method="get" role="search">
+      <label class="sr-only" for="q-home">Search the library</label>
+      <input id="q-home" type="search" name="q" placeholder="e.g. pricing notes from last quarter" autocomplete="off">
+      <button class="btn btn-ink" type="submit">Search</button>
+    </form>
+    <p class="hero-links">
+      <a href="/ask">Ask a question instead →</a>
+      <a href="/items/new">Add something →</a>
+    </p>
+  </div>
+  <dl class="stats">
+    <div><dt>Items</dt><dd>{{ stats.total }}</dd></div>
+    <div><dt>Words</dt><dd>{{ stats.words }}</dd></div>
+    <div><dt>Links</dt><dd>{{ stats.links }}</dd></div>
+    <div><dt>Tags</dt><dd>{{ stats.tags|length }}</dd></div>
+  </dl>
+</section>
+
+{% if empty %}
+<section class="onboard">
+  <h2>An empty shelf, for now</h2>
+  <p>Three ways to start. Each one keeps the original text, so search can quote it later.</p>
+  <ol class="steps">
+    <li><span class="step-no">1</span><div><strong>Write a note.</strong> Paste a meeting note, a decision or a paragraph you want to find again.<br><a class="btn btn-small" href="/items/new">New item</a></div></li>
+    <li><span class="step-no">2</span><div><strong>Upload a file.</strong> Markdown, plain text or HTML, up to 512 KB. HTML is reduced to its text.<br><a class="btn btn-small" href="/items/new#upload">Upload</a></div></li>
+    <li><span class="step-no">3</span><div><strong>Save a link.</strong> Store the URL with your own summary. Loom never fetches the page.<br><a class="btn btn-small" href="/items/new?kind=reference">Save a link</a></div></li>
+  </ol>
+</section>
+{% else %}
+<div class="dash-grid">
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Recent additions</h2>
+      <a href="/library">All {{ stats.total }} items →</a>
+    </div>
+    <div class="card-list">
+      {% for item in recent %}{% include "_item_card.html" %}{% endfor %}
+    </div>
+  </section>
+
+  <aside class="side">
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Topic clusters</h2>
+        <a href="/clusters">All →</a>
+      </div>
+      {% if clusters %}
+      <ul class="cluster-list">
+        {% for cluster in clusters %}
+        <li>
+          <a href="/clusters/{{ cluster.slug }}">{{ cluster.name }}</a>
+          <span class="count">{{ cluster.count }}</span>
+          <span class="terms">{% for term in cluster.terms %}<span class="chip">{{ term }}</span>{% endfor %}</span>
+        </li>
+        {% endfor %}
+      </ul>
+      <p class="fine">Clusters are recomputed from shared terms each time. They are a reading aid, not a folder tree.</p>
+      {% else %}
+      <p class="muted">Add a few items and shared topics will appear here.</p>
+      {% endif %}
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Collections</h2>
+        <a href="/collections">Manage →</a>
+      </div>
+      {% if collections %}
+      <ul class="collection-list">
+        {% for collection, count in collections %}
+        <li><a href="/library?collection={{ collection.id }}">{{ collection.name }}</a><span class="count">{{ count }}</span></li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="muted">No collections yet. A collection is a project shelf; tags cut across them.</p>
+      {% endif %}
+      {% if top_tags %}
+      <div class="tag-cloud">
+        {% for tag, count in top_tags %}<a href="/library?tag={{ tag|urlencode }}">{{ tag }} <span>{{ count }}</span></a>{% endfor %}
+      </div>
+      {% endif %}
+    </section>
+  </aside>
+</div>
+{% endif %}
+{% endblock %}

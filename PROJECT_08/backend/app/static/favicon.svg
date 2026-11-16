@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Loom">
+  <rect width="64" height="64" rx="10" fill="#1d4a3c"/>
+  <path d="M10 18h44M10 32h44M10 46h44" stroke="#f5efe2" stroke-width="3" fill="none"/>
+  <path d="M19 10v44M32 10v44M45 10v44" stroke="#bf8124" stroke-width="2" fill="none"/>
+</svg>

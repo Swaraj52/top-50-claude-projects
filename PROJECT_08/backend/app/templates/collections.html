@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Collections{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">Shelves for projects, tags cut across them</p>
+    <h1>Collections</h1>
+  </div>
+  <div class="head-actions"><a class="btn btn-ink" href="/items/new">Add item</a></div>
+</header>
+
+{% if error == 'duplicate' %}
+<div class="alert" role="alert">A collection with that name already exists.</div>
+{% elif error == 'name' %}
+<div class="alert" role="alert">Give the collection a short name.</div>
+{% endif %}
+
+<form class="inline-form" method="post" action="/collections">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <div class="field">
+    <label for="name">New collection</label>
+    <input id="name" type="text" name="name" maxlength="60" required placeholder="Client work">
+  </div>
+  <div class="field grow">
+    <label for="description">Description <span class="hint">optional</span></label>
+    <input id="description" type="text" name="description" maxlength="240" placeholder="What belongs on this shelf?">
+  </div>
+  <button class="btn btn-ink" type="submit">Create</button>
+</form>
+
+{% if rows %}
+<div class="collection-rows">
+  {% for collection, members, links in rows %}
+  <section class="collection-row">
+    <div class="collection-main">
+      <h2><a href="/library?collection={{ collection.id }}">{{ collection.name }}</a></h2>
+      <p class="fine">
+        {{ members|length }} item{{ '' if members|length == 1 else 's' }}
+        {% if links %}· {{ links }} with a source link{% endif %}
+        · created {{ collection.created_at|dt(tz, 'day') }}
+      </p>
+      {% if collection.description %}<p class="collection-desc">{{ collection.description }}</p>{% endif %}
+      {% if members %}
+      <ul class="collection-items">
+        {% for item in members[:5] %}<li><a href="/items/{{ item.id }}">{{ item.title }}</a><span class="mini">{{ item.kind|kind }}</span></li>{% endfor %}
+      </ul>
+      {% if members|length > 5 %}<p class="fine">and {{ (members|length) - 5 }} more</p>{% endif %}
+      {% else %}
+      <p class="muted">Empty shelf. Assign an item to it when you edit that item.</p>
+      {% endif %}
+    </div>
+    <div class="collection-tools">
+      <details>
+        <summary class="linkish">Rename</summary>
+        <form method="post" action="/collections/{{ collection.id }}" class="stack">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <label for="name-{{ collection.id }}">Name</label>
+          <input id="name-{{ collection.id }}" type="text" name="name" value="{{ collection.name }}" maxlength="60" required>
+          <label for="desc-{{ collection.id }}">Description</label>
+          <input id="desc-{{ collection.id }}" type="text" name="description" value="{{ collection.description }}" maxlength="240">
+          <button class="btn btn-small" type="submit">Save</button>
+        </form>
+      </details>
+      <form method="post" action="/collections/{{ collection.id }}/delete" data-confirm="Delete this collection? Its items stay in the library without a collection.">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="linkish danger" type="submit">Delete</button>
+      </form>
+    </div>
+  </section>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty quiet">
+  <h2>No collections yet</h2>
+  <p>Collections are optional. Use them for a client, a course or a project; use tags for themes that cross shelves.</p>
+</div>
+{% endif %}
+
+{% if loose %}
+<section class="panel">
+  <div class="panel-head"><h2>Not on a shelf</h2><span class="count">{{ loose|length }}</span></div>
+  <ul class="loose-list">
+    {% for item in loose %}<li><span class="kind kind-{{ item.kind }}">{{ item.kind|kind }}</span> <a href="/items/{{ item.id }}">{{ item.title }}</a></li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Loom{% endblock %} · Loom</title>
+  <meta name="description" content="Loom: search, cluster and question your own notes, documents and saved links.">
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/app.css?v={{ version }}">
+  <script src="/static/htmx.min.js" defer></script>
+  <script src="/static/app.js?v={{ version }}" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  {% if user %}
+  <header class="masthead">
+    <div class="masthead-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+          <path d="M4 8h24M4 16h24M4 24h24" stroke="currentColor" stroke-width="2" fill="none"/>
+          <path d="M9 4v24M16 4v24M23 4v24" stroke="currentColor" stroke-width="1.4" fill="none" opacity=".55"/>
+        </svg>
+        <span class="brand-name">Loom</span>
+        <span class="brand-tag">personal knowledge</span>
+      </a>
+
+      <form class="quick-search" action="/search" method="get" role="search">
+        <label class="sr-only" for="q-top">Search the library</label>
+        <input id="q-top" type="search" name="q" value="{{ q or '' }}" placeholder="Search notes, documents, links…" autocomplete="off">
+        <button type="submit" class="btn btn-ink">Search</button>
+      </form>
+
+      <nav class="nav" aria-label="Main">
+        <a href="/library" class="{{ 'on' if path.startswith('/library') or path.startswith('/items') else '' }}">Library</a>
+        <a href="/clusters" class="{{ 'on' if path.startswith('/clusters') else '' }}">Clusters</a>
+        <a href="/collections" class="{{ 'on' if path.startswith('/collections') else '' }}">Collections</a>
+        <a href="/tags" class="{{ 'on' if path.startswith('/tags') else '' }}">Tags</a>
+        <a href="/ask" class="{{ 'on' if path == '/ask' else '' }}">Ask</a>
+      </nav>
+
+      <div class="account">
+        <a class="avatar" href="/settings" title="Settings for {{ user.name }}">{{ user.name|initial }}</a>
+        <form method="post" action="/logout">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="linkish" type="submit">Sign out</button>
+        </form>
+      </div>
+    </div>
+  </header>
+  {% endif %}
+
+  <main id="main" class="{% block mainclass %}shell{% endblock %}">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <span>Loom v{{ version }} · local-first, no tracking</span>
+    <span class="credit">Built by <strong>Swayam</strong></span>
+    {% if ai_enabled %}<span class="badge badge-claude" title="Optional Claude answers are enabled">Claude on</span>{% else %}<span class="badge">Local only</span>{% endif %}
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

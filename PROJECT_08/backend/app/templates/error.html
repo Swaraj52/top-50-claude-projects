@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ status_code }} · {{ message }}{% endblock %}
+{% block content %}
+<div class="empty error-page">
+  <p class="eyebrow">Error {{ status_code }}</p>
+  <h1>{{ message }}</h1>
+  <p>Nothing was changed. Use the links below to get back to the library.</p>
+  <p>
+    <a class="btn btn-ink" href="/">Dashboard</a>
+    <a class="btn" href="/library">Library</a>
+    <a class="btn" href="/search">Search</a>
+  </p>
+</div>
+{% endblock %}

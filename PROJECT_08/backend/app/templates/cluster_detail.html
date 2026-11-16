@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ cluster.name }}{% endblock %}
+{% block content %}
+<nav class="crumbs" aria-label="Breadcrumb">
+  <a href="/clusters">Clusters</a><span>/</span><span class="current">{{ cluster.name }}</span>
+</nav>
+
+<header class="page-head">
+  <div>
+    <p class="eyebrow">{{ cluster.count }} of {{ total }} items share these terms</p>
+    <h1>{{ cluster.name }}</h1>
+  </div>
+  <div class="head-actions"><a class="btn" href="/clusters">All clusters</a></div>
+</header>
+
+<div class="chips cluster-terms">
+  {% for term in cluster.terms %}<span class="chip chip-strong">{{ term }}</span>{% endfor %}
+</div>
+<p class="fine">Every item below contains all of the terms above. This is why they were grouped; there is no hidden model.</p>
+
+<div class="cards">
+  {% for entry in cluster.items %}{% set item = entry %}{% include "_item_card.html" %}{% endfor %}
+</div>
+{% endblock %}

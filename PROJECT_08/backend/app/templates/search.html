@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Search{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">Ranked by words, not by ads</p>
+    <h1>Search</h1>
+  </div>
+  <div class="head-actions"><a class="btn" href="/ask">Ask a question</a></div>
+</header>
+
+<form class="search-big search-page" action="/search" method="get" role="search">
+  <label class="sr-only" for="q">Search the library</label>
+  <input id="q" type="search" name="q" value="{{ q }}" placeholder="Try: pricing notes from last quarter" autocomplete="off" autofocus>
+  <button class="btn btn-ink" type="submit">Search</button>
+</form>
+
+{% if show_help and query.active %}
+<section class="understanding">
+  <h2>How this was understood</h2>
+  <div class="chips">
+    {% for line in query.summary() %}<span class="chip">{{ line }}</span>{% endfor %}
+  </div>
+  <p class="fine">
+    {{ hits|length }} result{{ '' if hits|length == 1 else 's' }} across {{ total }} item{{ '' if total == 1 else 's' }}.
+    Quotes force an exact phrase; <code>kind:</code>, <code>tag:</code>, <code>in:</code> and <code>is:starred</code> filter.
+  </p>
+</section>
+{% elif not query.active %}
+<section class="understanding">
+  <h2>Search in plain words</h2>
+  <p>Loom drops filler words, lightly stems the rest and adds a small, fixed set of synonyms.
+    It does not guess at meaning it cannot show you.</p>
+  <div class="syntax">
+    <div><code>"quarterly plan"</code><span>Exact phrase</span></div>
+    <div><code>kind:note</code><span>Only notes, articles, references or snippets</span></div>
+    <div><code>tag:pricing</code><span>One tag</span></div>
+    <div><code>in:client-work</code><span>One collection</span></div>
+    <div><code>is:starred</code><span>Starred items only</span></div>
+  </div>
+</section>
+{% endif %}
+
+{% if hits %}
+<ol class="results">
+  {% for hit in hits %}
+  <li class="result">
+    <div class="result-rank" aria-hidden="true">{{ loop.index }}</div>
+    <div class="result-body">
+      <div class="result-top">
+        <span class="kind kind-{{ hit.item.kind }}">{{ hit.item.kind|kind }}</span>
+        {% if hit.item.collection %}<span class="collection">{{ hit.item.collection.name }}</span>{% endif %}
+        {% if hit.item.source_url %}<span class="host">{{ hit.item.source_url|host }}</span>{% endif %}
+        <span class="score" title="Raw score {{ hit.score }}">{{ hit.percent }}<small>/100</small></span>
+      </div>
+      <h2 class="result-title"><a href="/items/{{ hit.item.id }}">{{ hit.item.title }}</a></h2>
+      <p class="result-snippet">{{ hit.snippet|safe }}</p>
+      <div class="result-foot">
+        <span class="matched">matched: {% for term in hit.matched %}<span class="term">{{ term }}</span>{% endfor %}</span>
+        {% if hit.phrase_hits %}<span class="phrase-badge">exact phrase ×{{ hit.phrase_hits }}</span>{% endif %}
+        <span class="age">updated {{ hit.item.updated_at|relative }}</span>
+      </div>
+    </div>
+  </li>
+  {% endfor %}
+</ol>
+{% elif query.active %}
+<div class="empty">
+  <h2>Nothing matched</h2>
+  <p>Try fewer words, drop a filter, or check that the thing you remember is actually written down.</p>
+  <p><a class="btn" href="/search">Clear the query</a> <a class="btn btn-ink" href="/items/new">Add an item</a></p>
+</div>
+{% else %}
+<div class="empty quiet">
+  <h2>Search the shelf</h2>
+  <p>Results show the matched words, a short highlighted passage and why the item ranked where it did.</p>
+</div>
+{% endif %}
+{% endblock %}

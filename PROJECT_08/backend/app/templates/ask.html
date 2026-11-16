@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Ask{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">Answers with receipts</p>
+    <h1>Ask your library</h1>
+  </div>
+  <div class="head-actions"><a class="btn" href="/search">Plain search</a></div>
+</header>
+
+<p class="lede narrow">
+  Loom finds the closest passages first. The local answer quotes them and links every citation.
+  {% if ai_enabled %}With your key set, Claude may rewrite the prose from those same passages and is labelled when it does.{% else %}No API key is set, so the answer is always the local extractive one.{% endif %}
+</p>
+
+{% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+
+<form class="ask-form" action="/ask" method="post">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <label for="ask-q">Your question</label>
+  <textarea id="ask-q" name="q" rows="2" maxlength="500" placeholder="What did we decide about the pricing review?" required>{{ q }}</textarea>
+  <div class="ask-actions">
+    <button class="btn btn-ink" type="submit">Ask</button>
+    <span class="fine">Best for questions about a few related items. For a list of matches, use search.</span>
+  </div>
+</form>
+
+{% if answer %}
+{% if query.active %}
+<section class="understanding">
+  <h2>How the question was read</h2>
+  <div class="chips">
+    {% for line in query.summary() %}<span class="chip">{{ line }}</span>{% endfor %}
+  </div>
+</section>
+{% endif %}
+<section class="answer {{ 'answer-claude' if used_claude else 'answer-local' }}">
+  <div class="answer-head">
+    <span class="badge {{ 'badge-claude' if used_claude else 'badge-local' }}">{{ 'Claude' if used_claude else 'Local extract' }}</span>
+    <span class="fine">read {{ answer.read }} passage{{ '' if answer.read == 1 else 's' }}</span>
+  </div>
+  <p class="answer-text">{{ answer.text }}</p>
+  {% if answer.note or ai_note %}<p class="answer-note">{{ ai_note or answer.note }}</p>{% endif %}
+</section>
+
+{% if answer.citations %}
+<section class="panel">
+  <div class="panel-head"><h2>Citations</h2><span class="fine">in the order they were read</span></div>
+  <ol class="citations">
+    {% for citation in answer.citations %}
+    <li>
+      <a href="/items/{{ citation.item_id }}">{{ citation.title }}</a>
+      <span class="kind kind-{{ citation.kind }}">{{ citation.kind|kind }}</span>
+      <p>“{{ citation.sentence }}”</p>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+
+{% if hits %}
+<section class="panel">
+  <div class="panel-head"><h2>Closest passages</h2><span class="fine">ranked by the same query</span></div>
+  <ol class="results compact">
+    {% for hit in hits %}
+    <li class="result">
+      <div class="result-body">
+        <h3 class="result-title"><a href="/items/{{ hit.item.id }}">{{ hit.item.title }}</a></h3>
+        <p class="result-snippet">{{ hit.snippet|safe }}</p>
+        <div class="result-foot"><span class="score">{{ hit.percent }}<small>/100</small></span><span class="age">updated {{ hit.item.updated_at|relative }}</span></div>
+      </div>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+{% else %}
+<section class="panel explain">
+  <div class="panel-head"><h2>What happens when you ask</h2></div>
+  <ol class="steps">
+    <li><span class="step-no">1</span><div><strong>Understand.</strong> Filters are removed from the question, quotes become phrases, and filler words are dropped. The understanding is shown on the results.</div></li>
+    <li><span class="step-no">2</span><div><strong>Retrieve.</strong> The same local ranking as search picks up to eight items. Title and tag matches weigh more than body matches.</div></li>
+    <li><span class="step-no">3</span><div><strong>Quote.</strong> One sentence per item is chosen by term overlap, then quoted with its title. Nothing is invented; if no passage matches, the answer says so.</div></li>
+  </ol>
+  <p class="fine">
+    {% if ai_enabled %}Claude is enabled. It receives only the question and the selected passages, and only after the local answer exists. If it fails or times out, the local answer is shown with a note.{% else %}Claude is not enabled. Set <code>ANTHROPIC_API_KEY</code> in <code>PROJECT_08/.env</code> to allow a rewritten answer; the citations still come from local search.{% endif %}
+  </p>
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}{{ item.title }}{% endblock %}
+{% block content %}
+<nav class="crumbs" aria-label="Breadcrumb">
+  <a href="/library">Library</a>
+  <span>/</span>
+  {% if item.collection %}<a href="/library?collection={{ item.collection.id }}">{{ item.collection.name }}</a><span>/</span>{% endif %}
+  <span class="current">{{ item.kind|kind }}</span>
+</nav>
+
+<article class="item">
+  <header class="item-head">
+    <div class="item-kicker">
+      <span class="kind kind-{{ item.kind }}">{{ item.kind|kind }}</span>
+      {% if item.collection %}<a class="collection" href="/library?collection={{ item.collection.id }}">{{ item.collection.name }}</a>{% endif %}
+      {% if item.starred %}<span class="star" title="Starred">★ starred</span>{% endif %}
+      <span class="age">updated {{ item.updated_at|dt(tz, 'stamp') }}</span>
+    </div>
+    <h1>{{ item.title }}</h1>
+    <p class="item-meta">
+      {% if item.author %}By {{ item.author }} · {% endif %}
+      {{ item.body|reading }} · {{ item.body|length }} characters · added {{ item.created_at|dt(tz, 'day') }}
+    </p>
+    <div class="item-actions">
+      <a class="btn btn-small" href="/items/{{ item.id }}/edit">Edit</a>
+      <form method="post" action="/items/{{ item.id }}/star">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="next" value="/items/{{ item.id }}">
+        <button class="btn btn-small" type="submit">{{ 'Unstar' if item.starred else 'Star' }}</button>
+      </form>
+      <form method="post" action="/items/{{ item.id }}/delete" data-confirm="Delete this item and its text? The library keeps no copy.">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn btn-small btn-danger" type="submit">Delete</button>
+      </form>
+    </div>
+  </header>
+
+  {% if item.source_url %}
+  <p class="source-line">
+    Source:
+    <a href="{{ item.source_url }}" rel="noopener noreferrer nofollow" target="_blank">{{ host or item.source_url }}</a>
+    <span class="fine">Saved by you. Loom has not fetched this page.</span>
+  </p>
+  {% endif %}
+
+  <div class="prose">{{ body_html|safe }}</div>
+
+  {% if item.tags %}
+  <footer class="item-foot">
+    <span class="label">Tags</span>
+    <span class="mini-tags">{% for tag in item.tags|tags %}<a class="chip" href="/library?tag={{ tag|urlencode }}">{{ tag }}</a>{% endfor %}</span>
+  </footer>
+  {% endif %}
+</article>
+
+{% if related %}
+<section class="panel related">
+  <div class="panel-head">
+    <h2>Related in your library</h2>
+    <span class="fine">shared rare terms, strongest first</span>
+  </div>
+  <div class="card-list">
+    {% for hit in related %}
+    <article class="card related-card">
+      <div class="card-top">
+        <span class="kind kind-{{ hit.item.kind }}">{{ hit.item.kind|kind }}</span>
+        <span class="card-age">{{ hit.item.updated_at|relative }}</span>
+      </div>
+      <h3 class="card-title"><a href="/items/{{ hit.item.id }}">{{ hit.item.title }}</a></h3>
+      <p class="card-excerpt">{{ hit.snippet|safe }}</p>
+      <div class="card-foot"><span class="matched">shared: {% for term in hit.matched %}<span class="term">{{ term }}</span>{% endfor %}</span></div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}

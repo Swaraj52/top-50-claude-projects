@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block mainclass %}auth-shell{% endblock %}
+{% block content %}
+<section class="auth">
+  <div class="auth-story">
+    <a class="brand brand-large" href="/">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M4 8h24M4 16h24M4 24h24" stroke="currentColor" stroke-width="2" fill="none"/>
+        <path d="M9 4v24M16 4v24M23 4v24" stroke="currentColor" stroke-width="1.4" fill="none" opacity=".55"/>
+      </svg>
+      <span class="brand-name">Loom</span>
+    </a>
+    <p class="eyebrow">Personal knowledge search</p>
+    <h1>Your notes should answer back.</h1>
+    <p class="lede">
+      Keep notes, saved articles and reference material in one place. Search them in plain words,
+      see why a result ranked where it did, and ask a question that is answered with quotes from
+      your own library — not the open web.
+    </p>
+    <ul class="story-list">
+      <li><strong>Local by default.</strong> Ranking, snippets, clusters and answers run in-process.</li>
+      <li><strong>No crawler.</strong> A saved link is a bookmark you typed, not a page fetched behind your back.</li>
+      <li><strong>Honest labels.</strong> Every answer says whether it was extracted locally or written by Claude.</li>
+    </ul>
+    <p class="fine">Demo build · no account is needed to read the code · data stays in SQLite on this machine.</p>
+  </div>
+
+  <div class="auth-card">
+    <h2>Sign in</h2>
+    {% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+    <form method="post" action="/login" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ form_csrf }}">
+      <label for="email">Email</label>
+      <input id="email" type="email" name="email" value="{{ values.email or '' }}" required autocomplete="email" autofocus>
+      <label for="password">Password</label>
+      <input id="password" type="password" name="password" required autocomplete="current-password">
+      <button class="btn btn-ink btn-wide" type="submit">Open the desk</button>
+    </form>
+    <p class="switch">New here? <a href="/register">Create an account</a></p>
+  </div>
+</section>
+{% endblock %}

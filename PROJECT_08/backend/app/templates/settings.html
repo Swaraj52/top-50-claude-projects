@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">Your library, your machine</p>
+    <h1>Settings</h1>
+  </div>
+</header>
+
+{% if saved %}<div class="alert ok" role="status">Saved.</div>{% endif %}
+{% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+
+<div class="settings-grid">
+  <section class="panel">
+    <div class="panel-head"><h2>Profile</h2><span class="fine">{{ user.email }}</span></div>
+    <form method="post" action="/settings" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label for="name">Name</label>
+      <input id="name" type="text" name="name" value="{{ user.name }}" maxlength="80" required>
+      <label for="timezone">Timezone <span class="hint">IANA name</span></label>
+      <input id="timezone" type="text" name="timezone" value="{{ user.timezone }}" placeholder="Asia/Kolkata">
+      <p class="fine">Dates are stored in UTC and shown in this zone.</p>
+      <button class="btn" type="submit">Save profile</button>
+    </form>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Password</h2><span class="fine">other sessions end</span></div>
+    <form method="post" action="/settings/password" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label for="current">Current password</label>
+      <input id="current" type="password" name="current_password" required autocomplete="current-password">
+      <label for="new">New password</label>
+      <input id="new" type="password" name="new_password" minlength="8" required autocomplete="new-password">
+      <button class="btn" type="submit">Change password</button>
+    </form>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Your data</h2><span class="fine">on this disk</span></div>
+    <dl class="mini-stats">
+      <div><dt>Items</dt><dd>{{ counts.items }}</dd></div>
+      <div><dt>Collections</dt><dd>{{ counts.collections }}</dd></div>
+      <div><dt>Tags</dt><dd>{{ counts.tags }}</dd></div>
+      <div><dt>Words</dt><dd>{{ counts.words }}</dd></div>
+    </dl>
+    <p class="fine">
+      The library is a single SQLite file, <code>PROJECT_08/data/loom.db</code>. It is excluded from Git.
+      Export includes every item, collection and tag, and no password material.
+    </p>
+    <p><a class="btn" href="/settings/export">Download JSON export</a></p>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Answers</h2></div>
+    {% if ai_enabled %}
+    <p>Claude answers are <strong>enabled</strong> with <code>{{ ai_model }}</code>. Only the question and the selected passages are sent. If the call fails, the local answer is shown.</p>
+    {% else %}
+    <p>Claude is <strong>off</strong>. Search, ranking, snippets, clusters and answers all run locally. Set <code>ANTHROPIC_API_KEY</code> in <code>PROJECT_08/.env</code> to enable optional rewritten answers.</p>
+    {% endif %}
+    <p class="fine">No key is required and none is stored in the repository.</p>
+  </section>
+
+  <section class="panel danger-zone">
+    <div class="panel-head"><h2>Delete account</h2></div>
+    <p>This removes your account, items, collections and sessions in one transaction. Export first if you want a copy.</p>
+    <form method="post" action="/settings/delete" class="stack" data-confirm="Delete the account and every item? This cannot be undone.">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label for="confirm">Type DELETE</label>
+      <input id="confirm" type="text" name="confirm" placeholder="DELETE" autocomplete="off" required>
+      <label for="del-password">Password</label>
+      <input id="del-password" type="password" name="password" required autocomplete="current-password">
+      <button class="btn btn-danger" type="submit">Delete everything</button>
+    </form>
+  </section>
+</div>
+{% endblock %}

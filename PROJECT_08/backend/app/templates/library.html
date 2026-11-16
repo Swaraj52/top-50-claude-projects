@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Library{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">Everything you have kept</p>
+    <h1>Library <span class="head-count">{{ total }}</span></h1>
+  </div>
+  <div class="head-actions">
+    <a class="btn" href="/search">Search</a>
+    <a class="btn btn-ink" href="/items/new">Add item</a>
+  </div>
+</header>
+
+<form class="filters" action="/library" method="get" role="search" aria-label="Filter the library">
+  <div class="field">
+    <label for="f-kind">Kind</label>
+    <select id="f-kind" name="kind">
+      <option value="">All kinds</option>
+      {% for value in kinds %}<option value="{{ value }}" {{ 'selected' if kind == value else '' }}>{{ value|kind }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label for="f-collection">Collection</label>
+    <select id="f-collection" name="collection">
+      <option value="">Any collection</option>
+      {% for entry in collections %}<option value="{{ entry.id }}" {{ 'selected' if collection == entry.id|string else '' }}>{{ entry.name }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label for="f-tag">Tag</label>
+    <input id="f-tag" type="text" name="tag" value="{{ tag }}" placeholder="e.g. pricing">
+  </div>
+  <div class="field">
+    <label for="f-sort">Order</label>
+    <select id="f-sort" name="sort">
+      <option value="recent" {{ 'selected' if sort == 'recent' else '' }}>Recently updated</option>
+      <option value="oldest" {{ 'selected' if sort == 'oldest' else '' }}>Oldest first</option>
+      <option value="title" {{ 'selected' if sort == 'title' else '' }}>Title A–Z</option>
+    </select>
+  </div>
+  <label class="check"><input type="checkbox" name="starred" value="1" {{ 'checked' if starred else '' }}> Starred only</label>
+  <div class="filter-actions">
+    <button class="btn btn-small" type="submit">Apply</button>
+    <a class="linkish" href="/library">Clear</a>
+  </div>
+</form>
+
+{% if kind or tag or collection or starred %}
+<p class="filter-note">
+  Showing {{ items|length }} of {{ total }}
+  {% if kind %}· kind <strong>{{ kind|kind }}</strong>{% endif %}
+  {% if selected_collection %}· in <strong>{{ selected_collection.name }}</strong>{% endif %}
+  {% if tag %}· tag <strong>{{ tag }}</strong>{% endif %}
+  {% if starred %}· starred{% endif %}
+</p>
+{% endif %}
+
+{% if items %}
+<div class="cards">
+  {% for item in items %}{% include "_item_card.html" %}{% endfor %}
+</div>
+{% else %}
+<div class="empty">
+  <h2>No items match</h2>
+  <p>{% if total %}Try clearing a filter, or add something that covers this topic.{% else %}The library is empty. Add a note, upload a file, or save a link.{% endif %}</p>
+  <p><a class="btn btn-ink" href="/items/new">Add the first item</a></p>
+</div>
+{% endif %}
+{% endblock %}
