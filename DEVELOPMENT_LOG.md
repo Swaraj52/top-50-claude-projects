@@ -3,6 +3,74 @@
 Architectural decisions, dependency changes, bugs and their fixes. Newest entries go at the top
 of each section.
 
+## 2026-11-16: Project 08, Personal Knowledge Search ("Loom")
+
+### Decisions
+
+- **Lexical search, not embeddings.** A single-user library of notes and clippings is small enough
+  that a BM25-style ranker over title, summary, body and tags is fast, has no model download and can
+  explain every result. The search page shows the interpreted query (phrases, expanded synonyms,
+  filters) so the user can see why a hit appeared. Documented as a limitation, not a hidden gap.
+- **Query syntax is parsed once into a small structure.** `kind:`, `tag:`, `in:` and `is:starred`
+  filters are stripped before tokenising, quoted phrases become phrase requirements, and remaining
+  words expand through a hand-written stem map. The same parsed object drives ranking, snippets and
+  the "how I read it" panel, so the three can never disagree.
+- **Highlighting only marks terms that actually matched.** The snippet builder receives the matched
+  surface forms from the ranker rather than the raw query, and the regex is boundary-aware. Without
+  that, a query for "rate" marked the middle of "separate".
+- **Clusters are derived, never stored.** Tag membership comes first, then title terms, with a
+  generic-word blacklist; a term must cover at least two items and, once the library has five items,
+  no more than 60 percent of it. Clusters overlap on purpose and are recomputed on each request.
+- **Ask is extractive by default.** The answer is assembled from the highest-scoring passages and
+  every sentence carries a citation back to its item; when nothing scores, the page says so instead
+  of inventing. Claude may rewrite the wording only, from the same passages, and the UI labels that
+  as `Claude`.
+- **Uploads are parsed, not fetched.** `.md`, `.txt` and `.html` up to 512 KB are read from the
+  request body with HTML stripped to text. There is no crawler or URL fetching, so the app never
+  makes outbound requests on a user's behalf.
+
+### Dependencies (PROJECT_08 only)
+
+`fastapi`, `SQLAlchemy`, `alembic`, `Jinja2`, `pydantic`, `pydantic-settings`, `email-validator`,
+`python-multipart`, `uvicorn`, `tzdata`, `httpx`; dev: `pytest`. No JS toolchain: HTMX is vendored
+in `app/static/` with its licence file.
+
+### Bugs found and fixed
+
+- **Snippet highlighting hit the middle of words.** `snippet()` matched substrings, so "rate" marked
+  inside "separate" and "fee" inside "feedback". It now uses word boundaries and only the terms the
+  ranker actually matched; two regression tests pin the boundary behaviour.
+- **The clusters page described the wrong ceiling.** The copy said a term may not cover three
+  quarters of the library while the code used 60 percent once five items exist. The page now states
+  what the code does.
+- **The phone masthead clipped its nav.** At 390 px the last link fell outside the viewport; the nav
+  now wraps under 620 px and the library measures `scrollWidth == innerWidth == 390`.
+- A snippet test asserted against text that contained a real second match, so it failed for the
+  wrong reason. The fixture text was corrected rather than the assertion relaxed.
+
+## 2026-11-12 to 11-15: Projects 04–07 (backfilled)
+
+These releases were recorded in `SESSION_HISTORY.md` and `COMPLETED_FEATURES.md` when they shipped
+but not in this log, so the architectural notes are summarised here.
+
+- **04 Summit (goal tracker, :8004).** Weighted milestones with straight-line pace and at-risk
+  signals; a labelled deterministic planner with an optional Claude coach; eight-week insights,
+  printable review, JSON export/import. Fixed in the pass: an HTML `.bar` class colliding with SVG
+  bars, stretched SVG chart text, an invisible sidebar sign-out.
+- **05 Cadence (habit coach, :8005).** Schedule-aware habits, done/rest logs, pending-today
+  semantics, streaks, week grid and weekly reflections. Fixed: paused habits dragging down reports,
+  today counted as missed, a clipped mobile nav; the grid gained a sticky habit column.
+- **06 Quorum (meeting memory, :8006).** A deterministic local extractor produces summaries,
+  decisions and owners; Claude is optional, validated and labelled. Fixed: an over-eager "Follow up
+  with…" prefix truncating titles, an owner pill colliding with `.empty`, a missing `Due` label, a
+  duplicated month, lowercase statuses, a wrapped search button, a clipped phone nav. PowerShell
+  `Set-Content` double-encoded punctuation in three files and added BOMs to five Python files; all
+  were repaired and re-scanned.
+- **07 Switchboard (email desk, :8007).** No IMAP, OAuth or SMTP by design: mail arrives by paste,
+  `.eml` upload or import. Five routes with visible reasons, an explainable priority score, local
+  summaries and drafts in three tones. Fixed: the sender line repeated the display name and the raw
+  address, and the importer renamed every mailbox "Imported" instead of keeping export names.
+
 ## 2026-11-09: Project 03, Daily Review Agent ("Shutdown")
 
 ### Decisions

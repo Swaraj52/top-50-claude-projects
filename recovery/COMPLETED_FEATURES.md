@@ -12,6 +12,31 @@ Only items that were actually checked are listed here.
 | Root docs and recovery system | Written and generated; `CLAUDE.md` enforces the start-command rule |
 | Public GitHub repo `Swaraj52/top-50-claude-projects` | `gh api`: public, owner Swaraj52; remote `main` matched local after each push |
 
+## Project 08: Personal Knowledge Search ("Loom"), v1.0
+
+| Feature | Verification |
+|---|---|
+| Accounts, scrypt hashing, hashed session tokens, CSRF (forms and HTMX), login/answer rate limits, per-user isolation, security headers | pytest; browser |
+| Items in four kinds (note, article, reference, snippet) with title, body, URL, summary, collection, tags and star; create, edit, delete | pytest; browser |
+| Uploads: `.md`, `.txt` and `.html` up to 512 KB, HTML stripped to text, filename as the fallback title | pytest |
+| Query understanding: quoted phrases, `kind:`/`tag:`/`in:`/`is:starred` filters, synonym expansion, and the interpreted query shown on the page | pytest; search page in the browser |
+| Ranking: BM25-style scoring over title, summary, body and tags, with the matched display form surfaced for each term | pytest |
+| Snippets: a window around real matches only, `<mark>` around whole words, HTML escaped, no marks inside larger words | pytest (45 search tests) |
+| Topic clusters: tag-first, generic-term blacklist, at least two items, a 60% ceiling once the library reaches five items, overlapping membership, stable slugs | pytest; clusters pages in the browser |
+| Ask: extractive answer assembled from the best passages with per-claim citations, and an honest "not enough evidence" path | pytest; browser |
+| Claude answer rewrite: request shape, strict JSON, code fences, length clamps, no-key path, HTTP/network/timeout/invalid-JSON fallbacks | pytest with a fake transport. **Not called live (no API key)** |
+| Collections and tags: create, rename, delete, item counts, tag pages, safe redirects | pytest; browser |
+| Settings: name, IANA timezone, password change ending other sessions, JSON export, account deletion with password + `DELETE` | pytest; browser |
+| Import accepts a real export (`loom-export-v1`): 14 items and 4 collections matched, starring preserved; a second run skipped all 14 items; `--dry-run` writes nothing | Manual round trip against a scratch database |
+| Mobile: masthead nav wraps under 620 px; `scrollWidth == innerWidth == 390` on the library | Playwright; measured in the browser |
+| Light/dark schemes, desktop and phone layouts | 12 Playwright screenshots at 1440 px (light/dark) and 390 px |
+| Migrations | pytest: the session fixture runs Alembic and every test copies that schema |
+| Live preview: `scripts/preview.py` | Started on :8008; demo account signed in; all pages returned 200 with no console errors |
+
+- **Tests:** backend 181 passed across 8 files.
+- **Docs:** README (15 sections), PRD, ARCHITECTURE, YOUR_DATA, `.env.example`, 12 screenshots.
+- **Deliberate omission:** no crawler, page fetching or embeddings; search is lexical and explains itself.
+
 ## Project 07: Email Command Center ("Switchboard"), v1.0
 
 | Feature | Verification |

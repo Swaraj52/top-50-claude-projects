@@ -1,47 +1,46 @@
 # Current State
 
-_Last updated: 2026-11-15_
+_Last updated: 2026-11-16_
 
 ## Authorized project
 
 **Standing authorization for Projects 04–50.** The owner (2026-11-12) asked for all remaining
-projects to be built sequentially without waiting for a per-project command. Projects 01–07 are
+projects to be built sequentially without waiting for a per-project command. Projects 01–08 are
 closed; do not rewrite their history unless the owner names them. Continue automatically with the
-first project that is not verified and published (currently **Project 08**).
+first project that is not verified and published (currently **Project 09**).
 
 ## Programme status
 
 | Item | Value |
 |---|---|
 | Phase | Building sequentially (standing authorization) |
-| Current project | 07 complete; next is 08 |
-| Projects completed | 7 / 50 |
-| Projects published to GitHub | 7 / 50 |
+| Current project | 08 complete; next is 09 |
+| Projects completed | 8 / 50 |
+| Projects published to GitHub | 8 / 50 |
 | Workspace | `C:\Users\Swayam Naik\TOP-50-CLAUDE-PROJECTS` |
 | GitHub repo | https://github.com/Swaraj52/top-50-claude-projects |
-| Latest release | `project-07-v1.0` |
+| Latest release | `project-08-v1.0` |
 
-## Last project: 07, Email Command Center ("Switchboard")
+## Last project: 08, Personal Knowledge Search ("Loom")
 
 - **Stack:** FastAPI + Jinja2 templates + HTMX (server-rendered, no JS build), SQLite + Alembic,
-  Claude for optional summaries and reply drafts with a labelled deterministic local writer
-- **Port:** 8007 (single process). Preview: `python PROJECT_07/backend/scripts/preview.py`,
-  launch.json entry `project-07-switchboard`; demo `demo@switchboard.example` / `switchboard-demo`
-- **Tests:** 201 backend tests, all passing
-- **Verified:** registration/login/session/CSRF, pasted intake and `.eml` upload, `Message-ID`
-  dedupe, threading by cleaned subject inside a mailbox with a closed-thread split, five routes
-  with visible reasons, explainable priority score, local summaries and drafts in three tones,
-  mark-sent semantics, follow-ups with natural-language dates and Overdue/Today/Next seven
-  days/Later/No date grouping, inbox views plus search across subjects and bodies, mailbox filter,
-  settings, VIP list, password change ending other sessions, JSON export, importer round trip
-  (12 threads, 15 messages, 4 drafts, 7 follow-ups; second and third imports skipped all 12),
-  account deletion, light/dark, 390 px mobile with no horizontal scroll; 12 screenshots captured
-  from the live app
-- **Not verified live:** the Claude summary and draft paths (no API key); the local writer is what
+  Claude for an optional answer rewrite with a labelled deterministic extractive answer underneath
+- **Port:** 8008 (single process). Preview: `python PROJECT_08/backend/scripts/preview.py`,
+  launch.json entry `project-08-loom`; demo `demo@loom.example` / `loom-demo`
+- **Tests:** 181 backend tests, all passing
+- **Verified:** registration/login/session/CSRF, item CRUD for four kinds (note, article,
+  reference, snippet), collections and tags, markdown/text/HTML upload (512 KB cap, HTML stripped
+  to text), lexical BM25-style search with visible query understanding, synonym expansion, quoted
+  phrases, `kind:`/`tag:`/`in:`/`is:starred` filters, highlighted snippets, tag-first topic
+  clusters with a generic-term blacklist and overlap, extractive Ask with citations, settings,
+  password change ending other sessions, JSON export, importer round trip (14 items and 4
+  collections matched; a second run skipped all 14), account deletion, light/dark, 390 px mobile
+  with no horizontal scroll; 12 screenshots captured from the live app
+- **Not verified live:** the Claude answer rewrite (no API key); the local extractive answer is what
   the screenshots show and the UI labels it `Local`
-- **Deliberate omission:** no IMAP, OAuth or SMTP. Mail arrives by paste, `.eml` upload or a local
-  JSON import; "mark sent" records locally only
-- **Owner's data:** requested after release, per `PROJECT_07/docs/YOUR_DATA.md`
+- **Deliberate omission:** no crawler, page fetching or embeddings. Search is lexical and explains
+  itself; items arrive by typing, upload or JSON import
+- **Owner's data:** requested after release, per `PROJECT_08/docs/YOUR_DATA.md`
 - **Known errors:** none
 
 ## Standing constraints

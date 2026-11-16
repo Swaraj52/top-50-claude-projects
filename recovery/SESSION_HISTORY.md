@@ -156,5 +156,30 @@
 - **Recovery instructions:** continue with Project 08 (Personal Knowledge Search, port 8008) without
   waiting. Read `CURRENT_STATE.md` and `NEXT_ACTIONS.md`.
 
+## Session 9: 2026-11-16, Project 08 (standing authorization, resumed after restart)
+
+- **Authorized by:** the standing instruction to build Projects 04–50 sequentially, continued with the
+  owner's `/continue`.
+- **Built:** Loom. A server-rendered FastAPI + Jinja2 + HTMX personal library: notes, articles,
+  references and snippets in collections with tags, a lexical BM25-style search that shows how it
+  read the query (phrases, synonyms, `kind:`/`tag:`/`in:`/`is:starred` filters), highlighted
+  snippets over real matches, tag-first topic clusters, an extractive Ask with citations, markdown,
+  text and HTML uploads, JSON export plus an idempotent importer, and a one-command preview on
+  :8008 with a fourteen-item seed.
+- **Verified:** 181 backend tests across 8 files; browser pass at desktop, phone, light and dark;
+  every page 200 with no console or page errors; 12 Playwright screenshots; the library measured
+  390 px with no horizontal scroll. Export → import round trip against a scratch database matched
+  14 items and 4 collections including stars, and a second run skipped all 14.
+- **Fixed in the pass:** snippet highlighting marked the middle of larger words (now boundary-aware
+  and fed only actually matched terms, with regression tests); the clusters page claimed a
+  three-quarters ceiling instead of the implemented 60%; the phone masthead clipped its nav (now
+  wraps under 620 px).
+- **Deliberate omission:** no crawler, page fetching or embeddings. Items arrive by typing, upload
+  or import, and search is lexical so it can always explain a result.
+- **Not verified live:** the Claude answer rewrite (no API key); the local extractive answer is what
+  the screenshots show and the UI labels it `Local`.
+- **Recovery instructions:** continue with Project 09 (Business Strategy Planner, port 8009)
+  without waiting. Read `CURRENT_STATE.md` and `NEXT_ACTIONS.md`.
+
 
 
