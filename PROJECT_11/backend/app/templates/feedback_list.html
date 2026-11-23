@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Feedback List{% endblock %}
+
+{% block content %}
+<div class="feedback-container">
+  <h1>Feedback Entries</h1>
+  
+  {% if feedback_entries %}
+  <table class="feedback-table">
+    <thead>
+      <tr>
+        <th>Review</th>
+        <th>Sentiment</th>
+        <th>Created</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in feedback_entries %}
+      <tr>
+        <td class="review-cell">{{ entry.review_text|truncate(50) }}</td>
+        <td class="sentiment-cell">{{ entry.sentiment_theme or 'neutral' }}</td>
+        <td class="date-cell">{{ entry.created_at|date('M d, Y') }}</td>
+        <td class="actions-cell">
+          <a href="#" class="action-link">View</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="no-entries">No feedback entries found.</p>
+  {% endif %}
+  
+  <div class="action-bar">
+    <a href="/feedback" class="btn-primary">Add New Feedback</a>
+  </div>
+</div>
+{% endblock %}

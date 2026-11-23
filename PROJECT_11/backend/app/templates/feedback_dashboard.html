@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Feedback Dashboard{% endblock %}
+
+{% block content %}
+<div class="feedback-container">
+  <h1>Customer Feedback Analyzer</h1>
+  
+  <section class="import-feedback">
+    <h2>Import Feedback</h2>
+    <form method="post" action="/feedback/import" class="feedback-form">
+      <div class="form-group">
+        <textarea name="reviews" rows="4" cols="50" placeholder="Enter customer reviews, survey responses, or support feedback..."></textarea>
+      </div>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button type="submit" class="btn-primary">Analyze Feedback</button>
+    </form>
+  </section>
+  
+  {% if feedback_count > 0 %}
+  <section class="analysis-results">
+    <h2>Analysis Results ({% if feedback_count %}{{ feedback_count }}{% else %}0{% endif %} entries)</h2>
+    
+    {% for entry in feedback_entries %}
+    <div class="feedback-entry">
+      <p class="review-text">{{ entry.review_text }}</p>
+      <div class="meta-info">
+        <span class="sentiment-label">Sentiment: {{ entry.sentiment_theme or 'neutral' }}</span>
+        <span class="date-label">Added: {{ entry.created_at|date('MMM d, Y') }}</span>
+      </div>
+      <div class="analysis-details">
+        <div class="pain-points">
+          <strong>Pain Points:</strong> {{ entry.pain_points or 'None identified' }}
+        </div>
+        <div class="feature-requests">
+          <strong>Feature Requests:</strong> {{ entry.feature_requests or 'None identified' }}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    
+    <div class="action-buttons">
+      <a href="/feedback/clear" class="btn-secondary">Clear All Feedback</a>
+      <a href="/feedback/list" class="btn-secondary">View List</a>
+    </div>
+  </section>
+  {% else %}
+  <section class="no-feedback">
+    <p>No feedback entries yet. Import your first review to get started.</p>
+  </section>
+  {% endif %}
+</div>
+{% endblock %}
