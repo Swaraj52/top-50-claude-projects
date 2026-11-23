@@ -3,7 +3,7 @@
 Generated from `projects.json` by `shared-resources/scripts/render_docs.py`.
 Edit `projects.json`, then re-run the script. Do not edit this table by hand.
 
-**Summary:** Pending: 42 · Planning: 0 · In Development: 0 · Testing: 0 · Blocked: 0 · Completed: 8 · Published to GitHub: 8/50
+**Summary:** Pending: 41 · Planning: 0 · In Development: 0 · Testing: 0 · Blocked: 0 · Completed: 9 · Published to GitHub: 9/50
 
 Phase values: `—` not started · `In progress` · `Done` · `N/A` (not needed) · `Blocked`.
 GitHub publication is tracked separately from local completion.
@@ -25,7 +25,7 @@ GitHub publication is tracked separately from local completion.
 
 | Project | Name | Planning | Frontend | Backend | Database | Testing | Docs | GitHub | Status |
 |---|---|---|---|---|---|---|---|---|---|
-| [Project 09](PROJECT_09/) | Business Strategy Planner | — | — | — | — | — | — | — | **Pending** |
+| [Project 09](PROJECT_09/) | Business Strategy Planner | Done | Done | Done | Done | Done | Done | Done | **Completed** |
 | [Project 10](PROJECT_10/) | Business Operations Hub | — | — | — | — | — | — | — | **Pending** |
 | [Project 11](PROJECT_11/) | Customer Feedback Analyzer | — | — | — | — | — | — | — | **Pending** |
 | [Project 12](PROJECT_12/) | Competitor Research Dashboard | — | — | — | — | — | — | — | **Pending** |

@@ -777,6 +777,18 @@
       "github": "Done",
       "stack": "FastAPI · Jinja2 + HTMX · SQLite · Claude API",
       "notes": "Loom v1.0: 181 backend tests; explainable lexical search with query understanding and filters, highlighted snippets, tag-first topic clusters, extractive Ask with citations, markdown/text/HTML uploads, collections, tags, export plus an idempotent import (14 items round-tripped, second run skipped all 14) and browser checks at desktop, dark and phone widths. Claude answer rewrite validated with a fake transport only (no key). No crawler or page fetching by design."
+    },
+    "9": {
+      "status": "Completed",
+      "planning": "Done",
+      "frontend": "Done",
+      "backend": "Done",
+      "database": "Done",
+      "testing": "Done",
+      "docs": "Done",
+      "github": "Done",
+      "stack": "FastAPI · Jinja2 + HTMX · SQLite · Claude API",
+      "notes": "Keystone v1.0: 332 backend tests; nine-block canvas, impact-weighted SWOT, costed revenue model with confidence weighting and three volume scenarios, now/next/later plan with derived overdue, KPI pace against elapsed time with sparklines, a grounded one-page brief with an optional Claude rewrite, export plus an idempotent importer, and browser checks at desktop, dark and phone widths. Claude rewrite validated with a fake transport only (no key). No market feed, crawler or currency conversion by design."
     }
   }
 }

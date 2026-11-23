@@ -64,6 +64,14 @@
         "PROJECT_08/backend/scripts/preview.py"
       ],
       "port": 8008
+    },
+    {
+      "name": "project-09-keystone",
+      "runtimeExecutable": "PROJECT_09/backend/.venv/Scripts/python.exe",
+      "runtimeArgs": [
+        "PROJECT_09/backend/scripts/preview.py"
+      ],
+      "port": 8009
     }
   ]
 }

@@ -116,11 +116,12 @@ Generated from `projects.json`; descriptions and features come from the source P
 ### 09. Business Strategy Planner
 
 - **Folder:** [`PROJECT_09/`](PROJECT_09/)
-- **Status:** Pending
+- **Status:** Completed
 - **What it does:** Shapes a business idea into a market, positioning, revenue model and execution plan.
 - **Core features:** Business canvas, SWOT, Milestones, KPI plan
-- **Tech stack:** Chosen when the project starts
+- **Tech stack:** FastAPI · Jinja2 + HTMX · SQLite · Claude API
 - **Reserved local ports:** backend `8009`, frontend `5109`
+- **Notes:** Keystone v1.0: 332 backend tests; nine-block canvas, impact-weighted SWOT, costed revenue model with confidence weighting and three volume scenarios, now/next/later plan with derived overdue, KPI pace against elapsed time with sparklines, a grounded one-page brief with an optional Claude rewrite, export plus an idempotent importer, and browser checks at desktop, dark and phone widths. Claude rewrite validated with a fake transport only (no key). No market feed, crawler or currency conversion by design.
 
 > Original brief: Business idea ko market, positioning, revenue model aur execution plan mein shape karta hai.
 
