@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Competitor Research Dashboard{% endblock %}
+
+{% block content %}
+<div class="competitor-container">
+  <h1>Competitor Research Dashboard</h1>
+  
+  <section class="add-competitor">
+    <h2>Add Competitor</h2>
+    <form method="post" action="/competitor/add" class="competitor-form">
+      <div class="form-group">
+        <input type="text" name="name" placeholder="Competitor name" required>
+        <input type="text" name="website" placeholder="Website (optional)">
+        <textarea name="positioning" rows="3" placeholder="Positioning statement (optional)"></textarea>
+      </div>
+      <button type="submit" class="btn-primary">Add Competitor</button>
+    </form>
+  </section>
+  
+  {% if competitor_count > 0 %}
+  <section class="competitor-list">
+    <h2>Competitors ({% if competitor_count %}{{ competitor_count }}{% else %}0{% endif %})</h2>
+    <table class="competitor-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Positioning</th>
+          <th>Comparisons</th>
+          <th>Opportunities</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for competitor in competitors %}
+        <tr>
+          <td class="name-cell">{{ competitor.name }}</td>
+          <td class="positioning-cell">{{ competitor.positioning or '—' }}</td>
+          <td class="comparisons-cell">{{ competitor.comparisons|length }}</td>
+          <td class="opportunities-cell">{{ competitor.opportunities|length }}</td>
+          <td class="actions-cell">
+            <a href="#" class="action-link">View</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+  {% else %}
+  <section class="no-competitors">
+    <p>No competitors added yet. Add your first competitor above.</p>
+  </section>
+  {% endif %}
+  
+  <section class="opportunity-list">
+    <h2>Opportunity Notes ({% if opportunities|length %}{{ opportunities|length }}{% else %}0{% endif %})</h2>
+    <ul class="opportunity-list-items">
+      {% for opp in opportunities %}
+      <li class="opportunity-item">
+        <strong>{{ opp.title }}</strong>: {{ opp.description or '—' }}
+        <a href="#" class="delete-link">delete</a>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Competitor Research Dashboard{% endblock %} · Competitor</title>
+  <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="/static/competitor.css?v={{ version }}">
+  <script src="/static/htmx.min.js" defer></script>
+  <script src="/static/competitor.js?v={{ version }}" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="masthead">
+    <div class="masthead-inner">
+      <a class="brand" href="/competitor">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+          <path d="M4 6h24v2H4V6zm12 4h8v10h-8V10zm0 8h8v4h-8v-4zm0 4h8v2h-8v-2zm8-4h4v14h-4V12z"/>
+        </svg>
+        Competitor Dashboard
+      </a>
+    </div>
+  </header>
+
+  <main id="main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <small>Built by Swayam</small>
+  </footer>
+</body>
+</html>

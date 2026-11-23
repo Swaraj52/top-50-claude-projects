@@ -1,0 +1,268 @@
+/* Competitor Research Dashboard - Design System */
+
+/* Colors: Teal accent, clean background, professional styling */
+
+/:root {
+  --bg-light: #f0fdf4;
+  --bg-dark: #0f172a;
+  --accent: #14b8a6;
+  --accent-hover: #0d9488;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --card-bg: #ffffff;
+}
+
+/* Reset */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg-light);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+/* Masthead */
+.masthead {
+  background: var(--bg-dark);
+  border-bottom: 1px solid #334155;
+  padding: 1rem 2rem;
+}
+
+.masthead-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: var(--bg-light);
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+.brand-mark {
+  width: 20px;
+  height: 20px;
+}
+
+/* Main content */
+.competitor-container {
+  max-width: 1400px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+/* Add Competitor form */
+.add-competitor {
+  background: var(--card-bg);
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.add-competitor h2 {
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.competitor-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.competitor-form input,
+.competitor-form textarea {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 2px solid #cbd5e1;
+  border-radius: 6px;
+  background: white;
+  color: var(--text-primary);
+  resize: vertical;
+  min-height: 40px;
+}
+
+.competitor-form input:focus,
+.competitor-form textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+}
+
+.competitor-form .btn-primary {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+  width: 100%;
+}
+
+.competitor-form .btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.competitor-form .btn-primary:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+/* Competitor list */
+.competitor-list {
+  background: var(--card-bg);
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.competitor-list h2 {
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.competitor-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.competitor-table th {
+  background: #f1f5f9;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.competitor-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.competitor-table tr:hover {
+  background: #f8f9fa;
+}
+
+.name-cell {
+  font-weight: 500;
+}
+
+.positioning-cell {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.comparisons-cell,
+.opportunities-cell {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.actions-cell {
+  text-align: right;
+}
+
+.action-link {
+  color: var(--accent);
+  text-decoration: underline;
+  font-size: 0.875rem;
+}
+
+/* No competitors state */
+.no-competitors {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-secondary);
+}
+
+.no-competitors p {
+  margin: 1rem 0;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Opportunity notes */
+.opportunity-list {
+  background: var(--card-bg);
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.opportunity-list h2 {
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.opportunity-list-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.opportunity-item {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.opportunity-item:last-child {
+  border-bottom: none;
+}
+
+.opportunity-item strong {
+  color: var(--text-primary);
+}
+
+.delete-link {
+  color: var(--error);
+  font-size: 0.875rem;
+  text-decoration: underline;
+  margin-left: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .masthead-inner {
+    padding: 0 1rem;
+  }
+  
+  .competitor-container {
+    margin: 1rem;
+  }
+  
+  .competitor-form .btn-primary {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .competitor-table,
+  .competitor-table th,
+  .competitor-table td {
+    min-width: 120px;
+  }
+  
+  .opportunity-list,
+  .add-competitor {
+    padding: 1rem;
+  }
+}
