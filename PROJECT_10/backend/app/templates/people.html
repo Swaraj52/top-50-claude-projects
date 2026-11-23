@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}People{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">The team list</p>
+    <h1>Who can own a process</h1>
+    <p class="lede">
+      A name here can own a process and run a checklist. Email is optional and only ever stored
+      locally; nothing is sent to it.
+    </p>
+  </div>
+  <div class="head-actions"><a class="btn btn-primary" href="/people/new">Add a person</a></div>
+</header>
+
+{% if people %}
+<div class="split split-wide">
+  <section class="panel panel-flush" aria-label="People">
+    <table class="table">
+      <thead><tr><th>Person</th><th>Role</th><th class="num">Active SOPs</th><th class="num">Reviews due</th><th>State</th><th></th></tr></thead>
+      <tbody>
+        {% for row in cover.rows %}
+        <tr class="{{ 'is-muted' if not row.person.active else '' }}">
+          <td>
+            <span class="person">
+              <span class="avatar avatar-sm">{{ row.person.name|initial }}</span>
+              <span>
+                <a class="row-title" href="/people/{{ row.person.id }}/edit">{{ row.person.name }}</a>
+                {% if row.person.email %}<span class="row-sub">{{ row.person.email }}</span>{% endif %}
+              </span>
+            </span>
+          </td>
+          <td>{{ row.person.role or '—' }}</td>
+          <td class="num mono">{{ row.active }}</td>
+          <td class="num mono">{{ row.due }}</td>
+          <td>{% if row.person.active %}<span class="flag flag-current">Active</span>{% else %}<span class="flag flag-inactive">Inactive</span>{% endif %}</td>
+          <td class="num">
+            <form method="post" action="/people/{{ row.person.id }}/toggle">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <button class="linkish" type="submit">{{ 'Deactivate' if row.person.active else 'Reactivate' }}</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <aside class="panel" aria-labelledby="coverage">
+    <div class="panel-head"><h2 id="coverage">Coverage</h2></div>
+    <dl class="fact-list">
+      <div><dt>People</dt><dd>{{ cover.people }} ({{ cover.active_people }} active)</dd></div>
+      <div><dt>Active SOPs</dt><dd>{{ cover.active_sops }}</dd></div>
+      <div><dt>With an owner</dt><dd>{{ cover.owned_active }}</dd></div>
+      <div><dt>Unowned</dt><dd>{{ cover.unowned_count }}</dd></div>
+      <div><dt>Coverage</dt><dd>{{ cover.coverage_percent if cover.coverage_percent is not none else '—' }}{% if cover.coverage_percent is not none %}%{% endif %}</dd></div>
+    </dl>
+    {% if cover.unowned %}
+    <h3 class="subhead">Nobody holds these</h3>
+    <ul class="plain-list">
+      {% for sop in cover.unowned %}
+      <li><a href="/sops/{{ sop.id }}" class="mono">{{ sop.code }}</a> {{ sop.title }}</li>
+      {% endfor %}
+    </ul>
+    <p><a class="btn btn-ghost btn-sm" href="/ownership">Open the ownership matrix</a></p>
+    {% else %}
+    <p class="muted">Every active process has an owner.</p>
+    {% endif %}
+  </aside>
+</div>
+{% else %}
+<div class="empty empty-large">
+  <p class="empty-title">No people yet</p>
+  <p>Add the people who do the work. You can write SOPs first, but nothing can be activated until an owner exists.</p>
+  <p><a class="btn btn-primary" href="/people/new">Add the first person</a></p>
+</div>
+{% endif %}
+{% endblock %}

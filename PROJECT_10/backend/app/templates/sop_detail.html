@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+{% block title %}{{ sop.code }} · {{ sop.title }}{% endblock %}
+{% block content %}
+<header class="page-head page-head-sop">
+  <div>
+    <p class="eyebrow">
+      <a href="/sops">{{ sop.area|area }}</a> · {{ sop.code }}
+      <span class="flag flag-{{ sop.status }}">{{ sop.status|sstatus }}</span>
+      <span class="flag flag-{{ review.key }}">{{ review.label }}</span>
+    </p>
+    <h1>{{ sop.title }}</h1>
+    <p class="lede">
+      Owner: {% if sop.owner %}{{ sop.owner.name }}{% if sop.owner.role %} ({{ sop.owner.role }}){% endif %}{% else %}<span class="flag flag-unowned">Unowned</span>{% endif %}
+      · {{ sop.cadence|cadence }}
+      · Reviewed {{ sop.last_reviewed_on|datefmt if sop.last_reviewed_on else 'never' }}
+      · Next review {{ review.next_on|datefmt }}
+      · v{{ sop.version }}
+    </p>
+  </div>
+  <div class="head-actions">
+    <a class="btn btn-ghost" href="/sops/{{ sop.id }}/edit">Edit header</a>
+    <a class="btn btn-ghost" href="/sops">Library</a>
+  </div>
+</header>
+
+{% if created %}<div class="alert alert-good" role="status">The draft is saved. Add the steps, then activate it.</div>{% endif %}
+{% if saved %}<div class="alert alert-good" role="status">The header is updated.</div>{% endif %}
+{% if reviewed %}<div class="alert alert-good" role="status">Marked as reviewed today. The next review window starts from {{ review.next_on|datefmt }}.</div>{% endif %}
+
+<section class="status-bar" aria-label="Process actions">
+  <div class="status-copy">
+    {% if sop.status == 'active' %}
+      <p><strong>In force.</strong> This process can be run as a checklist.</p>
+    {% elif sop.status == 'draft' %}
+      <p><strong>Draft.</strong> {% if ready %}It meets the activation rules.{% else %}{{ problems|join(' ') }}{% endif %}</p>
+    {% else %}
+      <p><strong>Retired.</strong> Kept for history; it cannot be started.</p>
+    {% endif %}
+  </div>
+  <div class="status-actions">
+    {% if sop.status != 'active' %}
+    <form method="post" action="/sops/{{ sop.id }}/status">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="action" value="activate">
+      <button class="btn btn-primary btn-sm" type="submit">Activate</button>
+    </form>
+    {% endif %}
+    {% if sop.status == 'active' %}
+    <form method="post" action="/sops/{{ sop.id }}/status">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="action" value="retire">
+      <button class="btn btn-ghost btn-sm" type="submit">Retire</button>
+    </form>
+    {% endif %}
+    {% if sop.status == 'retired' %}
+    <form method="post" action="/sops/{{ sop.id }}/status">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="action" value="draft">
+      <button class="btn btn-ghost btn-sm" type="submit">Reopen as draft</button>
+    </form>
+    {% endif %}
+    <form method="post" action="/sops/{{ sop.id }}/review">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button class="btn btn-ghost btn-sm" type="submit">Mark reviewed today</button>
+    </form>
+  </div>
+</section>
+
+{% if problems and sop.status == 'draft' %}
+<div class="note">
+  <p><strong>Before activation:</strong></p>
+  <ul>{% for problem in problems %}<li>{{ problem }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+<div class="split split-wide">
+  <section class="panel" aria-labelledby="purpose">
+    <div class="panel-head"><h2 id="purpose">Purpose and scope</h2></div>
+    {% if sop.purpose %}
+    <p class="prose">{{ sop.purpose }}</p>
+    {% else %}
+    <p class="muted">No purpose written yet. A purpose of at least 20 characters is needed to activate.</p>
+    {% endif %}
+    {% if sop.scope %}
+    <h3 class="subhead">Scope</h3>
+    <p class="prose">{{ sop.scope }}</p>
+    {% endif %}
+    <dl class="fact-list">
+      <div><dt>Area</dt><dd>{{ sop.area|area }}</dd></div>
+      <div><dt>Cadence</dt><dd>{{ sop.cadence|cadence }}</dd></div>
+      <div><dt>Review</dt><dd>{{ sop.review_months|review }}</dd></div>
+      <div><dt>Steps</dt><dd>{{ steps.count }}{% if steps.minutes %} · {{ steps.minutes }} min{% endif %}</dd></div>
+      <div><dt>Roles</dt><dd>{{ steps.roles|join(', ') if steps.roles else '—' }}</dd></div>
+      <div><dt>Last reviewed</dt><dd>{{ sop.last_reviewed_on|datefmt if sop.last_reviewed_on else 'Never' }}</dd></div>
+    </dl>
+  </section>
+
+  <aside class="panel" aria-labelledby="start">
+    <div class="panel-head"><h2 id="start">Start a checklist</h2></div>
+    {% if sop.status == 'active' and steps.count %}
+    <p class="muted">The checklist copies the current steps. Later edits to the SOP do not change a run already in progress.</p>
+    <form method="post" action="/sops/{{ sop.id }}/runs" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label for="run_owner">Who runs it</label>
+      <select id="run_owner" name="owner_id">
+        <option value="">Use the SOP owner{% if not sop.owner %} (none){% endif %}</option>
+        {% for person in people %}
+        <option value="{{ person.id }}">{{ person.name }}{% if person.role %} · {{ person.role }}{% endif %}</option>
+        {% endfor %}
+      </select>
+      <label for="due_on">Due date</label>
+      <input id="due_on" type="date" name="due_on">
+      <p class="hint">Leave blank to use the cadence: daily, weekly, monthly or quarterly. Ad hoc gets no date.</p>
+      <button class="btn btn-primary" type="submit">Start the run</button>
+    </form>
+    {% elif sop.status != 'active' %}
+    <p class="muted">Only an active process can be run. Activate it once it has a purpose, an owner and at least one step.</p>
+    {% else %}
+    <p class="muted">This process has no steps, so there is nothing to run. Add the first step below.</p>
+    {% endif %}
+  </aside>
+</div>
+
+<section class="panel" aria-labelledby="steps" id="steps">
+  <div class="panel-head">
+    <h2 id="steps">Steps</h2>
+    <span class="tag">{{ steps.count }} of 40</span>
+  </div>
+
+  {% if steps.steps %}
+  <ol class="steps">
+    {% for step in steps.steps %}
+    <li class="step" id="step-{{ step.id }}">
+      <div class="step-num mono">{{ step.position }}</div>
+      <div class="step-body">
+        <p class="step-title">{{ step.title }}</p>
+        {% if step.detail %}<p class="step-detail">{{ step.detail }}</p>{% endif %}
+        <p class="step-meta">
+          {% if step.role %}<span class="chip">{{ step.role }}</span>{% endif %}
+          {% if step.minutes %}<span class="chip">{{ step.minutes }} min</span>{% endif %}
+        </p>
+      </div>
+      <div class="step-actions">
+        <form method="post" action="/steps/{{ step.id }}/move">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <input type="hidden" name="direction" value="up">
+          <button class="icon-btn" type="submit" title="Move up" {{ 'disabled' if loop.first else '' }}>↑</button>
+        </form>
+        <form method="post" action="/steps/{{ step.id }}/move">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <input type="hidden" name="direction" value="down">
+          <button class="icon-btn" type="submit" title="Move down" {{ 'disabled' if loop.last else '' }}>↓</button>
+        </form>
+        <form method="post" action="/steps/{{ step.id }}/delete" data-confirm="Delete step {{ step.position }}?">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="icon-btn icon-danger" type="submit" title="Delete step">×</button>
+        </form>
+      </div>
+      <details class="step-edit">
+        <summary>Edit step {{ step.position }}</summary>
+        <form method="post" action="/steps/{{ step.id }}/edit" class="stack">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <label for="step_title_{{ step.id }}">Title</label>
+          <input id="step_title_{{ step.id }}" name="title" value="{{ step.title }}" maxlength="160" required>
+          <label for="step_detail_{{ step.id }}">Detail</label>
+          <textarea id="step_detail_{{ step.id }}" name="detail" rows="3" maxlength="600">{{ step.detail }}</textarea>
+          <div class="field-grid">
+            <div class="field">
+              <label for="step_role_{{ step.id }}">Role</label>
+              <input id="step_role_{{ step.id }}" name="role" value="{{ step.role }}" maxlength="80" placeholder="Operator">
+            </div>
+            <div class="field">
+              <label for="step_minutes_{{ step.id }}">Minutes</label>
+              <input id="step_minutes_{{ step.id }}" name="minutes" value="{{ step.minutes }}" type="number" min="0" max="1440">
+            </div>
+          </div>
+          <div class="form-actions"><button class="btn btn-primary btn-sm" type="submit">Save step</button></div>
+        </form>
+      </details>
+    </li>
+    {% endfor %}
+  </ol>
+  {% else %}
+  <div class="empty">
+    <p class="empty-title">No steps yet</p>
+    <p>A process without steps cannot be handed over or run. Start with the first thing that happens.</p>
+  </div>
+  {% endif %}
+
+  {% if steps.count < 40 %}
+  <form method="post" action="/sops/{{ sop.id }}/steps" class="add-step">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <h3 class="subhead">Add a step</h3>
+    <div class="field-grid">
+      <div class="field field-grow">
+        <label for="new_title">What happens</label>
+        <input id="new_title" name="title" maxlength="160" required placeholder="Reconcile the bank lines">
+      </div>
+      <div class="field field-narrow">
+        <label for="new_role">Role</label>
+        <input id="new_role" name="role" maxlength="80" placeholder="Operator">
+      </div>
+      <div class="field field-narrow">
+        <label for="new_minutes">Minutes</label>
+        <input id="new_minutes" name="minutes" type="number" min="0" max="1440" value="0">
+      </div>
+    </div>
+    <div class="field">
+      <label for="new_detail">Detail</label>
+      <textarea id="new_detail" name="detail" rows="2" maxlength="600" placeholder="How to do it, and what to check before moving on."></textarea>
+    </div>
+    <div class="form-actions"><button class="btn btn-primary" type="submit">Add the step</button></div>
+  </form>
+  {% else %}
+  <p class="muted">This process has reached the 40-step limit.</p>
+  {% endif %}
+</section>
+
+<div class="split">
+  <section class="panel" aria-labelledby="history">
+    <div class="panel-head">
+      <h2 id="history">Checklist history</h2>
+      <a class="small-link" href="/runs?status=open">All open runs</a>
+    </div>
+    {% if runs %}
+    <table class="table">
+      <thead><tr><th>Started</th><th>Who</th><th>Status</th><th>Due</th></tr></thead>
+      <tbody>
+        {% for run in runs %}
+        <tr>
+          <td><a href="/runs/{{ run.id }}">{{ run.started_on|datefmt }}</a></td>
+          <td>{{ run.owner.name if run.owner else '—' }}</td>
+          <td><span class="flag flag-{{ run.status }}">{{ run.status|rstatus }}</span></td>
+          <td>{{ run.due_on|datefmt if run.due_on else '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty">
+      <p class="empty-title">Never run</p>
+      <p>Starting a checklist records who ran it and when, without changing the SOP.</p>
+    </div>
+    {% endif %}
+  </section>
+
+  <aside class="panel panel-danger" aria-labelledby="danger">
+    <div class="panel-head"><h2 id="danger">Delete this process</h2></div>
+    <p class="muted">Deleting removes the steps and every checklist run made from them. There is no undo.</p>
+    <form method="post" action="/sops/{{ sop.id }}/delete" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label for="confirm">Type <code>{{ sop.code }}</code> to confirm</label>
+      <input id="confirm" name="confirm" autocomplete="off" required>
+      <button class="btn btn-danger" type="submit">Delete permanently</button>
+    </form>
+  </aside>
+</div>
+{% endblock %}

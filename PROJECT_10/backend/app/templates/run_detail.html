@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Checklist · {{ sop.code }}{% endblock %}
+{% block content %}
+{% if completed_flag %}
+<div class="alert alert-good" role="status">Checklist closed. Every step is ticked and the record is kept.</div>
+{% endif %}
+
+<header class="page-head">
+  <div>
+    <p class="eyebrow">
+      <a href="/sops/{{ sop.id }}">{{ sop.code }}</a> · Checklist
+      <span class="flag flag-{{ run.status }}">{{ run.status|rstatus }}</span>
+      <span class="flag flag-{{ due.key }}">{{ due.label }}</span>
+    </p>
+    <h1>{{ sop.title }}</h1>
+    <p class="lede">
+      Run by {% if run.owner %}{{ run.owner.name }}{% else %}nobody named{% endif %}
+      · started {{ run.started_on|datefmt }}
+      · due {{ run.due_on|datefmt if run.due_on else 'no date' }}
+    </p>
+  </div>
+  <div class="head-actions">
+    <a class="btn btn-ghost" href="/sops/{{ sop.id }}">The SOP</a>
+    <a class="btn btn-ghost" href="/runs">All checklists</a>
+  </div>
+</header>
+
+<div id="checklist">
+  {% include "_checklist.html" %}
+</div>
+
+<div class="split">
+  <section class="panel" aria-labelledby="run-notes">
+    <div class="panel-head"><h2 id="run-notes">Run notes</h2></div>
+    {% if run.status == 'open' %}
+    <form method="post" action="/runs/{{ run.id }}/edit" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div class="field-grid">
+        <div class="field">
+          <label for="run_owner">Who is running it</label>
+          <select id="run_owner" name="owner_id">
+            <option value="">Nobody named</option>
+            {% for person in people %}
+            <option value="{{ person.id }}" {{ 'selected' if run.owner_id == person.id else '' }}>{{ person.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label for="run_due">Due date</label>
+          <input id="run_due" type="date" name="due_on" value="{{ run.due_on.isoformat() if run.due_on else '' }}">
+        </div>
+      </div>
+      <div class="field">
+        <label for="run_notes_field">Notes</label>
+        <textarea id="run_notes_field" name="notes" rows="3" maxlength="1500" placeholder="What happened, what was odd, what to change next time.">{{ run.notes }}</textarea>
+      </div>
+      <div class="form-actions"><button class="btn btn-ghost" type="submit">Save the run details</button></div>
+    </form>
+    {% elif run.notes %}
+    <p class="prose">{{ run.notes }}</p>
+    {% else %}
+    <p class="muted">No notes were left on this run.</p>
+    {% endif %}
+  </section>
+
+  <aside class="panel {% if run.status == 'open' %}panel-danger{% else %}panel-quiet{% endif %}" aria-labelledby="close">
+    <div class="panel-head"><h2 id="close">{{ 'Close the checklist' if run.status == 'open' else 'Closed' }}</h2></div>
+    {% if run.status == 'open' %}
+    <p class="muted">Completing needs every step ticked. Abandoning keeps the record and says the run stopped early.</p>
+    <form method="post" action="/runs/{{ run.id }}/complete" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button class="btn btn-primary" type="submit" {{ 'disabled' if not progress.complete else '' }}>
+        {{ 'Complete the run' if not progress.complete else 'Complete · all steps done' }}
+      </button>
+      {% if not progress.complete %}<p class="hint">{{ progress.open }} step{{ '' if progress.open == 1 else 's' }} still open.</p>{% endif %}
+    </form>
+    <form method="post" action="/runs/{{ run.id }}/abandon" class="stack" data-confirm="Abandon this checklist? The record stays.">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input type="hidden" name="confirm" value="abandon">
+      <button class="btn btn-danger" type="submit">Abandon the run</button>
+    </form>
+    {% else %}
+    <p class="muted">Closed {{ run.completed_at|dt(tz, 'stamp') if run.completed_at else 'earlier' }}. Every tick and note is kept for the record.</p>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

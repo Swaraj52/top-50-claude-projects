@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Draft an SOP{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">Draft from a description</p>
+    <h1>Describe the process; start from an outline</h1>
+    <p class="lede">
+      Write what happens and why, in your own words. Foundry proposes an ordered outline you can
+      edit before saving. Without an API key the outline is local and labelled as a starter.
+    </p>
+  </div>
+  <div class="head-actions"><a class="btn btn-ghost" href="/sops">Library</a></div>
+</header>
+
+{% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+
+<div class="split split-wide">
+  <section class="panel">
+    <form method="post" action="/sops/draft" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div class="field">
+        <label for="area">Area</label>
+        <select id="area" name="area">
+          {% for key, label in AREAS %}
+          <option value="{{ key }}" {{ 'selected' if area == key else '' }}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label for="description">The process in your own words</label>
+        <textarea id="description" name="description" rows="9" maxlength="2000" required
+                  placeholder="Every month we collect the invoices, match them against the bank statement, chase anything that does not line up, then send the summary to the owner.">{{ description }}</textarea>
+        <p class="hint">At least 20 characters. Name the trigger, the order of work and where it stops.</p>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Draft the outline</button>
+        <a class="btn btn-ghost" href="/sops/new">Write it by hand instead</a>
+      </div>
+    </form>
+  </section>
+
+  <aside class="panel panel-quiet">
+    <div class="panel-head"><h2>What happens next</h2></div>
+    <ol class="plain-list">
+      <li>A local starter outline is built from your description and the area you chose.</li>
+      <li>{% if ai_enabled %}With Claude enabled, the same description is sent for a rewrite and validated.{% else %}With no API key, the local outline is what you get: labelled, editable and never invented beyond your words.{% endif %}</li>
+      <li>You edit the title, purpose and every step.</li>
+      <li>Nothing is saved until you accept the draft. Accepting creates a <strong>draft</strong> SOP, not an active one.</li>
+    </ol>
+    <p class="fine">{% if ai_enabled %}AI is on. The description you type is sent to the model; nothing else is.{% else %}No API key is configured. Nothing leaves this machine.{% endif %}</p>
+  </aside>
+</div>
+{% endblock %}

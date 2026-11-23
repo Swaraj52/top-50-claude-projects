@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Review the draft{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">Draft outline · {{ 'Claude' if source == 'claude' else 'Local starter' }}</p>
+    <h1>Edit it before you keep it</h1>
+    <p class="lede">
+      This is a proposal built from your description. Every field below is editable, and nothing is
+      saved until you accept it. Accepting creates a draft SOP with these steps.
+    </p>
+  </div>
+  <div class="head-actions"><a class="btn btn-ghost" href="/sops/draft?area={{ area }}">Try another description</a></div>
+</header>
+
+{% if note %}<div class="alert alert-warn" role="status">{{ note }}</div>{% endif %}
+<div class="note">
+  <p><strong>Source of this outline: {{ 'Claude' if source == 'claude' else 'the local starter' }}.</strong>
+  {% if source == 'local' %}No model was called; the steps come from your description and the area template.{% endif %}
+  Read each step as a suggestion, not as policy you have approved.</p>
+</div>
+
+<form method="post" action="/sops/draft/accept" class="panel form-panel">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <input type="hidden" name="description" value="{{ description }}">
+
+  <div class="field-grid">
+    <div class="field field-narrow">
+      <label for="code">Code</label>
+      <input id="code" name="code" value="{{ code }}" maxlength="20" required pattern="[A-Za-z0-9-]{3,20}">
+    </div>
+    <div class="field field-grow">
+      <label for="title">Title</label>
+      <input id="title" name="title" value="{{ proposal.title }}" maxlength="160" required>
+    </div>
+  </div>
+
+  <div class="field-grid">
+    <div class="field">
+      <label for="area">Area</label>
+      <select id="area" name="area">
+        {% for key, label in AREAS %}
+        <option value="{{ key }}" {{ 'selected' if area == key else '' }}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label for="owner_id">Owner</label>
+      <select id="owner_id" name="owner_id">
+        <option value="">Nobody yet</option>
+        {% for person in people %}
+        <option value="{{ person.id }}">{{ person.name }}{% if person.role %} · {{ person.role }}{% endif %}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label for="cadence">Cadence</label>
+      <select id="cadence" name="cadence">
+        {% for key, label in CADENCE_OPTIONS %}
+        <option value="{{ key }}" {{ 'selected' if key == 'monthly' else '' }}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label for="review_months">Review</label>
+      <select id="review_months" name="review_months">
+        {% for months, label in REVIEW_OPTIONS %}
+        <option value="{{ months }}" {{ 'selected' if months == 6 else '' }}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="purpose">Purpose</label>
+    <textarea id="purpose" name="purpose" rows="4" maxlength="1500" required>{{ proposal.purpose }}</textarea>
+  </div>
+  <div class="field">
+    <label for="scope">Scope</label>
+    <textarea id="scope" name="scope" rows="3" maxlength="800">{{ proposal.scope }}</textarea>
+  </div>
+
+  <h3 class="subhead">Proposed steps</h3>
+  <ol class="draft-steps">
+    {% for step in proposal.steps %}
+    <li>
+      <span class="step-num mono">{{ loop.index }}</span>
+      <div class="draft-step-body">
+        <label class="sr-only" for="step_title_{{ loop.index }}">Step {{ loop.index }} title</label>
+        <input id="step_title_{{ loop.index }}" name="step_title" value="{{ step.title }}" maxlength="160" required>
+        <label class="sr-only" for="step_detail_{{ loop.index }}">Step {{ loop.index }} detail</label>
+        <textarea id="step_detail_{{ loop.index }}" name="step_detail" rows="2" maxlength="600" placeholder="Detail (optional)">{{ step.detail }}</textarea>
+        <label class="sr-only" for="step_role_{{ loop.index }}">Step {{ loop.index }} role</label>
+        <input id="step_role_{{ loop.index }}" name="step_role" value="{{ step.role }}" maxlength="80" placeholder="Role">
+      </div>
+    </li>
+    {% endfor %}
+  </ol>
+
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit">Accept as a draft SOP</button>
+    <a class="btn btn-ghost" href="/sops">Discard</a>
+  </div>
+</form>
+{% endblock %}

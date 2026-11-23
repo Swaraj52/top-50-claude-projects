@@ -1,0 +1,63 @@
+<section class="panel checklist" aria-labelledby="checklist-head">
+  <div class="panel-head">
+    <h2 id="checklist-head">Steps</h2>
+    <span class="tag">{{ progress.done }} of {{ progress.total }} done</span>
+  </div>
+
+  <div class="progress-head">
+    <div class="meter meter-lg" role="img" aria-label="{{ progress.percent }}% complete">
+      <span style="width: {{ progress.percent }}%"></span>
+    </div>
+    <p class="progress-copy">
+      <strong>{{ progress.percent }}%</strong>
+      {% if progress.complete %}All steps are ticked.{% else %}{{ progress.open }} step{{ '' if progress.open == 1 else 's' }} left.{% endif %}
+    </p>
+  </div>
+
+  {% if items %}
+  <ol class="checklist-items">
+    {% for item in items %}
+    <li class="check-item {{ 'is-done' if item.done else '' }}" id="item-{{ item.id }}">
+      <form method="post" action="/runs/{{ run.id }}/items/{{ item.id }}/toggle"
+            class="check-form" hx-post="/runs/{{ run.id }}/items/{{ item.id }}/toggle"
+            hx-target="#checklist" hx-swap="outerHTML">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="check-toggle" type="submit"
+                aria-pressed="{{ 'true' if item.done else 'false' }}"
+                title="{{ 'Mark not done' if item.done else 'Mark done' }}"
+                {{ 'disabled' if run.status != 'open' else '' }}>
+          <span class="check-box" aria-hidden="true">{{ '✓' if item.done else '' }}</span>
+          <span class="sr-only">{{ 'Mark not done' if item.done else 'Mark done' }}: {{ item.title }}</span>
+        </button>
+        <div class="check-body">
+          <p class="check-title"><span class="mono check-num">{{ item.position }}</span> {{ item.title }}</p>
+          {% if item.detail %}<p class="check-detail">{{ item.detail }}</p>{% endif %}
+          <p class="check-meta">
+            {% if item.role %}<span class="chip">{{ item.role }}</span>{% endif %}
+            {% if item.done and item.done_at %}<span class="check-when">ticked {{ item.done_at|dt(tz, 'stamp') }}</span>{% endif %}
+            {% if item.note %}<span class="check-note">“{{ item.note }}”</span>{% endif %}
+          </p>
+        </div>
+      </form>
+      {% if run.status == 'open' %}
+      <details class="check-note-form">
+        <summary>Note</summary>
+        <form method="post" action="/runs/{{ run.id }}/items/{{ item.id }}/note" class="stack">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <label class="sr-only" for="note_{{ item.id }}">Note for step {{ item.position }}</label>
+          <input id="note_{{ item.id }}" name="note" value="{{ item.note }}" maxlength="300"
+                 placeholder="What you found at this step">
+          <button class="btn btn-ghost btn-sm" type="submit">Save note</button>
+        </form>
+      </details>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+  {% else %}
+  <div class="empty">
+    <p class="empty-title">This run has no items</p>
+    <p>The SOP had no steps when the checklist started.</p>
+  </div>
+  {% endif %}
+</section>

@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Desk{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">The desk</p>
+    <h1>Good {{ 'morning' if now.hour < 12 else 'afternoon' if now.hour < 18 else 'evening' }}, {{ user.name.split(' ')[0] }}</h1>
+    <p class="lede">What the handbook says, what is running, and who is answerable for it.</p>
+  </div>
+  <div class="head-actions">
+    <a class="btn btn-primary" href="/sops/new">Write an SOP</a>
+    <a class="btn btn-ghost" href="/sops/draft">Draft from a description</a>
+  </div>
+</header>
+
+<section class="stats" aria-label="Handbook at a glance">
+  <div class="stat">
+    <span class="stat-label">Active SOPs</span>
+    <span class="stat-value">{{ counts.active }}</span>
+    <span class="stat-note">{{ counts.total }} in the library · {{ counts.draft }} draft</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">Owned coverage</span>
+    <span class="stat-value">{{ cover.coverage_percent if cover.coverage_percent is not none else '—' }}{% if cover.coverage_percent is not none %}%{% endif %}</span>
+    <span class="stat-note">{{ cover.unowned_count }} active process{{ '' if cover.unowned_count == 1 else 'es' }} with no owner</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">Open checklists</span>
+    <span class="stat-value">{{ runs.open_count }}</span>
+    <span class="stat-note">{{ runs.overdue }} overdue · {{ runs.done }} finished</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">Reviews due</span>
+    <span class="stat-value">{{ counts.review_due }}</span>
+    <span class="stat-note">Past their review window</span>
+  </div>
+</section>
+
+<div class="split">
+  <section class="panel" aria-labelledby="moves">
+    <div class="panel-head">
+      <h2 id="moves">Next moves</h2>
+      <span class="tag">{{ attention|length }} to fix</span>
+    </div>
+    {% if attention %}
+    <ul class="moves">
+      {% for item in attention %}
+      <li class="move move-{{ item.key }}">
+        <div>
+          <p class="move-title">{{ item.title }}</p>
+          <p class="move-detail">{{ item.detail }}</p>
+        </div>
+        <a class="btn btn-sm btn-ghost" href="{{ item.href }}">{{ item.action }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty">
+      <p class="empty-title">Nothing is on fire.</p>
+      <p>Every active process has an owner, a step list and a current review. Start a checklist when the work comes round again.</p>
+    </div>
+    {% endif %}
+  </section>
+
+  <aside class="panel" aria-labelledby="open-runs">
+    <div class="panel-head">
+      <h2 id="open-runs">Running now</h2>
+      <a class="small-link" href="/runs">All checklists</a>
+    </div>
+    {% if open_runs %}
+    <ul class="run-list">
+      {% for row in open_runs %}
+      <li>
+        <a class="run-row" href="/runs/{{ row.run.id }}">
+          <span class="run-code">{{ row.run.sop.code }}</span>
+          <span class="run-body">
+            <span class="run-title">{{ row.run.sop.title }}</span>
+            <span class="run-meta">{{ row.progress.done }}/{{ row.progress.total }} steps · {{ row.due.label }}</span>
+          </span>
+          <span class="meter" aria-hidden="true"><span style="width: {{ row.progress.percent }}%"></span></span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty">
+      <p class="empty-title">No open checklists</p>
+      <p>Open an active SOP and press <strong>Start a checklist</strong> to run it.</p>
+    </div>
+    {% endif %}
+  </aside>
+</div>
+
+<div class="split">
+  <section class="panel" aria-labelledby="reviews">
+    <div class="panel-head">
+      <h2 id="reviews">Review window</h2>
+      <a class="small-link" href="/sops?attention=1">Only what needs review</a>
+    </div>
+    {% if review_due %}
+    <table class="table">
+      <thead>
+        <tr><th>Code</th><th>Process</th><th>Owner</th><th>State</th></tr>
+      </thead>
+      <tbody>
+        {% for row in review_due %}
+        <tr>
+          <td class="mono">{{ row.sop.code }}</td>
+          <td><a href="/sops/{{ row.sop.id }}">{{ row.sop.title }}</a></td>
+          <td>{{ row.sop.owner.name if row.sop.owner else '—' }}</td>
+          <td><span class="flag flag-{{ row.state.key }}">{{ row.state.label }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty">
+      <p class="empty-title">Every review is current</p>
+      <p>Nothing is inside its review window right now.</p>
+    </div>
+    {% endif %}
+  </section>
+
+  <aside class="panel" aria-labelledby="recent">
+    <div class="panel-head">
+      <h2 id="recent">Recently closed</h2>
+    </div>
+    {% if recent %}
+    <ul class="recent-list">
+      {% for run in recent %}
+      <li>
+        <a href="/runs/{{ run.id }}">
+          <span class="mono">{{ run.sop.code }}</span>
+          <span>{{ run.sop.title }}</span>
+          <span class="flag flag-{{ run.status }}">{{ run.status|rstatus }}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty">
+      <p class="empty-title">Nothing closed yet</p>
+      <p>A finished or abandoned checklist appears here.</p>
+    </div>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

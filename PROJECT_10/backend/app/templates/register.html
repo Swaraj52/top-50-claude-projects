@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Create an account{% endblock %}
+{% block mainclass %}auth-shell{% endblock %}
+{% block content %}
+<section class="auth">
+  <div class="auth-story">
+    <a class="brand brand-large" href="/">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="7" y="7" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"/>
+        <path d="M7 16h18M16 7v18" stroke="currentColor" stroke-width="1" opacity=".45"/>
+        <circle cx="16" cy="16" r="3.2" fill="currentColor"/>
+      </svg>
+      <span class="brand-text">
+        <span class="brand-name">Foundry</span>
+        <span class="brand-tag">operations handbook</span>
+      </span>
+    </a>
+    <p class="eyebrow">Start with one process</p>
+    <h1>Write it down before you need it.</h1>
+    <p class="lede">
+      A working handbook for a small team: the recurring work, the order it happens in, and the
+      person answerable for it.
+    </p>
+    <p class="fine">Your account is local to this machine. Nothing is sent anywhere unless you add an API key.</p>
+  </div>
+
+  <div class="auth-card">
+    <h2>Create an account</h2>
+    {% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+    <form method="post" action="/register" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ form_csrf }}">
+      <label for="name">Your name</label>
+      <input id="name" name="name" value="{{ values.name or '' }}" required maxlength="80" autocomplete="name" autofocus>
+      <label for="email">Email</label>
+      <input id="email" type="email" name="email" value="{{ values.email or '' }}" required autocomplete="email">
+      <label for="password">Password</label>
+      <input id="password" type="password" name="password" required minlength="8" autocomplete="new-password">
+      <p class="hint">At least 8 characters. Stored as a scrypt hash, never in plain text.</p>
+      <label for="timezone">Timezone</label>
+      <input id="timezone" name="timezone" value="Asia/Kolkata" maxlength="64" autocomplete="off">
+      <p class="hint">An IANA name such as Asia/Kolkata. Used for "today" and due dates.</p>
+      <button class="btn btn-primary btn-wide" type="submit">Create the handbook</button>
+    </form>
+    <p class="switch">Already have an account? <a href="/login">Sign in</a></p>
+  </div>
+</section>
+{% endblock %}

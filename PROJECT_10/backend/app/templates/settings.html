@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">Settings</p>
+    <h1>{{ user.name }}</h1>
+    <p class="lede">{{ user.email }} · timezone {{ user.timezone }} · everything below is stored on this machine.</p>
+  </div>
+  <div class="head-actions"><a class="btn btn-ghost" href="/">Back to the desk</a></div>
+</header>
+
+{% if saved %}<div class="alert alert-good" role="status">Saved.</div>{% endif %}
+{% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+
+<div class="split">
+  <section class="panel">
+    <div class="panel-head"><h2>Profile</h2></div>
+    <form method="post" action="/settings" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div class="field">
+        <label for="name">Name</label>
+        <input id="name" name="name" value="{{ user.name }}" maxlength="80" required>
+      </div>
+      <div class="field">
+        <label for="timezone">Timezone</label>
+        <input id="timezone" name="timezone" value="{{ user.timezone }}" maxlength="64" required>
+        <p class="hint">An IANA name such as Asia/Kolkata. It decides what "today" means for due dates and reviews.</p>
+      </div>
+      <div class="form-actions"><button class="btn btn-primary" type="submit">Save profile</button></div>
+    </form>
+  </section>
+
+  <aside class="panel">
+    <div class="panel-head"><h2>Change password</h2></div>
+    <form method="post" action="/settings/password" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div class="field">
+        <label for="current_password">Current password</label>
+        <input id="current_password" type="password" name="current_password" required autocomplete="current-password">
+      </div>
+      <div class="field">
+        <label for="new_password">New password</label>
+        <input id="new_password" type="password" name="new_password" minlength="8" required autocomplete="new-password">
+        <p class="hint">At least 8 characters. Every other session is signed out.</p>
+      </div>
+      <div class="form-actions"><button class="btn btn-ghost" type="submit">Change password</button></div>
+    </form>
+  </aside>
+</div>
+
+<section class="panel" aria-labelledby="data">
+  <div class="panel-head">
+    <h2 id="data">Your data</h2>
+    <a class="btn btn-ghost btn-sm" href="/settings/export">Download JSON export</a>
+  </div>
+  <dl class="count-grid">
+    <div><dt>People</dt><dd>{{ counts.people }}</dd></div>
+    <div><dt>SOPs</dt><dd>{{ counts.sops }}</dd></div>
+    <div><dt>Steps</dt><dd>{{ counts.steps }}</dd></div>
+    <div><dt>Checklists</dt><dd>{{ counts.runs }}</dd></div>
+    <div><dt>Checklist items</dt><dd>{{ counts.items }}</dd></div>
+  </dl>
+  <p class="muted">
+    The export is a <code>foundry-export-v1</code> JSON file: people, SOPs with their steps, and
+    every checklist run with its items. It contains no password hash, session token, CSRF token or
+    API key.
+  </p>
+</section>
+
+<section class="panel panel-danger" aria-labelledby="delete">
+  <div class="panel-head"><h2 id="delete">Delete the account</h2></div>
+  <p class="muted">
+    This removes every person, process, step and checklist immediately, and signs you out. There
+    is no undo. Download the export first if you might want the data back.
+  </p>
+  <form method="post" action="/settings/delete" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div class="field-grid">
+      <div class="field">
+        <label for="delete_password">Password</label>
+        <input id="delete_password" type="password" name="password" required autocomplete="current-password">
+      </div>
+      <div class="field">
+        <label for="delete_confirm">Type DELETE</label>
+        <input id="delete_confirm" name="confirm" required autocomplete="off" placeholder="DELETE">
+      </div>
+    </div>
+    <div class="form-actions"><button class="btn btn-danger" type="submit">Delete everything</button></div>
+  </form>
+</section>
+{% endblock %}

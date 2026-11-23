@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}{{ 'New SOP' if mode == 'new' else sop.code }}{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">{{ 'New process' if mode == 'new' else 'Edit ' ~ sop.code }}</p>
+    <h1>{{ 'Write an SOP' if mode == 'new' else 'Edit the SOP header' }}</h1>
+    <p class="lede">
+      The header says what this process is for and who answers for it. The steps come next, on the
+      detail page. A new process starts as a draft.
+    </p>
+  </div>
+  <div class="head-actions">
+    {% if mode == 'edit' %}<a class="btn btn-ghost" href="/sops/{{ sop.id }}">Back to the SOP</a>{% endif %}
+    <a class="btn btn-ghost" href="/sops">Library</a>
+  </div>
+</header>
+
+{% if errors %}
+<div class="alert alert-list" role="alert">
+  <p><strong>Fix {{ errors|length }} thing{{ '' if errors|length == 1 else 's' }} first:</strong></p>
+  <ul>{% for error in errors %}<li>{{ error }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+<form method="post" action="{{ '/sops/new' if mode == 'new' else '/sops/' ~ sop.id ~ '/edit' }}" class="panel form-panel">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+  <div class="field-grid">
+    <div class="field field-narrow">
+      <label for="code">Code</label>
+      <input id="code" name="code" value="{{ values.code }}" maxlength="20" required
+             pattern="[A-Za-z0-9-]{3,20}" placeholder="OPS-01">
+      <p class="hint">Letters, digits and dashes. This is how people refer to it out loud.</p>
+    </div>
+    <div class="field field-grow">
+      <label for="title">Title</label>
+      <input id="title" name="title" value="{{ values.title }}" maxlength="160" required
+             placeholder="Monthly bank reconciliation">
+    </div>
+  </div>
+
+  <div class="field-grid">
+    <div class="field">
+      <label for="area">Area</label>
+      <select id="area" name="area">
+        {% for key, label in AREAS %}
+        <option value="{{ key }}" {{ 'selected' if values.area == key else '' }}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label for="owner_id">Owner</label>
+      <select id="owner_id" name="owner_id">
+        <option value="">Nobody yet</option>
+        {% for person in people %}
+        <option value="{{ person.id }}" {{ 'selected' if values.owner_id|string == person.id|string else '' }}>
+          {{ person.name }}{% if person.role %} · {{ person.role }}{% endif %}
+        </option>
+        {% endfor %}
+      </select>
+      <p class="hint">An active process needs an owner before it can be activated.</p>
+    </div>
+    <div class="field">
+      <label for="cadence">Cadence</label>
+      <select id="cadence" name="cadence">
+        {% for key, label in CADENCE_OPTIONS %}
+        <option value="{{ key }}" {{ 'selected' if values.cadence == key else '' }}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label for="review_months">Review</label>
+      <select id="review_months" name="review_months">
+        {% for months, label in REVIEW_OPTIONS %}
+        <option value="{{ months }}" {{ 'selected' if values.review_months|string == months|string else '' }}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="purpose">Purpose</label>
+    <textarea id="purpose" name="purpose" rows="4" maxlength="1500"
+              placeholder="Why this process exists, and what goes wrong without it.">{{ values.purpose }}</textarea>
+    <p class="hint">At least 20 characters before it can be activated.</p>
+  </div>
+
+  <div class="field">
+    <label for="scope">Scope</label>
+    <textarea id="scope" name="scope" rows="3" maxlength="800"
+              placeholder="Where it starts, where it stops, and what it does not cover.">{{ values.scope }}</textarea>
+  </div>
+
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit">{{ 'Create the draft' if mode == 'new' else 'Save the header' }}</button>
+    <a class="btn btn-ghost" href="{{ '/sops' if mode == 'new' else '/sops/' ~ sop.id }}">Cancel</a>
+    {% if mode == 'new' %}<span class="fine">You can add steps straight after this.</span>{% endif %}
+  </div>
+</form>
+
+{% if mode == 'new' and people|length == 0 %}
+<div class="note">
+  <p><strong>No people yet.</strong> You can still write the SOP, but activation needs an owner.
+  <a href="/people/new">Add the first person</a> when you are ready.</p>
+</div>
+{% endif %}
+{% endblock %}

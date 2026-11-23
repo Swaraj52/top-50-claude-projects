@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Ownership{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">Ownership tracker</p>
+    <h1>Every active process has a name against it</h1>
+    <p class="lede">
+      The tracker is derived from the owner field on each SOP, so it cannot drift from the library.
+      An active process with no owner is a gap, not a placeholder.
+    </p>
+  </div>
+  <div class="head-actions">
+    <a class="btn btn-ghost" href="/people">People</a>
+    <a class="btn btn-primary" href="/sops?attention=1">Fix what is due</a>
+  </div>
+</header>
+
+<section class="stats" aria-label="Ownership at a glance">
+  <div class="stat">
+    <span class="stat-label">Coverage</span>
+    <span class="stat-value">{{ cover.coverage_percent if cover.coverage_percent is not none else '—' }}{% if cover.coverage_percent is not none %}%{% endif %}</span>
+    <span class="stat-note">{{ cover.owned_active }} of {{ cover.active_sops }} active SOPs</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">Unowned</span>
+    <span class="stat-value">{{ cover.unowned_count }}</span>
+    <span class="stat-note">Active processes nobody holds</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">People</span>
+    <span class="stat-value">{{ cover.active_people }}</span>
+    <span class="stat-note">{{ cover.people }} on the list</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">Reviews due</span>
+    <span class="stat-value">{{ cover.rows|sum(attribute='due') }}</span>
+    <span class="stat-note">Across every owner</span>
+  </div>
+</section>
+
+{% if cover.unowned_count %}
+<section class="panel panel-warn" aria-labelledby="gaps">
+  <div class="panel-head">
+    <h2 id="gaps">Nobody owns these</h2>
+    <span class="tag">{{ cover.unowned_count }}</span>
+  </div>
+  <ul class="plain-list two-col">
+    {% for sop in cover.unowned %}
+    <li>
+      <a href="/sops/{{ sop.id }}"><span class="mono">{{ sop.code }}</span> {{ sop.title }}</a>
+      <span class="muted"> · {{ sop.area|area }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+  <p class="fine">Open a process, edit the header and pick an owner from the team list.</p>
+</section>
+{% else %}
+<div class="alert alert-good" role="status">Every active process has an owner. That is the whole point of this page.</div>
+{% endif %}
+
+<section class="panel" aria-labelledby="matrix">
+  <div class="panel-head">
+    <h2 id="matrix">Area by person</h2>
+    <span class="tag">Active SOPs only</span>
+  </div>
+  {% if matrix.people %}
+  <div class="table-scroll">
+    <table class="table matrix">
+      <thead>
+        <tr>
+          <th scope="col">Area</th>
+          {% for person in matrix.people %}<th scope="col" class="num">{{ person.name }}</th>{% endfor %}
+          <th scope="col" class="num">Unowned</th>
+          <th scope="col" class="num">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in matrix.rows %}
+        <tr>
+          <th scope="row"><span class="chip chip-{{ row.area }}">{{ row.label }}</span></th>
+          {% for cell in row.cells %}
+          <td class="num mono {{ 'is-zero' if cell.count == 0 else '' }}">{{ cell.count }}</td>
+          {% endfor %}
+          <td class="num mono {{ 'is-gap' if row.unowned else 'is-zero' }}">{{ row.unowned }}</td>
+          <td class="num mono">{{ row.total }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th scope="row">Total</th>
+          {% for person in matrix.people %}
+          <td class="num mono">{{ matrix.totals[loop.index0] }}</td>
+          {% endfor %}
+          <td class="num mono">{{ cover.unowned_count }}</td>
+          <td class="num mono">{{ matrix.total }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">
+    <p class="empty-title">No active people</p>
+    <p>Add someone to the team list, or reactivate a person, to see who holds what.</p>
+    <p><a class="btn btn-primary" href="/people/new">Add a person</a></p>
+  </div>
+  {% endif %}
+</section>
+
+<section class="panel" aria-labelledby="ledger">
+  <div class="panel-head"><h2 id="ledger">The ledger</h2></div>
+  {% if cover.rows %}
+  <table class="table">
+    <thead><tr><th>Person</th><th>Role</th><th class="num">Owned</th><th class="num">Active</th><th class="num">Drafts</th><th class="num">Reviews due</th></tr></thead>
+    <tbody>
+      {% for row in cover.rows %}
+      <tr class="{{ 'is-muted' if not row.person.active else '' }}">
+        <td>{{ row.person.name }}{% if not row.person.active %} <span class="flag flag-inactive">Inactive</span>{% endif %}</td>
+        <td>{{ row.person.role or '—' }}</td>
+        <td class="num mono">{{ row.owned }}</td>
+        <td class="num mono">{{ row.active }}</td>
+        <td class="num mono">{{ row.drafts }}</td>
+        <td class="num mono">{{ row.due }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty"><p class="empty-title">No one on the team list</p><p><a href="/people/new">Add a person</a> before assigning owners.</p></div>
+  {% endif %}
+</section>
+{% endblock %}

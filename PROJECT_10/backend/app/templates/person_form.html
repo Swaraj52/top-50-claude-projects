@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Add a person' if mode == 'new' else 'Edit ' ~ person.name }}{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">{{ 'New person' if mode == 'new' else 'Editing ' ~ person.name }}</p>
+    <h1>{{ 'Add someone to the team list' if mode == 'new' else 'Edit this person' }}</h1>
+    <p class="lede">A person can own processes and run checklists. Deactivating keeps their history.</p>
+  </div>
+  <div class="head-actions"><a class="btn btn-ghost" href="/people">People</a></div>
+</header>
+
+{% if errors %}
+<div class="alert alert-list" role="alert">
+  <ul>{% for error in errors %}<li>{{ error }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+<form method="post" action="{{ '/people/new' if mode == 'new' else '/people/' ~ person.id ~ '/edit' }}" class="panel form-panel">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <div class="field-grid">
+    <div class="field field-grow">
+      <label for="name">Name</label>
+      <input id="name" name="name" value="{{ values.name }}" maxlength="80" required autofocus>
+    </div>
+    <div class="field">
+      <label for="role">Role</label>
+      <input id="role" name="role" value="{{ values.role }}" maxlength="80" placeholder="Bookkeeper">
+    </div>
+  </div>
+  <div class="field">
+    <label for="email">Email (optional)</label>
+    <input id="email" type="email" name="email" value="{{ values.email }}" maxlength="254" autocomplete="off">
+    <p class="hint">Stored locally, never mailed by Foundry.</p>
+  </div>
+  <div class="field">
+    <label for="notes">Notes</label>
+    <textarea id="notes" name="notes" rows="3" maxlength="300" placeholder="When they are available, what they are learning, anything a handover needs.">{{ values.notes }}</textarea>
+  </div>
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit">{{ 'Add the person' if mode == 'new' else 'Save changes' }}</button>
+    <a class="btn btn-ghost" href="/people">Cancel</a>
+  </div>
+</form>
+
+{% if mode == 'edit' %}
+<section class="panel panel-danger">
+  <div class="panel-head"><h2>Remove this person</h2></div>
+  <p class="muted">
+    Removal detaches their name from any process, which leaves those processes unowned. Deactivate
+    instead if you want to keep the history.
+  </p>
+  <form method="post" action="/people/{{ person.id }}/delete" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="confirm">Type <strong>{{ person.name }}</strong> to confirm</label>
+    <input id="confirm" name="confirm" autocomplete="off" required>
+    <button class="btn btn-danger" type="submit">Remove permanently</button>
+  </form>
+</section>
+{% endif %}
+{% endblock %}

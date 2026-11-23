@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}SOP library{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">The library</p>
+    <h1>Every process, one code</h1>
+    <p class="lede">
+      {{ all_counts.active }} active, {{ all_counts.draft }} draft, {{ all_counts.retired }} retired.
+      {% if all_counts.unowned %}Somebody needs to own {{ all_counts.unowned }} of the active ones.{% endif %}
+    </p>
+  </div>
+  <div class="head-actions">
+    <a class="btn btn-primary" href="/sops/new">Write an SOP</a>
+    <a class="btn btn-ghost" href="/sops/draft">Draft from a description</a>
+  </div>
+</header>
+
+<form class="filters" method="get" action="/sops" role="search">
+  <div class="filter filter-wide">
+    <label for="q">Search</label>
+    <input id="q" name="q" value="{{ q }}" placeholder="Code, title, owner or a step" maxlength="120">
+  </div>
+  <div class="filter">
+    <label for="status">Status</label>
+    <select id="status" name="status">
+      <option value="">Any live</option>
+      {% for key, label in SOP_STATUS_OPTIONS %}
+      <option value="{{ key }}" {{ 'selected' if status == key else '' }}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="filter">
+    <label for="area">Area</label>
+    <select id="area" name="area">
+      <option value="">Every area</option>
+      {% for key, label in AREAS %}
+      <option value="{{ key }}" {{ 'selected' if area == key else '' }}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="filter">
+    <label for="owner">Owner</label>
+    <select id="owner" name="owner">
+      <option value="">Anyone</option>
+      {% for person in people %}
+      <option value="{{ person.id }}" {{ 'selected' if owner|string == person.id|string else '' }}>{{ person.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="filter filter-check">
+    <label for="attention">Review</label>
+    <label class="check"><input id="attention" type="checkbox" name="attention" value="1" {{ 'checked' if attention else '' }}> Needs review</label>
+  </div>
+  <div class="filter filter-go">
+    <button class="btn btn-ghost" type="submit">Filter</button>
+    {% if q or status or area or owner or attention %}<a class="small-link" href="/sops">Clear</a>{% endif %}
+  </div>
+</form>
+
+{% if sops %}
+<section class="panel panel-flush" aria-label="SOP list">
+  <table class="table table-library">
+    <thead>
+      <tr>
+        <th>Code</th>
+        <th>Process</th>
+        <th>Area</th>
+        <th>Owner</th>
+        <th class="num">Steps</th>
+        <th>Review</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for sop in sops %}
+      <tr>
+        <td class="mono nowrap"><a href="/sops/{{ sop.id }}">{{ sop.code }}</a></td>
+        <td>
+          <a class="row-title" href="/sops/{{ sop.id }}">{{ sop.title }}</a>
+          <span class="row-sub">{{ sop.status|sstatus }} · v{{ sop.version }} · {{ sop.cadence|cadence }}</span>
+        </td>
+        <td><span class="chip chip-{{ sop.area }}">{{ sop.area|area }}</span></td>
+        <td>{% if sop.owner %}{{ sop.owner.name }}{% else %}<span class="flag flag-unowned">Unowned</span>{% endif %}</td>
+        <td class="num mono">{{ step_counts[sop.id] }}</td>
+        <td><span class="flag flag-{{ states[sop.id].key }}">{{ states[sop.id].label }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% else %}
+<div class="empty empty-large">
+  <p class="empty-title">Nothing matches that</p>
+  <p>Either the filters are too narrow or the library is still empty. Start with the process you repeat most.</p>
+  <p><a class="btn btn-primary" href="/sops/new">Write the first SOP</a> <a class="btn btn-ghost" href="/sops">Clear filters</a></p>
+</div>
+{% endif %}
+{% endblock %}

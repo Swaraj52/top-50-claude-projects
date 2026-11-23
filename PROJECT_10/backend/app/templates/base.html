@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Foundry{% endblock %} · Foundry</title>
+  <meta name="description" content="Foundry: keep SOPs, process checklists and ownership in one working handbook.">
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/app.css?v={{ version }}">
+  <script src="/static/htmx.min.js" defer></script>
+  <script src="/static/app.js?v={{ version }}" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="masthead">
+    <div class="masthead-inner">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+          <rect x="7" y="7" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"/>
+          <path d="M7 16h18M16 7v18" stroke="currentColor" stroke-width="1" opacity=".45"/>
+          <circle cx="16" cy="16" r="3.2" fill="currentColor"/>
+        </svg>
+        <span class="brand-text">
+          <span class="brand-name">Foundry</span>
+          <span class="brand-tag">operations handbook</span>
+        </span>
+      </a>
+
+      {% if user %}
+      <nav class="topnav" aria-label="Sections">
+        <a href="/" class="{{ 'on' if path == '/' else '' }}">Desk</a>
+        <a href="/sops" class="{{ 'on' if path.startswith('/sops') or path.startswith('/steps') else '' }}">SOPs</a>
+        <a href="/runs" class="{{ 'on' if path.startswith('/runs') else '' }}">Checklists</a>
+        <a href="/people" class="{{ 'on' if path.startswith('/people') else '' }}">People</a>
+        <a href="/ownership" class="{{ 'on' if path.startswith('/ownership') else '' }}">Ownership</a>
+        <a href="/settings" class="{{ 'on' if path.startswith('/settings') else '' }}">Settings</a>
+      </nav>
+
+      <div class="masthead-actions">
+        <a class="btn btn-primary btn-sm" href="/sops/new">New SOP</a>
+        <div class="account">
+          <a class="avatar" href="/settings" title="Settings for {{ user.name }}">{{ user.name|initial }}</a>
+          <form method="post" action="/logout">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="linkish" type="submit">Sign out</button>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </header>
+
+  <main id="main" class="{% block mainclass %}{{ 'wrap' if user else 'auth-shell' }}{% endblock %}">
+    {% if user %}<div class="rule" aria-hidden="true"></div>{% endif %}
+    {% block content %}{% endblock %}
+
+    {% if user %}
+    <footer class="footer">
+      <span>Foundry v{{ version }} · local-first, no tracking
+        {% if ai_enabled %}<span class="badge badge-claude">Claude on</span>{% else %}<span class="badge">Local drafting</span>{% endif %}
+      </span>
+      <span class="credit">Built by <strong>Swayam</strong></span>
+    </footer>
+    {% endif %}
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

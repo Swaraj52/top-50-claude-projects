@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Checklists{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">Checklists</p>
+    <h1>Processes actually being run</h1>
+    <p class="lede">
+      A checklist is a snapshot of an SOP's steps at the moment it started. Finishing one is proof
+      the work happened; it never edits the process itself.
+    </p>
+  </div>
+  <div class="head-actions"><a class="btn btn-ghost" href="/sops">Open the library</a></div>
+</header>
+
+<section class="stats" aria-label="Checklist counts">
+  <div class="stat">
+    <span class="stat-label">Open</span>
+    <span class="stat-value">{{ summary.open_count }}</span>
+    <span class="stat-note">In progress right now</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">Overdue</span>
+    <span class="stat-value">{{ summary.overdue }}</span>
+    <span class="stat-note">Past their due date</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">Finished</span>
+    <span class="stat-value">{{ summary.done }}</span>
+    <span class="stat-note">Every item ticked</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">Abandoned</span>
+    <span class="stat-value">{{ summary.abandoned }}</span>
+    <span class="stat-note">Stopped, with a record</span>
+  </div>
+</section>
+
+<nav class="tabs" aria-label="Filter by status">
+  <a href="/runs" class="{{ 'on' if not status else '' }}">All</a>
+  <a href="/runs?status=open" class="{{ 'on' if status == 'open' else '' }}">Open</a>
+  <a href="/runs?status=done" class="{{ 'on' if status == 'done' else '' }}">Done</a>
+  <a href="/runs?status=abandoned" class="{{ 'on' if status == 'abandoned' else '' }}">Abandoned</a>
+</nav>
+
+{% if runs %}
+<section class="panel panel-flush" aria-label="Run list">
+  <table class="table">
+    <thead>
+      <tr><th>Started</th><th>Process</th><th>Who</th><th class="num">Steps</th><th>Due</th><th>Status</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for run in runs %}
+      <tr>
+        <td class="mono nowrap">{{ run.started_on|datefmt }}</td>
+        <td>
+          <a class="row-title" href="/runs/{{ run.id }}">{{ run.sop.title }}</a>
+          <span class="row-sub mono">{{ run.sop.code }}</span>
+        </td>
+        <td>{{ run.owner.name if run.owner else '—' }}</td>
+        <td class="num mono">{{ run.items|selectattr('done')|list|length }}/{{ run.items|length }}</td>
+        <td>{{ run.due_on|datefmt if run.due_on else '—' }}</td>
+        <td><span class="flag flag-{{ run.status }}">{{ run.status|rstatus }}</span></td>
+        <td class="num"><a class="small-link" href="/runs/{{ run.id }}">Open</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% else %}
+<div class="empty empty-large">
+  <p class="empty-title">No checklists here yet</p>
+  <p>Open an active SOP and press <strong>Start a checklist</strong>. The run copies the steps, so the process is not changed by doing it.</p>
+  <p><a class="btn btn-primary" href="/sops?status=active">Find an active SOP</a></p>
+</div>
+{% endif %}
+{% endblock %}
