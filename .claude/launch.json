@@ -1,77 +1,49 @@
 {
-  "version": "0.0.1",
+  "version": "0.1.0",
   "configurations": [
     {
       "name": "project-01-daybook",
-      "runtimeExecutable": "PROJECT_01/backend/.venv/Scripts/python.exe",
-      "runtimeArgs": [
-        "PROJECT_01/backend/scripts/preview.py"
-      ],
-      "port": 8001
+      "url": "http://127.0.0.1:8001"
     },
     {
       "name": "project-02-stacks",
-      "runtimeExecutable": "PROJECT_02/backend/.venv/Scripts/python.exe",
-      "runtimeArgs": [
-        "PROJECT_02/backend/scripts/preview.py"
-      ],
-      "port": 8002
+      "url": "http://127.0.0.1:8002"
     },
     {
       "name": "project-03-shutdown",
-      "runtimeExecutable": "PROJECT_03/backend/.venv/Scripts/python.exe",
-      "runtimeArgs": [
-        "PROJECT_03/backend/scripts/preview.py"
-      ],
-      "port": 8003
+      "url": "http://127.0.0.1:8003"
     },
     {
       "name": "project-04-summit",
-      "runtimeExecutable": "PROJECT_04/backend/.venv/Scripts/python.exe",
-      "runtimeArgs": [
-        "PROJECT_04/backend/scripts/preview.py"
-      ],
-      "port": 8004
+      "url": "http://127.0.0.1:8004"
     },
     {
       "name": "project-05-cadence",
-      "runtimeExecutable": "PROJECT_05/backend/.venv/Scripts/python.exe",
-      "runtimeArgs": [
-        "PROJECT_05/backend/scripts/preview.py"
-      ],
-      "port": 8005
+      "url": "http://127.0.0.1:8005"
     },
     {
       "name": "project-06-quorum",
-      "runtimeExecutable": "PROJECT_06/backend/.venv/Scripts/python.exe",
-      "runtimeArgs": [
-        "PROJECT_06/backend/scripts/preview.py"
-      ],
-      "port": 8006
+      "url": "http://127.0.0.1:8006"
     },
     {
       "name": "project-07-switchboard",
-      "runtimeExecutable": "PROJECT_07/backend/.venv/Scripts/python.exe",
-      "runtimeArgs": [
-        "PROJECT_07/backend/scripts/preview.py"
-      ],
-      "port": 8007
+      "url": "http://127.0.0.1:8007"
     },
     {
       "name": "project-08-loom",
-      "runtimeExecutable": "PROJECT_08/backend/.venv/Scripts/python.exe",
-      "runtimeArgs": [
-        "PROJECT_08/backend/scripts/preview.py"
-      ],
-      "port": 8008
+      "url": "http://127.0.0.1:8008"
     },
     {
       "name": "project-09-keystone",
-      "runtimeExecutable": "PROJECT_09/backend/.venv/Scripts/python.exe",
-      "runtimeArgs": [
-        "PROJECT_09/backend/scripts/preview.py"
-      ],
-      "port": 8009
+      "url": "http://127.0.0.1:8009"
+    },
+    {
+      "name": "project-10-foundry",
+      "url": "http://127.0.0.1:8010"
+    },
+    {
+      "name": "project-11-customer-feedback",
+      "url": "http://127.0.0.1:8011"
     }
   ]
 }

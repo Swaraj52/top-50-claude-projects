@@ -178,7 +178,8 @@
         "SOP library",
         "Process checklist",
         "Ownership tracker"
-      ]
+      ],
+      "progress": "10"
     },
     {
       "id": 11,
@@ -190,7 +191,8 @@
         "Sentiment themes",
         "Pain points",
         "Feature requests"
-      ]
+      ],
+      "progress": "11"
     },
     {
       "id": 12,
@@ -681,114 +683,5 @@
       ]
     }
   ],
-  "progress": {
-    "1": {
-      "status": "Completed",
-      "planning": "Done",
-      "frontend": "Done",
-      "backend": "Done",
-      "database": "Done",
-      "testing": "Done",
-      "docs": "Done",
-      "github": "Done",
-      "stack": "FastAPI · SQLite · React + TypeScript · Claude API",
-      "notes": "Daybook v1.0: 74 backend + 30 frontend tests; verified end-to-end in a browser incl. a real ICS feed. Claude briefing and IMAP not verified live (no key/credentials)."
-    },
-    "2": {
-      "status": "Completed",
-      "planning": "Done",
-      "frontend": "Done",
-      "backend": "Done",
-      "database": "Done",
-      "testing": "Done",
-      "docs": "Done",
-      "github": "Done",
-      "stack": "FastAPI · SQLite FTS5 · React + TypeScript · Claude API",
-      "notes": "Stacks v1.0: 60 backend + 12 frontend tests; live capture of a real Wikipedia article and a real YouTube transcript verified in a browser. Claude summaries/answers not verified live (no key)."
-    },
-    "3": {
-      "status": "Completed",
-      "planning": "Done",
-      "frontend": "Done",
-      "backend": "Done",
-      "database": "Done",
-      "testing": "Done",
-      "docs": "Done",
-      "github": "Done",
-      "stack": "FastAPI · Jinja2 + HTMX · SQLite · Claude API",
-      "notes": "Shutdown v1.0: 33 backend tests; triage, review and commit verified end-to-end in a browser with the database checked afterwards. Claude review not verified live (no key)."
-    },
-    "4": {
-      "status": "Completed",
-      "planning": "Done",
-      "frontend": "Done",
-      "backend": "Done",
-      "database": "Done",
-      "testing": "Done",
-      "docs": "Done",
-      "github": "Done",
-      "stack": "FastAPI · Jinja2 + HTMX · SQLite · Claude API",
-      "notes": "Summit v1.0: 41 backend tests; weighted milestones, pace, weekly actions, check-ins, coach fallback and charts verified in a browser. Claude coach not verified live (no key)."
-    },
-    "5": {
-      "status": "Completed",
-      "planning": "Done",
-      "frontend": "Done",
-      "backend": "Done",
-      "database": "Done",
-      "testing": "Done",
-      "docs": "Done",
-      "github": "Done",
-      "stack": "FastAPI · Jinja2 + HTMX · SQLite · Claude API",
-      "notes": "Cadence v1.0: 76 backend tests; pending-today semantics, planned rest, paused-habit exclusion, week grid, reflections, insights and the labelled local coach verified against seeded data in a browser. Claude coach not verified live (no key)."
-    },
-    "6": {
-      "status": "Completed",
-      "planning": "Done",
-      "frontend": "Done",
-      "backend": "Done",
-      "database": "Done",
-      "testing": "Done",
-      "docs": "Done",
-      "github": "Done",
-      "stack": "FastAPI · Jinja2 + HTMX · SQLite · Claude API",
-      "notes": "Quorum v1.0: 144 backend tests; capture, decisions, owners, due-date grouping, memory search, export/import and deletion verified against seeded data in a browser at desktop, dark and phone widths. Claude extraction validated with a fake transport only (no key)."
-    },
-    "7": {
-      "status": "Completed",
-      "planning": "Done",
-      "frontend": "Done",
-      "backend": "Done",
-      "database": "Done",
-      "testing": "Done",
-      "docs": "Done",
-      "github": "Done",
-      "stack": "FastAPI · Jinja2 + HTMX · SQLite · Claude API",
-      "notes": "Switchboard v1.0: 201 backend tests; paste, .eml upload, threading, five routes, explainable priority, local summaries and drafts, follow-ups, export and account deletion verified against seeded data in a browser at desktop, dark and phone widths. Claude summaries/drafts validated with a fake transport only (no key). No IMAP/OAuth/SMTP by design."
-    },
-    "8": {
-      "status": "Completed",
-      "planning": "Done",
-      "frontend": "Done",
-      "backend": "Done",
-      "database": "Done",
-      "testing": "Done",
-      "docs": "Done",
-      "github": "Done",
-      "stack": "FastAPI · Jinja2 + HTMX · SQLite · Claude API",
-      "notes": "Loom v1.0: 181 backend tests; explainable lexical search with query understanding and filters, highlighted snippets, tag-first topic clusters, extractive Ask with citations, markdown/text/HTML uploads, collections, tags, export plus an idempotent import (14 items round-tripped, second run skipped all 14) and browser checks at desktop, dark and phone widths. Claude answer rewrite validated with a fake transport only (no key). No crawler or page fetching by design."
-    },
-    "9": {
-      "status": "Completed",
-      "planning": "Done",
-      "frontend": "Done",
-      "backend": "Done",
-      "database": "Done",
-      "testing": "Done",
-      "docs": "Done",
-      "github": "Done",
-      "stack": "FastAPI · Jinja2 + HTMX · SQLite · Claude API",
-      "notes": "Keystone v1.0: 332 backend tests; nine-block canvas, impact-weighted SWOT, costed revenue model with confidence weighting and three volume scenarios, now/next/later plan with derived overdue, KPI pace against elapsed time with sparklines, a grounded one-page brief with an optional Claude rewrite, export plus an idempotent importer, and browser checks at desktop, dark and phone widths. Claude rewrite validated with a fake transport only (no key). No market feed, crawler or currency conversion by design."
-    }
-  }
+  "progress": {}
 }
