@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% block title %}KPIs · {{ venture.name }}{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">KPI plan</p>
+    <h1>Three numbers that would prove it</h1>
+    <p class="lede">Progress is measured from baseline to target. Pace compares that with the share of time elapsed, so "on track" means something on a Tuesday.</p>
+  </div>
+  <div class="head-actions">
+    <span class="chip">{{ (summary.health_percent ~ '% on pace') if summary.health_percent is not none else 'no readings yet' }}</span>
+  </div>
+</header>
+
+{% if saved %}<div class="notice" role="status">Reading saved.</div>{% endif %}
+{% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+
+<section class="strip" aria-label="KPI summary">
+  <div class="strip-cell">
+    <span class="strip-label">KPIs</span>
+    <strong>{{ summary.total }}</strong>
+    <span class="fine">{{ summary.measured }} measured</span>
+  </div>
+  <div class="strip-cell">
+    <span class="strip-label">On pace</span>
+    <strong>{{ summary.healthy }}</strong>
+    <span class="fine">reached, ahead or on track</span>
+  </div>
+  <div class="strip-cell {{ 'warn' if summary.counts.behind or summary.counts.missed }}">
+    <span class="strip-label">Off pace</span>
+    <strong>{{ summary.counts.behind + summary.counts.missed }}</strong>
+    <span class="fine">{{ summary.counts.behind }} behind · {{ summary.counts.missed }} missed</span>
+  </div>
+  <div class="strip-cell">
+    <span class="strip-label">No readings</span>
+    <strong>{{ summary.counts.no_data }}</strong>
+    <span class="fine">nothing to judge yet</span>
+  </div>
+</section>
+
+<section class="form-card" id="kpi-form">
+  <h2>{{ 'Edit KPI' if edit_kpi else 'Add a KPI' }}</h2>
+  <form method="post" action="{{ '/kpis/' ~ edit_kpi.id ~ '/edit' if edit_kpi else '/ventures/' ~ venture.id ~ '/kpis' }}" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div class="field-row">
+      <div class="grow">
+        <label for="kpi-name">Name</label>
+        <input id="kpi-name" name="name" value="{{ edit_kpi.name if edit_kpi else '' }}" maxlength="120" required placeholder="Paying customers">
+      </div>
+      <div>
+        <label for="kpi-unit">Unit</label>
+        <input id="kpi-unit" name="unit" value="{{ edit_kpi.unit if edit_kpi else '' }}" maxlength="40" placeholder="customers">
+      </div>
+      <div>
+        <label for="kpi-direction">Direction</label>
+        <select id="kpi-direction" name="direction">
+          <option value="up" {{ 'selected' if (edit_kpi.direction if edit_kpi else 'up') == 'up' else '' }}>Higher is better</option>
+          <option value="down" {{ 'selected' if edit_kpi and edit_kpi.direction == 'down' else '' }}>Lower is better</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div>
+        <label for="kpi-baseline">Baseline</label>
+        <input id="kpi-baseline" name="baseline" type="number" step="any" value="{{ edit_kpi.baseline if edit_kpi else 0 }}" required>
+      </div>
+      <div>
+        <label for="kpi-target">Target</label>
+        <input id="kpi-target" name="target" type="number" step="any" value="{{ edit_kpi.target if edit_kpi else '' }}" required>
+      </div>
+      <div>
+        <label for="kpi-target-date">Target date</label>
+        <input id="kpi-target-date" name="target_date" type="date" value="{{ edit_kpi.target_date.isoformat() if edit_kpi and edit_kpi.target_date else '' }}">
+      </div>
+      <div>
+        <label for="kpi-cadence">Cadence</label>
+        <select id="kpi-cadence" name="cadence">
+          {% for value in ['weekly', 'monthly', 'quarterly'] %}
+          <option value="{{ value }}" {{ 'selected' if (edit_kpi.cadence if edit_kpi else 'monthly') == value else '' }}>{{ value|cadence }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <p class="hint">A target date turns progress into pace. Without one, the plan uses a plain 50% midpoint rule.</p>
+    <div class="inline-actions">
+      <button class="btn btn-primary" type="submit">{{ 'Save KPI' if edit_kpi else 'Add KPI' }}</button>
+      {% if edit_kpi %}<a class="btn btn-ghost" href="/ventures/{{ venture.id }}/kpis">Cancel</a>{% endif %}
+    </div>
+  </form>
+</section>
+
+{% if summary['items'] %}
+<div class="kpi-grid">
+  {% for row in summary['items'] %}
+  {% set k = row.kpi %}
+  <article class="kpi-card status-{{ row.status }}" id="kpi-{{ k.id }}">
+    <div class="kpi-head">
+      <div>
+        <h2>{{ k.name }}</h2>
+        <p class="fine">{{ k.direction == 'down' and 'Lower is better' or 'Higher is better' }} · {{ k.cadence|cadence }}{% if k.target_date %} · by {{ k.target_date|datefmt }}{% endif %}</p>
+      </div>
+      <span class="status status-{{ row.status }}">{{ row.status_label }}</span>
+    </div>
+
+    <div class="kpi-numbers">
+      <div>
+        <span class="fine">Latest</span>
+        <strong>{{ row.latest.value|num(k.unit) if row.latest else '—' }}</strong>
+      </div>
+      <div>
+        <span class="fine">Target</span>
+        <strong>{{ k.target|num(k.unit) }}</strong>
+      </div>
+      <div>
+        <span class="fine">Baseline</span>
+        <strong>{{ k.baseline|num(k.unit) }}</strong>
+      </div>
+      <div>
+        <span class="fine">From baseline</span>
+        <strong>{{ ('%+g'|format(row.from_baseline)) if row.from_baseline is not none else '—' }}</strong>
+      </div>
+    </div>
+
+    <div class="progress" role="img" aria-label="{{ row.progress or 0 }} percent of the way from baseline to target">
+      <span style="width: {{ row.progress or 0 }}%"></span>
+      {% if row.expected is not none %}<i class="pace-marker" style="left: {{ row.expected }}%" title="Expected pace: {{ row.expected }}%"></i>{% endif %}
+    </div>
+    <p class="fine">
+      {% if row.progress is not none %}{{ row.progress }}% of the gap closed{% else %}No reading yet{% endif %}
+      {% if row.expected is not none %} · expected {{ row.expected }}% by today{% endif %}
+      {% if row.delta is not none %} · {{ '%+g'|format(row.delta) }} points vs pace{% endif %}
+    </p>
+
+    {% if row.spark %}
+    <svg class="spark" viewBox="0 0 {{ row.spark.width }} {{ row.spark.height }}" role="img" aria-label="Reading history">
+      <polyline points="{{ row.spark.points }}" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    </svg>
+    <p class="fine">{{ row.spark.low|num(k.unit) }} to {{ row.spark.high|num(k.unit) }} across {{ k.readings|length }} readings</p>
+    {% endif %}
+
+    <details class="readings">
+      <summary>Readings ({{ k.readings|length }})</summary>
+      {% if k.readings %}
+      <ul class="reading-list">
+        {% for reading in k.readings|sort(attribute='recorded_on', reverse=true) %}
+        <li>
+          <span>{{ reading.recorded_on|datefmt }}</span>
+          <strong>{{ reading.value|num(k.unit) }}</strong>
+          <span class="fine">{{ reading.note }}</span>
+          <form method="post" action="/readings/{{ reading.id }}/delete" data-confirm="Delete this reading?">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="linkish danger" type="submit">Delete</button>
+          </form>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="fine">No readings yet.</p>
+      {% endif %}
+    </details>
+
+    <form method="post" action="/kpis/{{ k.id }}/readings" class="reading-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label class="sr-only" for="reading-{{ k.id }}">New reading for {{ k.name }}</label>
+      <input id="reading-{{ k.id }}" name="value" type="number" step="any" required placeholder="Value">
+      <input name="recorded_on" type="date" value="{{ today.isoformat() }}">
+      <input name="note" maxlength="200" placeholder="Note">
+      <button class="btn btn-ghost btn-sm" type="submit">Record</button>
+    </form>
+
+    <div class="row-actions">
+      <a class="linkish" href="/ventures/{{ venture.id }}/kpis?edit={{ k.id }}#kpi-form">Edit</a>
+      <form method="post" action="/kpis/{{ k.id }}/delete" data-confirm="Delete this KPI and all its readings?">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="linkish danger" type="submit">Delete</button>
+      </form>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<section class="empty">
+  <h2>Pick three numbers</h2>
+  <p>Demand, conversion and retention are usually enough. Add a KPI above and record its first reading today.</p>
+</section>
+{% endif %}
+{% endblock %}

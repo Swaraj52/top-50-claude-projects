@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit ' ~ venture.name if editing else 'New venture' }}{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">{{ 'Settings' if editing else 'New venture' }}</p>
+    <h1>{{ venture.name if editing else 'Name the idea' }}</h1>
+    <p class="lede">Only the name is required. Everything else sharpens the brief, and you can edit it later.</p>
+  </div>
+  {% if editing %}<div class="head-actions"><a class="btn btn-ghost" href="/ventures/{{ venture.id }}">Back to overview</a></div>{% endif %}
+</header>
+
+{% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+
+<form method="post" action="{{ '/ventures/' ~ venture.id ~ '/edit' if editing else '/ventures/new' }}" class="form-card">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+  <fieldset>
+    <legend>The idea</legend>
+    <label for="name">Venture name</label>
+    <input id="name" name="name" value="{{ values.name }}" required maxlength="120" autofocus>
+    <p class="hint">The name is unique in your portfolio. It appears on the brief.</p>
+
+    <label for="one_liner">One-liner</label>
+    <input id="one_liner" name="one_liner" value="{{ values.one_liner }}" maxlength="240" placeholder="What it does, in one sentence a customer would repeat.">
+
+    <div class="field-row">
+      <div>
+        <label for="stage">Stage</label>
+        <select id="stage" name="stage">
+          {% for value in ['idea', 'validating', 'building', 'growing'] %}
+          <option value="{{ value }}" {{ 'selected' if values.stage == value else '' }}>{{ value|stage }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="horizon">Planning horizon</label>
+        <select id="horizon" name="horizon">
+          {% for value in ['90 days', '6 months', '12 months', '3 years'] %}
+          <option value="{{ value }}" {{ 'selected' if values.horizon == value else '' }}>{{ value }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="currency">Currency</label>
+        <select id="currency" name="currency">
+          {% for value in ['INR', 'USD', 'EUR', 'GBP'] %}
+          <option value="{{ value }}" {{ 'selected' if values.currency == value else '' }}>{{ value }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <p class="hint">Money stays in whole units of this currency. Mixed currencies are never summed.</p>
+  </fieldset>
+
+  <fieldset>
+    <legend>Market and positioning</legend>
+    <label for="segment">Target segment</label>
+    <input id="segment" name="segment" value="{{ values.segment }}" maxlength="240" placeholder="Who feels the problem most sharply?">
+    <p class="hint">A named segment beats "everyone". It is used in the brief's opening.</p>
+
+    <label for="market">Market context</label>
+    <textarea id="market" name="market" rows="3" maxlength="2000" placeholder="Size, timing, regulation or a change that makes this possible now.">{{ values.market }}</textarea>
+
+    <label for="alternatives">What people use instead</label>
+    <textarea id="alternatives" name="alternatives" rows="2" maxlength="2000" placeholder="The real alternatives, including doing nothing.">{{ values.alternatives }}</textarea>
+
+    <label for="differentiation">Why this is different</label>
+    <textarea id="differentiation" name="differentiation" rows="2" maxlength="2000" placeholder="The one thing that is hard to copy.">{{ values.differentiation }}</textarea>
+  </fieldset>
+
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit">{{ 'Save changes' if editing else 'Create venture' }}</button>
+    <a class="btn btn-ghost" href="{{ '/ventures/' ~ venture.id if editing else '/' }}">Cancel</a>
+  </div>
+</form>
+
+{% if editing %}
+<section class="danger-zone">
+  <h2>Archive or delete</h2>
+  <p>Archiving keeps the history and hides the venture from the portfolio. Deleting removes every canvas note, SWOT item, stream, cost, milestone and KPI reading.</p>
+  <form method="post" action="/ventures/{{ venture.id }}/archive" class="inline">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button class="btn btn-ghost" type="submit">{{ 'Restore to portfolio' if venture.archived else 'Archive venture' }}</button>
+  </form>
+  <form method="post" action="/ventures/{{ venture.id }}/delete" class="inline" data-confirm="Delete {{ venture.name }} and everything in it? This cannot be undone.">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label class="sr-only" for="confirm">Type the venture name to confirm</label>
+    <input id="confirm" name="confirm" placeholder="Type {{ venture.name }} to confirm">
+    <button class="btn btn-danger" type="submit">Delete permanently</button>
+  </form>
+</section>
+{% endif %}
+{% endblock %}

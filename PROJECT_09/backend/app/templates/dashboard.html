@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Portfolio{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">Portfolio</p>
+    <h1>{{ 'Archived ventures' if archived else 'Your ventures' }}</h1>
+    <p class="lede">One desk, every idea. Open a venture to work its canvas, model, plan and numbers.</p>
+  </div>
+  <div class="head-actions">
+    {% if archived %}
+    <a class="btn btn-ghost" href="/">Active ventures</a>
+    {% else %}
+    <a class="btn btn-primary" href="/ventures/new">New venture</a>
+    {% endif %}
+  </div>
+</header>
+
+{% if not archived %}
+<section class="strip" aria-label="Portfolio summary">
+  <div class="strip-cell">
+    <span class="strip-label">Ventures</span>
+    <strong>{{ totals.ventures }}</strong>
+  </div>
+  <div class="strip-cell">
+    <span class="strip-label">Open milestones</span>
+    <strong>{{ totals.milestones }}</strong>
+  </div>
+  <div class="strip-cell {{ 'warn' if totals.overdue }}">
+    <span class="strip-label">Overdue</span>
+    <strong>{{ totals.overdue }}</strong>
+  </div>
+  <div class="strip-cell {{ 'warn' if totals.attention }}">
+    <span class="strip-label">KPIs off pace</span>
+    <strong>{{ totals.attention }}</strong>
+  </div>
+</section>
+{% endif %}
+
+{% if cards %}
+<div class="venture-grid">
+  {% for card in cards %}
+  {% set v = card.venture %}
+  {% set s = card.snap %}
+  <article class="venture-card">
+    <div class="venture-top">
+      <a class="venture-name" href="/ventures/{{ v.id }}">{{ v.name }}</a>
+      <span class="chip chip-stage">{{ v.stage|stage }}</span>
+    </div>
+    <p class="venture-line">{{ v.one_liner or 'No one-liner yet — the brief will be thin until you write one.' }}</p>
+
+    <dl class="venture-stats">
+      <div>
+        <dt>Canvas</dt>
+        <dd>{{ s.canvas.percent }}%<span class="fine">{{ s.canvas.filled }}/{{ s.canvas.total }} blocks</span></dd>
+      </div>
+      <div>
+        <dt>Base MRR</dt>
+        <dd>{{ s.finance.expected_mrr|money(v.currency) }}<span class="fine">{{ 'margin ' ~ (s.finance.margin_percent ~ '%') if s.finance.margin_percent is not none else 'not costed' }}</span></dd>
+      </div>
+      <div>
+        <dt>Plan</dt>
+        <dd>{{ s.plan.done }}/{{ s.plan.total }}<span class="fine">{{ s.plan.overdue_count }} overdue</span></dd>
+      </div>
+      <div>
+        <dt>KPIs</dt>
+        <dd>{{ (s.kpis.health_percent ~ '%') if s.kpis.health_percent is not none else '—' }}<span class="fine">{{ s.kpis.measured }} measured</span></dd>
+      </div>
+    </dl>
+
+    <div class="venture-next">
+      {% if s.plan.next_due %}
+      <span class="next-label">Next</span>
+      <span class="next-title">{{ s.plan.next_due.title }}</span>
+      <span class="fine">{{ s.plan.next_due.due_date|datefmt }}</span>
+      {% elif s.actions %}
+      <span class="next-label">Next step</span>
+      <span class="next-title">{{ s.actions[0].label }}</span>
+      {% else %}
+      <span class="next-title">Nothing open — review the brief.</span>
+      {% endif %}
+    </div>
+
+    <div class="venture-foot">
+      <a class="btn btn-ghost btn-sm" href="/ventures/{{ v.id }}">Open</a>
+      <a class="btn btn-ghost btn-sm" href="/ventures/{{ v.id }}/brief">Brief</a>
+      <span class="fine">{{ v.updated_at|relative }} ago</span>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<section class="empty">
+  {% if archived %}
+  <h2>Nothing archived</h2>
+  <p>Ventures you archive stay here with their history intact.</p>
+  <a class="btn btn-primary" href="/">Back to active ventures</a>
+  {% else %}
+  <h2>Start with one sentence</h2>
+  <p>
+    A venture begins with a name and a one-liner. The canvas, SWOT, model, plan and KPIs come next,
+    and the brief writes itself from whatever you have filled in.
+  </p>
+  <a class="btn btn-primary" href="/ventures/new">Create the first venture</a>
+  {% endif %}
+</section>
+{% endif %}
+
+{% if archived_count and not archived %}
+<p class="switch-line"><a href="/?archived=1">Archived ventures ({{ archived_count }})</a></p>
+{% endif %}
+{% endblock %}

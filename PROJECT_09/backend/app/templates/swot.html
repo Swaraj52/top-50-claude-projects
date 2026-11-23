@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}SWOT · {{ venture.name }}{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">SWOT</p>
+    <h1>What is true, in four directions</h1>
+    <p class="lede">Impact runs from 1 to 5. The balance weighs strengths and opportunities against weaknesses and threats, so the brief can say whether the ledger leans strong or exposed.</p>
+  </div>
+  <div class="head-actions">
+    <span class="tone tone-{{ summary.tone }}">{{ summary.tone_label }}</span>
+  </div>
+</header>
+
+{% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+
+<section class="strip" aria-label="SWOT summary">
+  <div class="strip-cell">
+    <span class="strip-label">Strengths</span>
+    <strong>{{ summary.counts.strength }}</strong>
+    <span class="fine">impact {{ summary.impact.strength }}</span>
+  </div>
+  <div class="strip-cell">
+    <span class="strip-label">Weaknesses</span>
+    <strong>{{ summary.counts.weakness }}</strong>
+    <span class="fine">impact {{ summary.impact.weakness }}</span>
+  </div>
+  <div class="strip-cell">
+    <span class="strip-label">Opportunities</span>
+    <strong>{{ summary.counts.opportunity }}</strong>
+    <span class="fine">impact {{ summary.impact.opportunity }}</span>
+  </div>
+  <div class="strip-cell">
+    <span class="strip-label">Threats</span>
+    <strong>{{ summary.counts.threat }}</strong>
+    <span class="fine">impact {{ summary.impact.threat }}</span>
+  </div>
+  <div class="strip-cell {{ 'warn' if summary.tone == 'exposed' }}">
+    <span class="strip-label">Balance</span>
+    <strong>{{ '%+d'|format(summary.balance) }}</strong>
+    <span class="fine">positive minus negative impact</span>
+  </div>
+</section>
+
+<section class="form-card form-inline-card" id="swot-form">
+  <h2>{{ 'Edit item' if edit_item else 'Add an item' }}</h2>
+  <form method="post" action="{{ '/swot/' ~ edit_item.id ~ '/edit' if edit_item else '/ventures/' ~ venture.id ~ '/swot' }}" class="inline-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div>
+      <label for="quadrant">Quadrant</label>
+      <select id="quadrant" name="quadrant">
+        {% for quadrant in quadrants %}
+        <option value="{{ quadrant }}" {{ 'selected' if (edit_item.quadrant if edit_item else 'strength') == quadrant else '' }}>{{ labels[quadrant] }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="grow">
+      <label for="text">Item</label>
+      <input id="text" name="text" value="{{ edit_item.text if edit_item else '' }}" maxlength="300" required placeholder="One sentence, no hedging.">
+    </div>
+    <div>
+      <label for="impact">Impact</label>
+      <select id="impact" name="impact">
+        {% for n in [1, 2, 3, 4, 5] %}
+        <option value="{{ n }}" {{ 'selected' if (edit_item.impact if edit_item else 3) == n else '' }}>{{ n }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="grow">
+      <label for="evidence">Evidence <span class="fine">(optional)</span></label>
+      <input id="evidence" name="evidence" value="{{ edit_item.evidence if edit_item else '' }}" maxlength="300" placeholder="A fact, a quote, a number.">
+    </div>
+    <div class="inline-actions">
+      <button class="btn btn-primary" type="submit">{{ 'Save item' if edit_item else 'Add item' }}</button>
+      {% if edit_item %}<a class="btn btn-ghost" href="/ventures/{{ venture.id }}/swot">Cancel</a>{% endif %}
+    </div>
+  </form>
+</section>
+
+<div class="swot-grid">
+  {% for quadrant in quadrants %}
+  <section class="swot-quadrant quadrant-{{ quadrant }}" id="{{ quadrant }}">
+    <div class="canvas-block-head">
+      <h2>{{ labels[quadrant] }}</h2>
+      <span class="count">{{ summary.counts[quadrant] }}</span>
+    </div>
+    <p class="fine">{{ help_text[quadrant] }}</p>
+    {% if summary.grouped[quadrant] %}
+    <ul class="swot-list">
+      {% for item in summary.grouped[quadrant] %}
+      <li>
+        <div class="swot-main">
+          <span class="impact-dots" title="Impact {{ item.impact }} of 5">
+            {% for n in [1, 2, 3, 4, 5] %}<i class="{{ 'on' if n <= item.impact else '' }}"></i>{% endfor %}
+          </span>
+          <strong>{{ item.text }}</strong>
+          {% if item.evidence %}<span class="fine">{{ item.evidence }}</span>{% endif %}
+        </div>
+        <div class="row-actions">
+          <a class="linkish" href="/ventures/{{ venture.id }}/swot?edit={{ item.id }}#swot-form">Edit</a>
+          <form method="post" action="/swot/{{ item.id }}/delete" data-confirm="Delete this SWOT item?">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="linkish danger" type="submit">Delete</button>
+          </form>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="fine">Nothing here yet.</p>
+    {% endif %}
+  </section>
+  {% endfor %}
+</div>
+
+{% if summary.risks %}
+<section class="panel">
+  <div class="panel-head"><h2>What would hurt first</h2></div>
+  <ol class="action-list">
+    {% for item in summary.risks %}
+    <li>
+      <span class="action-label">{{ item.text }}</span>
+      <span class="action-why">{{ item.quadrant|quadrant }} · impact {{ item.impact }}/5{% if item.evidence %} · {{ item.evidence }}{% endif %}</span>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+{% endblock %}

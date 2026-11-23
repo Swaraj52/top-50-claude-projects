@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Brief · {{ venture.name }}{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">Strategy brief</p>
+    <h1>{{ venture.name }}, on one page</h1>
+    <p class="lede">{{ venture.one_liner or 'No one-liner yet — the brief will open weakly until you write one.' }}</p>
+  </div>
+  <div class="head-actions">
+    <button class="btn btn-ghost" type="button" data-print>Print</button>
+    <a class="btn btn-ghost" href="/ventures/{{ venture.id }}/edit">Edit venture</a>
+  </div>
+</header>
+
+{% if saved %}<div class="notice" role="status">Memo saved.</div>{% endif %}
+{% if ai == 'saved' %}<div class="notice" role="status">Claude rewrote the memo. Check it before sending.</div>{% endif %}
+{% if ai == 'failed' %}<div class="alert" role="alert">Claude was unavailable or returned an invalid result, so the saved memo was left unchanged.</div>{% endif %}
+
+{% include "_memo.html" %}
+
+{% if source == 'draft' %}
+<p class="fine memo-hint">This memo is generated from your inputs but not saved yet. "Save this memo" keeps it with the venture.</p>
+{% endif %}
+
+<div class="brief-sections">
+  {% for block in blocks %}
+  <section class="brief-block">
+    <h2>{{ block.heading }}</h2>
+    {% for para in block.body %}<p>{{ para }}</p>{% endfor %}
+  </section>
+  {% endfor %}
+</div>
+
+<section class="panel brief-foot">
+  <div>
+    <h2>The numbers behind this page</h2>
+    <p class="fine">
+      Base MRR {{ snap.finance.expected_mrr|money(venture.currency) }} ·
+      base ARR {{ snap.finance.arr|money(venture.currency) }} ·
+      monthly cost {{ snap.finance.total_cost|money(venture.currency) }} ·
+      margin {{ snap.finance.margin|money(venture.currency) }}
+    </p>
+  </div>
+  <p class="fine">Generated {{ generated_at|dt(tz, 'stamp') if generated_at else 'just now' }} · {{ venture.horizon }} horizon</p>
+</section>
+{% endblock %}

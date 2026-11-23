@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block title %}{{ venture.name }}{% endblock %}
+{% block content %}
+<header class="page-head venture-head">
+  <div>
+    <p class="eyebrow">{{ venture.stage|stage }} · {{ venture.horizon }} · {{ venture.currency }}</p>
+    <h1>{{ venture.name }}</h1>
+    <p class="lede">{{ venture.one_liner or 'No one-liner yet. Write one before the brief goes anywhere.' }}</p>
+  </div>
+  <div class="head-actions">
+    <a class="btn btn-ghost" href="/ventures/{{ venture.id }}/edit">Edit</a>
+    <a class="btn btn-primary" href="/ventures/{{ venture.id }}/brief">The brief</a>
+  </div>
+</header>
+
+{% if saved %}<div class="notice" role="status">Saved.</div>{% endif %}
+
+<section class="strip strip-wide" aria-label="Venture summary">
+  <div class="strip-cell">
+    <span class="strip-label">Canvas</span>
+    <strong>{{ snap.canvas.percent }}%</strong>
+    <span class="fine">{{ snap.canvas.filled }}/{{ snap.canvas.total }} blocks</span>
+  </div>
+  <div class="strip-cell">
+    <span class="strip-label">Base MRR</span>
+    <strong>{{ headline.mrr }}</strong>
+    <span class="fine">{{ headline.weighted }} confidence-weighted</span>
+  </div>
+  <div class="strip-cell {{ 'warn' if snap.finance.margin is not none and snap.finance.margin < 0 }}">
+    <span class="strip-label">Monthly margin</span>
+    <strong>{{ headline.margin }}</strong>
+    <span class="fine">{{ (headline.margin_percent ~ '%') if headline.margin_percent is not none else 'not costed' }}</span>
+  </div>
+  <div class="strip-cell {{ 'warn' if snap.plan.overdue_count }}">
+    <span class="strip-label">Plan</span>
+    <strong>{{ headline.milestones }}</strong>
+    <span class="fine">{{ snap.plan.overdue_count }} overdue</span>
+  </div>
+  <div class="strip-cell">
+    <span class="strip-label">KPI pace</span>
+    <strong>{{ (headline.kpi_health ~ '%') if headline.kpi_health is not none else '—' }}</strong>
+    <span class="fine">{{ snap.kpis.measured }} measured</span>
+  </div>
+</section>
+
+<div class="overview-grid">
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Next moves</h2>
+      <span class="fine">{{ snap.actions|length }} suggested</span>
+    </div>
+    {% if snap.actions %}
+    <ol class="action-list">
+      {% for action in snap.actions %}
+      <li>
+        <a class="action-label" href="{{ action.href }}">{{ action.label }}</a>
+        <span class="action-why">{{ action.why }}</span>
+      </li>
+      {% endfor %}
+    </ol>
+    {% else %}
+    <p class="fine">Nothing outstanding. Regenerate the brief and send it.</p>
+    {% endif %}
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Canvas coverage</h2>
+      <a class="fine" href="/ventures/{{ venture.id }}/canvas">Open canvas →</a>
+    </div>
+    <div class="meter" role="img" aria-label="{{ snap.canvas.percent }} percent of the canvas filled">
+      <span style="width: {{ snap.canvas.percent }}%"></span>
+    </div>
+    {% if snap.canvas.missing %}
+    <p class="fine">Still empty: {{ snap.canvas.missing_labels|join(', ') }}.</p>
+    {% else %}
+    <p class="fine">Every block has at least one note.</p>
+    {% endif %}
+    {% if snap.gaps %}
+    <ul class="gap-list">
+      {% for gap in snap.gaps %}
+      <li><strong>{{ gap.label }}</strong> — {{ gap.prompt }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>The plan</h2>
+      <a class="fine" href="/ventures/{{ venture.id }}/plan">Open plan →</a>
+    </div>
+    {% if snap.plan.next_due %}
+    <p class="next-milestone">
+      <span class="chip">{{ snap.plan.next_due.horizon|horizon }}</span>
+      <strong>{{ snap.plan.next_due.title }}</strong>
+      <span class="fine">{{ snap.plan.next_due.due_date|datefmt }} · {{ snap.plan.next_due.due_date|days(today) }}</span>
+    </p>
+    {% if snap.plan.next_due.success_criterion %}
+    <p class="fine">Done when: {{ snap.plan.next_due.success_criterion }}</p>
+    {% endif %}
+    {% else %}
+    <p class="fine">No open milestones. Add three for the next 90 days.</p>
+    {% endif %}
+    <p class="fine">{{ snap.plan.done }} of {{ snap.plan.total }} milestones complete.</p>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Numbers</h2>
+      <a class="fine" href="/ventures/{{ venture.id }}/revenue">Open model →</a>
+    </div>
+    {% if snap.finance.streams %}
+    <p class="big-number">{{ snap.finance.arr|compact(venture.currency) }}<span class="fine">base ARR</span></p>
+    <p class="fine">
+      {{ snap.finance.streams }} stream{{ 's' if snap.finance.streams != 1 }} ·
+      {{ snap.finance.total_cost|money(venture.currency) }} monthly cost ·
+      {{ snap.finance.breakeven_units if snap.finance.breakeven_units is not none else '—' }} units to break even
+    </p>
+    {% else %}
+    <p class="fine">No revenue streams yet, so the model is not costed.</p>
+    {% endif %}
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>SWOT</h2>
+      <a class="fine" href="/ventures/{{ venture.id }}/swot">Open ledger →</a>
+    </div>
+    <p class="swot-tone"><span class="tone tone-{{ snap.swot.tone }}">{{ snap.swot.tone_label }}</span></p>
+    <p class="fine">
+      {{ snap.swot.counts.strength }} strengths · {{ snap.swot.counts.weakness }} weaknesses ·
+      {{ snap.swot.counts.opportunity }} opportunities · {{ snap.swot.counts.threat }} threats
+    </p>
+    {% if snap.swot.risks %}
+    <p class="fine">Sharpest risk: {{ snap.swot.risks[0].text }} ({{ snap.swot.risks[0].impact }}/5).</p>
+    {% endif %}
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>KPIs</h2>
+      <a class="fine" href="/ventures/{{ venture.id }}/kpis">Open KPIs →</a>
+    </div>
+    {% if snap.kpis['items'] %}
+    <ul class="kpi-mini">
+      {% for row in snap.kpis['items'][:4] %}
+      <li>
+        <span class="status status-{{ row.status }}">{{ row.status_label }}</span>
+        <span class="kpi-name">{{ row.kpi.name }}</span>
+        <span class="fine">
+          {% if row.latest %}{{ row.latest.value|num(row.kpi.unit) }}{% else %}no reading{% endif %}
+          / {{ row.kpi.target|num(row.kpi.unit) }}
+        </span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="fine">No KPIs. Three numbers are enough: demand, conversion and retention.</p>
+    {% endif %}
+  </section>
+</div>
+
+<section class="panel brief-cta">
+  <div>
+    <h2>The one-page brief</h2>
+    <p class="fine">
+      {{ 'A saved memo is ready.' if venture.narrative else 'Generated from what you have filled in; save it when it reads right.' }}
+    </p>
+  </div>
+  <a class="btn btn-primary" href="/ventures/{{ venture.id }}/brief">{{ 'Read the brief' if venture.narrative else 'Generate the brief' }}</a>
+</section>
+{% endblock %}

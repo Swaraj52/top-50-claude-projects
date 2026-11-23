@@ -1,0 +1,46 @@
+<section class="panel memo" id="memo">
+  <div class="panel-head">
+    <h2>The memo</h2>
+    <span class="badge {{ 'badge-claude' if source == 'claude' else '' }}">
+      {% if source == 'claude' %}Claude{% elif source == 'local' %}Local{% else %}Draft{% endif %}
+    </span>
+  </div>
+
+  <div class="memo-body">
+    {% for para in narrative.split('\n\n') %}
+    <p>{{ para }}</p>
+    {% endfor %}
+  </div>
+
+  {% if note %}<div class="alert" role="alert">{{ note }}</div>{% endif %}
+  {% if source == 'claude' %}
+  <p class="fine">Claude rewrote the stored facts. The numbers and dates above are unchanged.</p>
+  {% elif source == 'local' %}
+  <p class="fine">Assembled locally from the canvas, model, plan and KPI log.</p>
+  {% else %}
+  <p class="fine">A draft assembled locally; save it to keep it with the venture.</p>
+  {% endif %}
+
+  <div class="memo-actions">
+    <form method="post" action="/ventures/{{ venture.id }}/brief">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button class="btn btn-ghost btn-sm" type="submit">Save this memo</button>
+    </form>
+    {% if ai_enabled %}
+    <form method="post" action="/ventures/{{ venture.id }}/brief/ai"
+          hx-post="/ventures/{{ venture.id }}/brief/ai" hx-target="#memo" hx-swap="outerHTML" hx-indicator="#memo-busy">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button class="btn btn-primary btn-sm" type="submit">Rewrite with Claude</button>
+    </form>
+    <span id="memo-busy" class="fine htmx-indicator">Working…</span>
+    {% else %}
+    <span class="fine">Add an API key to <code>.env</code> to let Claude rewrite the wording.</span>
+    {% endif %}
+    {% if saved %}
+    <form method="post" action="/ventures/{{ venture.id }}/brief/reset" data-confirm="Discard the saved memo?">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <button class="linkish danger" type="submit">Discard saved memo</button>
+    </form>
+    {% endif %}
+  </div>
+</section>

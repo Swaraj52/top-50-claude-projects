@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}Plan · {{ venture.name }}{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">Execution plan</p>
+    <h1>Now, next, later</h1>
+    <p class="lede">A milestone is a result with a date. Overdue is derived from the date, not stored, so the plan cannot quietly look healthy.</p>
+  </div>
+  <div class="head-actions">
+    <span class="chip">{{ summary.progress }}% complete</span>
+  </div>
+</header>
+
+{% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+
+<section class="strip" aria-label="Plan summary">
+  <div class="strip-cell">
+    <span class="strip-label">Milestones</span>
+    <strong>{{ summary.total }}</strong>
+    <span class="fine">{{ summary.open }} open</span>
+  </div>
+  <div class="strip-cell">
+    <span class="strip-label">Done</span>
+    <strong>{{ summary.done }}</strong>
+    <span class="fine">{{ summary.progress }}%</span>
+  </div>
+  <div class="strip-cell {{ 'warn' if summary.overdue_count }}">
+    <span class="strip-label">Overdue</span>
+    <strong>{{ summary.overdue_count }}</strong>
+    <span class="fine">not done, date passed</span>
+  </div>
+  <div class="strip-cell">
+    <span class="strip-label">Next due</span>
+    <strong>{{ summary.next_due.due_date|datefmt if summary.next_due else '—' }}</strong>
+    <span class="fine">{{ summary.next_due.title if summary.next_due else 'nothing open' }}</span>
+  </div>
+</section>
+
+<section class="form-card" id="plan-form">
+  <h2>{{ 'Edit milestone' if edit_item else 'Add a milestone' }}</h2>
+  <form method="post" action="{{ '/milestones/' ~ edit_item.id ~ '/edit' if edit_item else '/ventures/' ~ venture.id ~ '/plan' }}" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div class="field-row">
+      <div class="grow">
+        <label for="title">Milestone</label>
+        <input id="title" name="title" value="{{ edit_item.title if edit_item else '' }}" maxlength="160" required placeholder="Ten paying customers">
+      </div>
+      <div>
+        <label for="due_date">Due date</label>
+        <input id="due_date" name="due_date" type="date" value="{{ edit_item.due_date.isoformat() if edit_item and edit_item.due_date else '' }}">
+      </div>
+    </div>
+    <label for="success_criterion">Done when</label>
+    <input id="success_criterion" name="success_criterion" value="{{ edit_item.success_criterion if edit_item else '' }}" maxlength="300" placeholder="The test that decides it, not the activity.">
+    <div class="field-row">
+      <div>
+        <label for="owner">Owner</label>
+        <input id="owner" name="owner" value="{{ edit_item.owner if edit_item else '' }}" maxlength="80" placeholder="You">
+      </div>
+      <div>
+        <label for="horizon">Horizon</label>
+        <select id="horizon" name="horizon">
+          {% for value in ['now', 'next', 'later'] %}
+          <option value="{{ value }}" {{ 'selected' if (edit_item.horizon if edit_item else 'now') == value else '' }}>{{ value|horizon }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="status">Status</label>
+        <select id="status" name="status">
+          {% for value in ['planned', 'in_progress', 'at_risk', 'done'] %}
+          <option value="{{ value }}" {{ 'selected' if (edit_item.status if edit_item else 'planned') == value else '' }}>{{ value|mstatus }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="inline-actions">
+      <button class="btn btn-primary" type="submit">{{ 'Save milestone' if edit_item else 'Add milestone' }}</button>
+      {% if edit_item %}<a class="btn btn-ghost" href="/ventures/{{ venture.id }}/plan">Cancel</a>{% endif %}
+    </div>
+  </form>
+</section>
+
+<div class="horizon-grid">
+  {% for column in board %}
+  <section class="horizon-column" id="{{ column.key }}">
+    <div class="canvas-block-head">
+      <h2>{{ column.label }}</h2>
+      <span class="count">{{ column.done }}/{{ column.total }}</span>
+    </div>
+    {% if column.cards %}
+    <ul class="milestone-list">
+      {% for card in column.cards %}
+      <li class="milestone-card status-{{ card.status }}">
+        <div class="milestone-top">
+          <span class="status status-{{ card.status }}">{{ card.label }}</span>
+          {% if card.m.due_date %}<span class="fine">{{ card.m.due_date|datefmt }}</span>{% endif %}
+        </div>
+        <strong class="milestone-title">{{ card.m.title }}</strong>
+        {% if card.m.success_criterion %}<p class="fine">Done when: {{ card.m.success_criterion }}</p>{% endif %}
+        <p class="fine">
+          {% if card.m.owner %}{{ card.m.owner }} · {% endif %}
+          {% if card.days is not none %}
+            {% if card.days < 0 %}{{ -card.days }} day{{ 's' if card.days != -1 }} overdue{% elif card.days == 0 %}due today{% else %}in {{ card.days }} days{% endif %}
+          {% else %}no date{% endif %}
+        </p>
+        <div class="row-actions">
+          {% if card.status != 'done' %}
+          <form method="post" action="/milestones/{{ card.m.id }}/status">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="status" value="done">
+            <button class="linkish" type="submit">Mark done</button>
+          </form>
+          {% else %}
+          <form method="post" action="/milestones/{{ card.m.id }}/status">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="status" value="in_progress">
+            <button class="linkish" type="submit">Reopen</button>
+          </form>
+          {% endif %}
+          <a class="linkish" href="/ventures/{{ venture.id }}/plan?edit={{ card.m.id }}#plan-form">Edit</a>
+          <form method="post" action="/milestones/{{ card.m.id }}/delete" data-confirm="Delete this milestone?">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="linkish danger" type="submit">Delete</button>
+          </form>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="fine">Nothing in {{ column.label|lower }} yet.</p>
+    {% endif %}
+  </section>
+  {% endfor %}
+</div>
+{% endblock %}

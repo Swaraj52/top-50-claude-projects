@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Canvas · {{ venture.name }}{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">Canvas</p>
+    <h1>Nine blocks, one argument</h1>
+    <p class="lede">Each block holds short notes, not paragraphs. The brief reads the first note in each block, so put the clearest one first.</p>
+  </div>
+  <div class="head-actions">
+    <span class="chip">{{ completeness.filled }}/{{ completeness.total }} filled</span>
+  </div>
+</header>
+
+{% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+
+<div class="meter meter-wide" role="img" aria-label="{{ completeness.percent }} percent of the canvas filled">
+  <span style="width: {{ completeness.percent }}%"></span>
+</div>
+
+<section class="form-card form-inline-card" id="canvas-form">
+  <h2>{{ 'Edit note' if edit_entry else 'Add a note' }}</h2>
+  <form method="post" action="{{ '/canvas/' ~ edit_entry.id ~ '/edit' if edit_entry else '/ventures/' ~ venture.id ~ '/canvas' }}" class="inline-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div>
+      <label for="block">Block</label>
+      <select id="block" name="block">
+        {% for block in blocks %}
+        <option value="{{ block }}" {{ 'selected' if (edit_entry.block if edit_entry else 'problem') == block else '' }}>{{ labels[block] }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="grow">
+      <label for="title">Note</label>
+      <input id="title" name="title" value="{{ edit_entry.title if edit_entry else '' }}" maxlength="160" required placeholder="The shortest true version.">
+    </div>
+    <div class="grow">
+      <label for="detail">Detail <span class="fine">(optional)</span></label>
+      <input id="detail" name="detail" value="{{ edit_entry.detail if edit_entry else '' }}" maxlength="600" placeholder="Evidence, a number, a name.">
+    </div>
+    <div class="inline-actions">
+      <button class="btn btn-primary" type="submit">{{ 'Save note' if edit_entry else 'Add note' }}</button>
+      {% if edit_entry %}<a class="btn btn-ghost" href="/ventures/{{ venture.id }}/canvas">Cancel</a>{% endif %}
+    </div>
+  </form>
+</section>
+
+<div class="canvas-grid">
+  {% for block in blocks %}
+  <section class="canvas-block" id="{{ block }}">
+    <div class="canvas-block-head">
+      <h2>{{ labels[block] }}</h2>
+      <span class="count">{{ grouped[block]|length }}</span>
+    </div>
+    {% if grouped[block] %}
+    <ul class="canvas-notes">
+      {% for entry in grouped[block] %}
+      <li>
+        <div class="note-body">
+          <strong>{{ entry.title }}</strong>
+          {% if entry.detail %}<span>{{ entry.detail }}</span>{% endif %}
+        </div>
+        <div class="row-actions">
+          <a class="linkish" href="/ventures/{{ venture.id }}/canvas?edit={{ entry.id }}#canvas-form">Edit</a>
+          <form method="post" action="/canvas/{{ entry.id }}/delete" data-confirm="Delete this canvas note?">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="linkish danger" type="submit">Delete</button>
+          </form>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="fine canvas-prompt">{{ prompts[block] }}</p>
+    {% endif %}
+  </section>
+  {% endfor %}
+</div>
+
+{% endblock %}

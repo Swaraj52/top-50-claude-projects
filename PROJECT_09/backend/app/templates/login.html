@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Sign in{% endblock %}
+{% block mainclass %}auth-shell{% endblock %}
+{% block content %}
+<section class="auth">
+  <div class="auth-story">
+    <a class="brand brand-large" href="/">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M6 26V9l10-4 10 4v17l-10 4z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M16 5v25M6 9l10 4 10-4" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".6"/>
+      </svg>
+      <span class="brand-text">
+        <span class="brand-name">Keystone</span>
+        <span class="brand-tag">strategy desk</span>
+      </span>
+    </a>
+    <p class="eyebrow">Business strategy planner</p>
+    <h1>An idea is not a plan until the numbers and the dates agree.</h1>
+    <p class="lede">
+      Take one venture from a sentence to a page: a nine-block canvas, an honest SWOT, a revenue
+      model with break-even, a milestone plan and the few numbers that would prove it.
+    </p>
+    <ul class="story-list">
+      <li><strong>Every number is yours.</strong> Revenue, costs and margins are integer arithmetic you can redo on paper.</li>
+      <li><strong>Pace, not optimism.</strong> KPIs compare progress with the time elapsed, so a green bar means something.</li>
+      <li><strong>Honest labels.</strong> The memo says whether it was assembled locally or rewritten by Claude.</li>
+    </ul>
+    <p class="fine">Demo build · data stays in SQLite on this machine · no tracking.</p>
+  </div>
+
+  <div class="auth-card">
+    <h2>Sign in</h2>
+    {% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+    <form method="post" action="/login" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ form_csrf }}">
+      <label for="email">Email</label>
+      <input id="email" type="email" name="email" value="{{ values.email or '' }}" required autocomplete="email" autofocus>
+      <label for="password">Password</label>
+      <input id="password" type="password" name="password" required autocomplete="current-password">
+      <button class="btn btn-primary btn-wide" type="submit">Open the desk</button>
+    </form>
+    <p class="switch">New here? <a href="/register">Create an account</a></p>
+  </div>
+</section>
+{% endblock %}

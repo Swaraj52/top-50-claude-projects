@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">Settings</p>
+    <h1>Your desk</h1>
+    <p class="lede">Profile, password and the data you own. Nothing here is shared with anyone.</p>
+  </div>
+</header>
+
+{% if saved %}<div class="notice" role="status">Saved.</div>{% endif %}
+{% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+
+<div class="two-col">
+  <section class="panel">
+    <div class="panel-head"><h2>Profile</h2></div>
+    <form method="post" action="/settings" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label for="name">Name</label>
+      <input id="name" name="name" value="{{ user.name }}" maxlength="80" required>
+      <label for="email">Email</label>
+      <input id="email" value="{{ user.email }}" disabled>
+      <p class="hint">The email is your sign-in and cannot be changed here.</p>
+      <label for="timezone">Timezone</label>
+      <input id="timezone" name="timezone" value="{{ user.timezone }}" maxlength="64" required>
+      <p class="hint">An IANA name such as Asia/Kolkata. "Today" and overdue dates use it.</p>
+      <button class="btn btn-primary" type="submit">Save profile</button>
+    </form>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Password</h2></div>
+    <form method="post" action="/settings/password" class="stack">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label for="current_password">Current password</label>
+      <input id="current_password" name="current_password" type="password" required autocomplete="current-password">
+      <label for="new_password">New password</label>
+      <input id="new_password" name="new_password" type="password" required minlength="8" autocomplete="new-password">
+      <p class="hint">Changing the password signs out every other session.</p>
+      <button class="btn btn-primary" type="submit">Change password</button>
+    </form>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Your data</h2></div>
+    <dl class="data-counts">
+      <div><dt>Ventures</dt><dd>{{ counts.ventures }}</dd></div>
+      <div><dt>Canvas notes</dt><dd>{{ counts.canvas }}</dd></div>
+      <div><dt>SWOT items</dt><dd>{{ counts.swot }}</dd></div>
+      <div><dt>Milestones</dt><dd>{{ counts.milestones }}</dd></div>
+      <div><dt>KPIs</dt><dd>{{ counts.kpis }}</dd></div>
+      <div><dt>Readings</dt><dd>{{ counts.readings }}</dd></div>
+    </dl>
+    <p class="fine">The export is JSON, contains every venture and reading, and no password or session material.</p>
+    <p><a class="btn btn-ghost" href="/settings/export">Download JSON export</a></p>
+    <p class="fine">Load an export with <code>python scripts/import_data.py path/to/keystone-export.json</code>. Re-running it skips ventures that already exist.</p>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>AI</h2></div>
+    {% if ai_enabled %}
+    <p>The Claude memo rewrite is enabled with model <code>{{ ai_model }}</code>. The local memo remains the default and every rewrite is labelled.</p>
+    {% else %}
+    <p>No API key is configured, so the local memo is always used. Add <code>ANTHROPIC_API_KEY</code> to <code>PROJECT_09/.env</code> to enable the optional rewrite.</p>
+    {% endif %}
+    <p class="fine">Keys are read from the environment or <code>.env</code>, never stored in the database.</p>
+  </section>
+</div>
+
+<section class="danger-zone">
+  <h2>Delete the account</h2>
+  <p>This removes every venture, canvas note, SWOT item, stream, cost, milestone, KPI and reading. It cannot be undone. Export first if you might want the data.</p>
+  <form method="post" action="/settings/delete" class="inline" data-confirm="Delete your account and everything in it? This cannot be undone.">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="delete-password">Password</label>
+    <input id="delete-password" name="password" type="password" required autocomplete="current-password">
+    <label for="delete-confirm">Type DELETE</label>
+    <input id="delete-confirm" name="confirm" placeholder="DELETE" required>
+    <button class="btn btn-danger" type="submit">Delete account</button>
+  </form>
+</section>
+{% endblock %}

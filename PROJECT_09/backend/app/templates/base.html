@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Keystone{% endblock %} · Keystone</title>
+  <meta name="description" content="Keystone: shape a business idea into a canvas, a SWOT, a revenue model, a plan and a KPI set.">
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/app.css?v={{ version }}">
+  <script src="/static/htmx.min.js" defer></script>
+  <script src="/static/app.js?v={{ version }}" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  {% if user %}
+  <div class="frame">
+    <aside class="rail">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+          <path d="M6 26V9l10-4 10 4v17l-10 4z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M16 5v25M6 9l10 4 10-4" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".6"/>
+        </svg>
+        <span class="brand-text">
+          <span class="brand-name">Keystone</span>
+          <span class="brand-tag">strategy desk</span>
+        </span>
+      </a>
+
+      <nav class="rail-nav" aria-label="Portfolio">
+        <span class="rail-label">Portfolio</span>
+        <a href="/" class="{{ 'on' if path == '/' else '' }}">Ventures</a>
+        <a href="/ventures/new" class="{{ 'on' if path == '/ventures/new' else '' }}">New venture</a>
+        <a href="/settings" class="{{ 'on' if path.startswith('/settings') else '' }}">Settings</a>
+      </nav>
+
+      {% if venture is defined and venture %}
+      <nav class="rail-nav workspace" aria-label="Workspace">
+        <span class="rail-label">{{ venture.name }}</span>
+        <a href="/ventures/{{ venture.id }}" class="{{ 'on' if path == '/ventures/' ~ venture.id else '' }}">Overview</a>
+        <a href="/ventures/{{ venture.id }}/canvas" class="{{ 'on' if path.endswith('/canvas') else '' }}">Canvas</a>
+        <a href="/ventures/{{ venture.id }}/swot" class="{{ 'on' if path.endswith('/swot') else '' }}">SWOT</a>
+        <a href="/ventures/{{ venture.id }}/revenue" class="{{ 'on' if path.endswith('/revenue') else '' }}">Revenue</a>
+        <a href="/ventures/{{ venture.id }}/plan" class="{{ 'on' if path.endswith('/plan') else '' }}">Plan</a>
+        <a href="/ventures/{{ venture.id }}/kpis" class="{{ 'on' if path.endswith('/kpis') else '' }}">KPIs</a>
+        <a href="/ventures/{{ venture.id }}/brief" class="{{ 'on' if path.endswith('/brief') else '' }}">Brief</a>
+      </nav>
+      {% endif %}
+
+      <div class="rail-foot">
+        {% if ai_enabled %}
+        <span class="badge badge-claude" title="Optional Claude memo rewriting is enabled">Claude on</span>
+        {% else %}
+        <span class="badge">Local only</span>
+        {% endif %}
+        <div class="account">
+          <a class="avatar" href="/settings" title="Settings for {{ user.name }}">{{ user.name|initial }}</a>
+          <form method="post" action="/logout">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="linkish" type="submit">Sign out</button>
+          </form>
+        </div>
+      </div>
+    </aside>
+    {% endif %}
+
+    <main id="main" class="{% block mainclass %}{{ 'shell' if user else 'auth-shell' }}{% endblock %}">
+      {% block content %}{% endblock %}
+
+      {% if user %}
+      <footer class="footer">
+        <span>Keystone v{{ version }} · local-first, no tracking</span>
+        <span class="credit">Built by <strong>Swayam</strong></span>
+      </footer>
+      {% endif %}
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

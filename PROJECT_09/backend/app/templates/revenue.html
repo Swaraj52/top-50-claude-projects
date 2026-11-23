@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+{% block title %}Revenue · {{ venture.name }}{% endblock %}
+{% block content %}
+<header class="page-head">
+  <div>
+    <p class="eyebrow">Revenue model</p>
+    <h1>What one customer pays, times how many</h1>
+    <p class="lede">Prices are whole units per month. Volume is paying units per month. Confidence weights the total; scenarios scale volume, not price.</p>
+  </div>
+  <div class="head-actions">
+    <div class="segmented" role="group" aria-label="Scenario">
+      {% for row in scenarios %}
+      <a href="/ventures/{{ venture.id }}/revenue?scenario={{ row.key }}" class="{{ 'on' if scenario == row.key else '' }}">{{ row.label }}</a>
+      {% endfor %}
+    </div>
+  </div>
+</header>
+
+{% if error %}<div class="alert" role="alert">{{ error }}</div>{% endif %}
+
+<section class="strip strip-wide" aria-label="Revenue summary">
+  <div class="strip-cell">
+    <span class="strip-label">Base MRR</span>
+    <strong>{{ summary.expected_mrr|money(venture.currency) }}</strong>
+    <span class="fine">{{ summary.volume }} paying units</span>
+  </div>
+  <div class="strip-cell">
+    <span class="strip-label">Base ARR</span>
+    <strong>{{ summary.arr|money(venture.currency) }}</strong>
+    <span class="fine">MRR × 12</span>
+  </div>
+  <div class="strip-cell">
+    <span class="strip-label">Weighted</span>
+    <strong>{{ summary.weighted_mrr|money(venture.currency) }}</strong>
+    <span class="fine">by confidence</span>
+  </div>
+  <div class="strip-cell">
+    <span class="strip-label">Monthly cost</span>
+    <strong>{{ summary.total_cost|money(venture.currency) }}</strong>
+    <span class="fine">{{ summary.fixed_cost|money(venture.currency) }} fixed</span>
+  </div>
+  <div class="strip-cell {{ 'warn' if summary.margin < 0 }}">
+    <span class="strip-label">Margin</span>
+    <strong>{{ summary.margin|money(venture.currency) }}</strong>
+    <span class="fine">{{ (summary.margin_percent ~ '%') if summary.margin_percent is not none else 'not costed' }}</span>
+  </div>
+  <div class="strip-cell">
+    <span class="strip-label">Break-even</span>
+    <strong>{{ summary.breakeven_units if summary.breakeven_units is not none else '—' }}</strong>
+    <span class="fine">units at blended price</span>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>Three cases</h2>
+    <span class="fine">volume × {{ summary.scenario_factor }} in the current view</span>
+  </div>
+  <table class="data-table">
+    <thead>
+      <tr><th>Case</th><th class="num">Revenue</th><th class="num">Cost</th><th class="num">Margin</th><th class="num">Margin %</th></tr>
+    </thead>
+    <tbody>
+      {% for row in scenarios %}
+      <tr class="{{ 'on' if scenario == row.key else '' }}">
+        <td>{{ row.label }} <span class="fine">×{{ row.factor }}</span></td>
+        <td class="num">{{ row.revenue|money(venture.currency) }}</td>
+        <td class="num">{{ row.cost|money(venture.currency) }}</td>
+        <td class="num">{{ row.margin|money(venture.currency) }}</td>
+        <td class="num">{{ (row.margin_percent ~ '%') if row.margin_percent is not none else '—' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<div class="two-col">
+  <section class="panel" id="streams">
+    <div class="panel-head">
+      <h2>Revenue streams</h2>
+      <span class="fine">{{ streams|length }}</span>
+    </div>
+
+    {% if streams %}
+    <ul class="money-list">
+      {% for stream in streams %}
+      <li>
+        <div class="money-main">
+          <div class="money-top">
+            <strong>{{ stream.name }}</strong>
+            <span class="chip">{{ stream.model|model }}</span>
+            <span class="chip chip-conf conf-{{ stream.confidence }}">{{ stream.confidence|confidence }} confidence</span>
+          </div>
+          <p class="fine">
+            {{ stream.price|money(venture.currency) }} × {{ stream.volume }} {{ stream.unit }}
+            = <strong>{{ (stream.price * stream.volume)|money(venture.currency) }}/mo</strong>
+            {% if stream.notes %} · {{ stream.notes }}{% endif %}
+          </p>
+        </div>
+        <div class="row-actions">
+          <a class="linkish" href="/ventures/{{ venture.id }}/revenue?edit_stream={{ stream.id }}#stream-form">Edit</a>
+          <form method="post" action="/streams/{{ stream.id }}/delete" data-confirm="Delete this revenue stream?">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="linkish danger" type="submit">Delete</button>
+          </form>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="fine">No streams. Start with the one a real customer would pay for first.</p>
+    {% endif %}
+
+    <form method="post" action="{{ '/streams/' ~ edit_stream.id ~ '/edit' if edit_stream else '/ventures/' ~ venture.id ~ '/revenue/streams' }}" class="stack form-block" id="stream-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <h3>{{ 'Edit stream' if edit_stream else 'Add a stream' }}</h3>
+      <label for="stream-name">Name</label>
+      <input id="stream-name" name="name" value="{{ edit_stream.name if edit_stream else '' }}" maxlength="120" required placeholder="Team plan">
+      <div class="field-row">
+        <div>
+          <label for="stream-model">Model</label>
+          <select id="stream-model" name="model">
+            {% for value in ['subscription', 'usage', 'one_off', 'marketplace', 'licence'] %}
+            <option value="{{ value }}" {{ 'selected' if (edit_stream.model if edit_stream else 'subscription') == value else '' }}>{{ value|model }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="stream-price">Price</label>
+          <input id="stream-price" name="price" type="number" min="0" step="1" value="{{ edit_stream.price if edit_stream else 0 }}">
+        </div>
+        <div>
+          <label for="stream-volume">Units / month</label>
+          <input id="stream-volume" name="volume" type="number" min="0" step="1" value="{{ edit_stream.volume if edit_stream else 0 }}">
+        </div>
+      </div>
+      <div class="field-row">
+        <div>
+          <label for="stream-unit">Unit label</label>
+          <input id="stream-unit" name="unit" value="{{ edit_stream.unit if edit_stream else 'per month' }}" maxlength="60">
+        </div>
+        <div>
+          <label for="stream-confidence">Confidence</label>
+          <select id="stream-confidence" name="confidence">
+            {% for value in ['high', 'medium', 'low'] %}
+            <option value="{{ value }}" {{ 'selected' if (edit_stream.confidence if edit_stream else 'medium') == value else '' }}>{{ value|confidence }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <label for="stream-notes">Notes</label>
+      <input id="stream-notes" name="notes" value="{{ edit_stream.notes if edit_stream else '' }}" maxlength="300" placeholder="Why this price, or what would change it.">
+      <div class="inline-actions">
+        <button class="btn btn-primary" type="submit">{{ 'Save stream' if edit_stream else 'Add stream' }}</button>
+        {% if edit_stream %}<a class="btn btn-ghost" href="/ventures/{{ venture.id }}/revenue#streams">Cancel</a>{% endif %}
+      </div>
+    </form>
+  </section>
+
+  <section class="panel" id="costs">
+    <div class="panel-head">
+      <h2>Cost lines</h2>
+      <span class="fine">{{ costs|length }}</span>
+    </div>
+
+    {% if costs %}
+    <ul class="money-list">
+      {% for cost in costs %}
+      <li>
+        <div class="money-main">
+          <div class="money-top">
+            <strong>{{ cost.name }}</strong>
+            <span class="chip">{{ cost.kind|costkind }}</span>
+          </div>
+          <p class="fine">{{ cost.amount|money(venture.currency) }}/mo{% if cost.notes %} · {{ cost.notes }}{% endif %}</p>
+        </div>
+        <div class="row-actions">
+          <a class="linkish" href="/ventures/{{ venture.id }}/revenue?edit_cost={{ cost.id }}#cost-form">Edit</a>
+          <form method="post" action="/costs/{{ cost.id }}/delete" data-confirm="Delete this cost line?">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="linkish danger" type="submit">Delete</button>
+          </form>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="fine">No costs. A model without costs cannot show a margin.</p>
+    {% endif %}
+
+    <form method="post" action="{{ '/costs/' ~ edit_cost.id ~ '/edit' if edit_cost else '/ventures/' ~ venture.id ~ '/revenue/costs' }}" class="stack form-block" id="cost-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <h3>{{ 'Edit cost' if edit_cost else 'Add a cost' }}</h3>
+      <label for="cost-name">Name</label>
+      <input id="cost-name" name="name" value="{{ edit_cost.name if edit_cost else '' }}" maxlength="120" required placeholder="Hosting">
+      <div class="field-row">
+        <div>
+          <label for="cost-amount">Monthly amount</label>
+          <input id="cost-amount" name="amount" type="number" min="0" step="1" value="{{ edit_cost.amount if edit_cost else 0 }}">
+        </div>
+        <div>
+          <label for="cost-kind">Kind</label>
+          <select id="cost-kind" name="kind">
+            {% for value in ['fixed', 'variable'] %}
+            <option value="{{ value }}" {{ 'selected' if (edit_cost.kind if edit_cost else 'fixed') == value else '' }}>{{ value|costkind }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <label for="cost-notes">Notes</label>
+      <input id="cost-notes" name="notes" value="{{ edit_cost.notes if edit_cost else '' }}" maxlength="300" placeholder="What drives it.">
+      <div class="inline-actions">
+        <button class="btn btn-primary" type="submit">{{ 'Save cost' if edit_cost else 'Add cost' }}</button>
+        {% if edit_cost %}<a class="btn btn-ghost" href="/ventures/{{ venture.id }}/revenue#costs">Cancel</a>{% endif %}
+      </div>
+    </form>
+  </section>
+</div>
+
+{% if models %}
+<section class="panel">
+  <div class="panel-head"><h2>Where the money comes from</h2></div>
+  <ul class="split-list">
+    {% for row in models %}
+    <li>
+      <span class="split-label">{{ row.label }}</span>
+      <span class="split-bar"><span style="width: {{ row.share }}%"></span></span>
+      <span class="fine">{{ row.amount|money(venture.currency) }} · {{ row.share }}%</span>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+{% endblock %}
