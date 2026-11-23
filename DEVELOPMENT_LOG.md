@@ -3,6 +3,71 @@
 Architectural decisions, dependency changes, bugs and their fixes. Newest entries go at the top
 of each section.
 
+## 2026-11-23: Project 09, Business Strategy Planner ("Keystone")
+
+### Decisions
+
+- **Every derived number is computed on read.** Canvas completeness, the SWOT balance, margin,
+  break-even, scenario revenue, overdue milestones and KPI status are functions of stored rows, never
+  cached columns. A cached total can disagree with its rows after an edit; a computed one cannot.
+- **Money is integer, whole-unit and single-currency.** Prices, volumes and costs are monthly
+  integers in the venture's own currency (INR, USD, EUR or GBP). There is no conversion table and no
+  cross-venture sum, so a portfolio never implies an exchange rate it did not use.
+- **Confidence is a small fixed weighting, not a probability.** Low 0.4, medium 0.7 and high 1.0
+  produce a weighted MRR shown beside the base figure. The UI calls it "by confidence" rather than
+  "expected value", because that is what it is.
+- **Scenarios scale volume only.** Conservative ×0.7, base ×1.0 and upside ×1.4 change units, not
+  price or mix. That keeps the arithmetic reproducible on paper and avoids implying a price forecast.
+- **Overdue is derived, never stored.** A milestone is overdue when it is not done and past its due
+  date. Storing a flag would let a plan go stale the day after it was written.
+- **KPI pace is progress against elapsed time.** Expected progress runs linearly from the KPI's
+  creation date to its target date, with a ±10-point tolerance. A KPI with no target date falls back
+  to a 50% midpoint rule and the page says so; the expected value and delta are always shown.
+- **The brief cannot invent a fact.** `brief.sections()` reads the same snapshot the pages use. Each
+  section lists the stored facts it has and an explicit sentence when it has none. The local memo is
+  assembled from those sentences and labelled Draft or Local; Claude may rewrite the prose only.
+- **Claude output is validated before it is stored.** The model must return a JSON object with a
+  string narrative: 2–6 paragraphs, no headings or fences, no paragraph under 40 characters, 240–
+  3,600 characters total. Any failure leaves the previous memo untouched and the redirected page
+  explains why, so an unavailable model cannot damage a saved plan.
+- **The importer is idempotent by venture name.** A name that already exists for the account is
+  skipped whole, so the same export can be loaded twice without duplicates. It is a restore tool,
+  not a merge tool; `--dry-run` walks the same path and rolls back.
+- **A second thin venture is seeded on purpose.** The demo has one full desk (Sahaj) and one
+  idea-stage venture (Second Draft) so every empty state and gap prompt is reachable from the demo
+  login instead of being hidden behind a complete example.
+
+### Dependencies (PROJECT_09 only)
+
+`fastapi`, `SQLAlchemy`, `alembic`, `Jinja2`, `pydantic`, `pydantic-settings`, `email-validator`,
+`python-multipart`, `uvicorn`, `tzdata`, `httpx`; dev: `pytest`. No JS toolchain: HTMX is vendored
+in `app/static/` with its licence file.
+
+### Bugs found and fixed
+
+- **The dark theme reused the ink token for text.** `--ink` is both the rail background and the body
+  text colour, so a dark override made body text vanish on dark paper. Added a separate `--strong`
+  text token, kept `--ink` for the rail, and moved form and heading text onto `--strong`.
+- **Anonymous auth tests shared a registered browser.** Tests that expected a signed-out browser were
+  using the logged-in fixture, so protected pages redirected instead of returning 401/403. They now
+  build a fresh `make_browser()` and load `/register` first to pick up the pre-session CSRF cookie.
+- **Finance fixtures asserted the wrong unit scale.** The blended-price test expected 7.5 from
+  price 100 / volume 10 plus price 50 / volume 10, but the blended price is total revenue ÷ total
+  volume (750 ÷ 20 = 75). Corrected the expectation and the break-even to 12 units.
+- **Brief tests asked sections for inputs they did not have.** The "Where it plays" section needs a
+  market, segment or customer/value notes, and the overview only offers the brief once the canvas is
+  usable. The tests now seed those inputs instead of expecting prose from an empty venture.
+- **Relative milestone dates in a memo test made it time-dependent.** The test built milestones from
+  `utcnow()` but asserted a fixed overdue count; it now pins the reference date.
+
+### Verification
+
+332 tests pass across ten files. The live preview was exercised at 1440 px light and dark and 390 px
+with no console or page errors; the portfolio measured `scrollWidth == innerWidth == 390`. Twelve
+screenshots were captured from the seeded app. A real export was deleted and re-imported into a
+scratch database: every entity returned, including the saved memo, and a second run skipped the
+existing venture. The Claude path is covered only by a fake transport (no API key).
+
 ## 2026-11-16: Project 08, Personal Knowledge Search ("Loom")
 
 ### Decisions

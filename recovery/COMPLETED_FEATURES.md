@@ -12,6 +12,30 @@ Only items that were actually checked are listed here.
 | Root docs and recovery system | Written and generated; `CLAUDE.md` enforces the start-command rule |
 | Public GitHub repo `Swaraj52/top-50-claude-projects` | `gh api`: public, owner Swaraj52; remote `main` matched local after each push |
 
+## Project 09: Business Strategy Planner ("Keystone"), v1.0
+
+| Feature | Verification |
+|---|---|
+| Accounts, scrypt hashing, hashed session tokens, CSRF (forms and HTMX), login/AI rate limits, per-user isolation, security headers | pytest; browser |
+| Ventures: create, edit, archive/restore, name-confirmed delete, unique names per account, stage and currency rules | pytest; browser |
+| Nine-block canvas with multiple notes per block, completeness and gap prompts | pytest; browser |
+| Impact-weighted SWOT: impact 1–5, counts and totals, ±3 balance band, top three risks | pytest; browser |
+| Revenue model: streams and costs, base/weighted MRR, ARR, margin, blended price, break-even, model split, 0.7/1.0/1.4 scenarios | pytest (40 finance tests); browser |
+| Plan: now/next/later, success criteria, owners, derived overdue, status transitions and completed timestamps, per-horizon progress | pytest; browser |
+| KPI plan: baseline-to-target progress in both directions, elapsed-time pace with a ±10-point band, all six statuses, one reading per day, SVG sparklines, attention order | pytest (49 KPI tests); browser |
+| Brief: six grounded sections, explicit missing-state text, draft/local labels, save/reset, print layout | pytest; browser |
+| Claude memo rewrite: request shape, strict JSON, paragraph and length validation, no-key path, HTTP/network/invalid-prose fallbacks, HTMX partial | pytest with a fake transport. **Not called live (no API key)** |
+| Settings: name, IANA timezone, password change ending other sessions, data counts, JSON export covering every entity, no secrets | pytest; browser |
+| Import accepts a real export (`keystone-export-v1`): full round trip including the saved memo, canvas, SWOT, streams, costs, milestones, KPIs and readings; a second run skipped the existing venture; `--dry-run` writes nothing | Manual round trip against a scratch database |
+| Mobile: rail collapses to a wrapped top bar under 900 px; `scrollWidth == innerWidth == 390` on the portfolio | Playwright; measured in the browser |
+| Light/dark schemes, desktop and phone layouts | 12 Playwright screenshots at 1440 px (light/dark) and 390 px |
+| Migrations | pytest: the session fixture runs Alembic and every test copies that schema |
+| Live preview: `scripts/preview.py` | Started on :8009; demo account signed in; every page and edit anchor returned 200 with no console or page errors |
+
+- **Tests:** backend 332 passed across 10 files.
+- **Docs:** README (15 sections), PRD, ARCHITECTURE, YOUR_DATA, `.env.example`, 12 screenshots.
+- **Deliberate omission:** no market feed, competitor crawler, currency conversion, cash-flow timing or churn model. Every figure is typed in or arithmetic over typed values.
+
 ## Project 08: Personal Knowledge Search ("Loom"), v1.0
 
 | Feature | Verification |

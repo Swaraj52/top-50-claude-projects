@@ -181,5 +181,32 @@
 - **Recovery instructions:** continue with Project 09 (Business Strategy Planner, port 8009)
   without waiting. Read `CURRENT_STATE.md` and `NEXT_ACTIONS.md`.
 
+## Session 10: 2026-11-23, Project 09 (standing authorization, resumed after restart)
+
+- **Authorized by:** the standing instruction to build Projects 04–50 sequentially, continued with
+  the owner's `/continue`.
+- **Built:** Keystone. A server-rendered FastAPI + Jinja2 + HTMX strategy desk: ventures with a
+  nine-block canvas, an impact-weighted SWOT ledger, revenue streams and costs with confidence
+  weighting and conservative/base/upside volume scenarios, now/next/later milestones with derived
+  overdue, a KPI plan with elapsed-time pace and sparklines, a grounded one-page brief with an
+  optional Claude rewrite, JSON export plus an idempotent importer, and a one-command preview on
+  :8009 with a two-venture seed.
+- **Verified:** 332 backend tests across 10 files; browser pass at desktop, phone, light and dark;
+  every page and edit anchor returned 200 with no console or page errors; 12 Playwright
+  screenshots; the portfolio measured 390 px with no horizontal scroll. Export → import round trip
+  against a scratch database restored every entity including the saved memo, and a second run
+  skipped the existing venture.
+- **Fixed in the pass:** anonymous auth tests were re-pointed at a fresh browser so the CSRF token
+  came from the page; registration tests now load `/register` before posting; the blended-price and
+  break-even fixture asserted the wrong unit scale; duplicate-email expectations were aligned with
+  the handler; brief section tests were given the inputs each section needs; and a few test
+  expectations were corrected for escaped apostrophes and relative milestone dates.
+- **Deliberate omission:** no market feed, competitor crawler, currency conversion, tax or cash-flow
+  model. Mixed currencies are never summed, and every derived figure can be recomputed by hand.
+- **Not verified live:** the Claude memo rewrite (no API key); the local memo is what the
+  screenshots show and the UI labels it `Local`.
+- **Recovery instructions:** continue with Project 10 (Business Operations Hub, port 8010)
+  without waiting. Read `CURRENT_STATE.md` and `NEXT_ACTIONS.md`.
+
 
 
